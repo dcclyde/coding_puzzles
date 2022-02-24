@@ -1,0 +1,16 @@
+
+Assume all strings in this puzzle are `[a-z ]+`.
+
+You're given a big table of frequencies for English ngrams.
+You're given a string `target` you want to find.
+
+You're about to be handed `corpus` of length N.
+You're guaranteed that `target` appears exactly once as a (contiguous) substring.
+You want to find that occurrence using the following imaginary tool (pretty similar to ctrl+F).
+
+To use the tool, you type some keystroke(s) matching [a-z ] or <deleteall> or <enter>. 
+
+and your cursor automatically jumps to some random occurrence of that substring in the corpus. You can always add more characters later - like you could type 3 characters, decide you don't like what you see, and then add a 4th character.
+
+
+.

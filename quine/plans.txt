@@ -1,0 +1,26 @@
+
+dat = '''stuff here'''
+
+out = ''
+for c in dat:
+    if c == '@':
+        out += '''other stuff'''
+    else:
+        out += c
+
+print(out)
+
+--------------------------------------
+
+What do my placeholders need to look like for this to work?
+If I take `dat` and replace `@` with `other_stuff` then I should recover the whole program.
+
+I guess the key question is how to replicate the contents of `dat`.
+
+
+Escape codes I'll want:
+@       time to reproduce the whole "dat = ..." line.
+$       '''
+
+
+.

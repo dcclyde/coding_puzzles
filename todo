@@ -1,0 +1,30 @@
+to add:
+passed in a bool --> something about bit reference?
+__LINE__ automatically
+
+I think debug should also accept a char* (sometimes "") as a label.
+
+
+set up my codeforces directory as a git(hub) repo.
+
+debug() should output a=a, b=b, c=c instead of a, b, c = a, b, c.
+debug() should output line number and also a comment/label.
+
+
+before adding to git, throw out any files that still perfectly match the template.
+*** or should I throw out any files with modified time within 1 minute of parent folder?
+
+Make "+" mean vector concatenation.
+
+
+
+
+
+replace cd with pushd-ish
+
+make tab = 4 spaces in debug template.
+
+Mess with crcf so it compiles faster while still catching some interesting mistakes.
+
+
+.
