@@ -102,15 +102,19 @@ void debug_out(Head H, Tail... T) {
 #define OUT_BOLD    "\033[" << BOLD_MAYBE << "m"
 #define OUT_RED     "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN    "\033[36" << BOLD_MAYBE << "m"
-#define OUT_GREEN   "\033[32" << BOLD_MAYBE << "m"
+// #define OUT_GREEN   "\033[32" << BOLD_MAYBE << "m"
+#define OUT_GREEN   "\033[32" << "m"
 #define OUT_BLUE    "\033[34" << BOLD_MAYBE << "m"
 
 // dbc = "debug with comment"
-#define dbc(A, ...) cerr << OUT_RED << right << setw(8) << __LINE__        \
-    << " " << A << OUT_BOLD << "\t: " << OUT_GREEN          \
-    << "[ " << #__VA_ARGS__ << " ]" << OUT_BOLD << " :    " \
+#define dbc(A, ...) cerr << OUT_RED \
+    << right << setw(20) << A \
+    << right << setw(8) << __LINE__        \
+    << OUT_BOLD << " : " << OUT_RESET \
+    << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
+    << OUT_BOLD << " :    " << OUT_RESET \
     << OUT_CYAN, debug_out(__VA_ARGS__); \
-    cerr << OUT_RESET
+    cerr << OUT_RESET;
 #define db(...) dbc("", __VA_ARGS__)
 
 ///// END debug setup, mostly stolen from tourist.

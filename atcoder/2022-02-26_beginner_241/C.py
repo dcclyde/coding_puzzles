@@ -1,0 +1,103 @@
+
+import copy
+from collections import defaultdict
+from collections import deque
+import math
+import sys
+import pickle
+import bz2
+import base64
+
+# sys.setrecursionlimit(10**5)  # This uses something like 128 MB RAM. I guess only play with this if I expect recursion depth problems.
+
+import logging
+logger = None
+# change DEBUG to INFO to block all the debug-level messages.
+numeric_log_level = getattr(logging, 'DEBUG', None)
+logging.basicConfig(
+    stream=sys.stderr,
+    format='%(asctime)s.%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+)
+logger = logging.getLogger('PUZZLES')
+logger.setLevel(numeric_log_level)
+
+
+if sys.version_info[0] == 2:
+    input = raw_input
+
+def nn():
+    return int(input())
+
+def li():
+    return list(input())
+
+def lm():
+    return list(map(int, input().split()))
+
+# Tries really hard to serialize + compress any input object as a string.
+# Useful if I want to precompute something fat, then compress it, then rebuild it when running on Google servers.
+def compress(abc):
+    return base64.b64encode(
+        bz2.compress(
+            pickle.dumps(
+                abc
+            )
+        )
+    )
+
+def expand(abc):
+    return pickle.loads(
+        bz2.decompress(
+            base64.b64decode(
+                abc
+            )
+        )
+    )
+
+# Snippet for printing while flushing output for interactive problems:
+# In python3: print(x, flush=True)
+# in python2: print(x) and then sys.stdout.flush()
+
+
+#########################################################################
+# Problem specific code usually goes below this line.
+#########################################################################
+
+
+def solve():
+    # logic logic logic
+    N = nn()
+    dat = []
+    for k in range(N):
+        dat.append(input().strip())
+
+    for j_start in range(N):
+        for k_start in range(N):
+            for dj, dk in [(0,1), (1,1), (1,0), (1,-1)]:
+                num_missing = 0
+                for steps in range(6):
+                    # remember to check whether I'm outside the grid.
+                    j = j_start + steps * dj
+                    k = k_start + steps * dk
+                    if not (0 <= j < N and 0 <= k < N):
+                        num_missing = 7
+                        break
+                    if dat[j][k] == '.':
+                        num_missing += 1
+
+                if num_missing <= 2:
+                    print('Yes')
+                    return
+
+    print('No')
+
+
+
+
+
+
+    return
+
+
+
+solve()
