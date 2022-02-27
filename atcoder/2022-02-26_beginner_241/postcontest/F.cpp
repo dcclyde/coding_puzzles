@@ -17,8 +17,8 @@ typedef long long ll;
 #ifdef DCCLYDE_LOCAL
     #include "/home/dcclyde/puzzles/code/codeforces/cftemplate_local.h"
 #else
-    #define dbc(...) 43;
-    #define db(...) 45;
+    #define dbc(...) ;
+    #define db(...) ;
     #define el
 #endif
 

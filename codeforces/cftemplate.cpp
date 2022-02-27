@@ -3,6 +3,8 @@
 
 using namespace std;
 typedef long long ll;
+#define MP make_pair
+#define MT make_tuple
 
 // use these if I steal data structures from benq
 // https://github.com/bqi343/USACO
@@ -15,8 +17,8 @@ typedef long long ll;
 #ifdef DCCLYDE_LOCAL
     #include "/home/dcclyde/puzzles/code/codeforces/cftemplate_local.h"
 #else
-    #define dbc(...) 43
-    #define db(...) 45
+    #define dbc(...) ;
+    #define db(...) ;
     #define el
 #endif
 
@@ -41,7 +43,8 @@ int main()
 
     int T = 1;
     std::cin >> T;  // just comment this for one-case problems.
-    for ( int k = 0 ; k < T ; ++k ) {
+    for ( int k = 1 ; k <= T ; ++k ) {
+        el; dbc("CASE" , k ); el;
         solve();
     }
 
