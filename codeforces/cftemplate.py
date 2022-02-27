@@ -72,8 +72,8 @@ def solve(L, R):
 
 
 
-    
-    return ' '.join(str(q) for q in (N, L, R))
+
+    return ' '.join(str(q) for q in (L, R))
 
 
 

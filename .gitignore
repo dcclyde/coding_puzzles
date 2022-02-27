@@ -1,5 +1,6 @@
 
 *.prog
 *.out
+*.o
 
 algorithm_library/benq/*

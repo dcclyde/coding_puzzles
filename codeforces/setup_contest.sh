@@ -8,7 +8,7 @@ then
     exit
 fi
 
-mkdir "$1"
+mkdir -p "$1"
 for PROBLEM in A B C D E F G H
 do
     cp "$cf_dir/cftemplate.py"  "$1/$PROBLEM.py"
