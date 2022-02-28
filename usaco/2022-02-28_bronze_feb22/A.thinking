@@ -1,0 +1,12 @@
+
+N <= 1e5
+Sum of A_k <= 1e6
+
+Let S = sum of A_k.
+After our modifications, all entries should equal d where d is some divisor of S.
+That gives <= 240 possibilities.
+https://en.wikipedia.org/wiki/Highly_composite_number
+https://oeis.org/search?q=7560%2C+10080&language=english&go=Search
+
+
+
