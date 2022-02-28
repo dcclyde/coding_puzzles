@@ -1,0 +1,5 @@
+
+Make directed edge from v to w if cow v would prefer gift w.
+Then iterate through gifts I'd like in order.
+If there's a path from gift v back to myself, then I could get gift v.
+

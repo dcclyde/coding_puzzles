@@ -14,5 +14,6 @@ do
     cp "$cf_dir/cftemplate.py"  "$1/$PROBLEM.py"
     cp "$cf_dir/cftemplate.cpp" "$1/$PROBLEM.cpp"
     touch "$1/$PROBLEM.in"
+    touch "$1/$PROBLEM.thinking"
 done
 cd "$1"

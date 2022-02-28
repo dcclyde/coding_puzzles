@@ -1,0 +1,19 @@
+
+N <= 40
+
+If N <= 20, just do it.
+
+Otherwise...
+I want some kinda DP.
+f[n, k] = map : position --> num ways to land here using k of first n choices
+Build that separately for first half vs second half.
+Then I can lookup quickly to get answers?
+
+"Choosing k of first n" can be expressed using bitmasks... do I want that?
+
+----- Submitted first solution but runtime is slow.
+I think I'm fine asymptotically but need to be more efficient.
+Do I really need all these maps or can I just store vectors?
+
+
+.

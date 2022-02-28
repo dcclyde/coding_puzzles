@@ -42,7 +42,7 @@ int main()
     std::cin.tie(0); std::cout.tie(0);
 
     int T = 1;
-    std::cin >> T;  // just comment this for one-case problems.
+    std::cin >> T;  dbc("loading num cases!!!")  // just comment this for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbc("CASE" , k ); el;
         solve();

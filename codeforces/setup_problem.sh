@@ -25,4 +25,5 @@ then
 else
     cp "$source_file" "$target_file"
     touch "$2.in"
+    touch "$2.thinking"
 fi

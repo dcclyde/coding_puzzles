@@ -1,0 +1,38 @@
+
+X = num_folders <= 1e4
+Y = num_emails <= 1e5
+S = screen_size <= min of others
+
+STRATEGY:
+
+Always file any email that's fileable without scrolling.
+
+Current view starts at folder A and email B.
+If there's still a remaining email for folder A, scroll down to find it.
+Otherwise, scroll folders down by 1.
+Remember to check for immediately fileable emails at this point.
+
+DATA STRUCTURES?
+
+Track the folder idx = first visible folder.
+
+Track 2 pointers start, end into the emails list.
+Maintain: num values in [start, end) with v >= fidx+S should be S.
+    (careful with OBOE!)
+
+Need to find all instances of fidx in the emails list.
+Well, really just the first and last instances...
+If first instance is before start, we lose.
+Otherwise, repeatedly increment start (and then update end) until end >= last loc.
+Then ++fidx.
+
+If we ever can't finish updating end (because too few items left) then we win.
+If we run out of fidx then we win.
+
+
+TESTING
+* Test a case where I can see all remaining folders but there are multiple screens of emails left.
+    (both YES and NO cases)
+
+
+.
