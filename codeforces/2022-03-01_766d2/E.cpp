@@ -64,10 +64,10 @@ void solve() {
 
     // avoid realloc
     // todo test whether this actually helps
-    auto it1 = dp[0].begin();
-    auto it2 = dp[0].begin();
-    auto rit1 = dp[0].rbegin();
-    auto rit2 = dp[0].rbegin();
+    // auto it1 = dp[0].begin();
+    // auto it2 = dp[0].begin();
+    // auto rit1 = dp[0].rbegin();
+    // auto rit2 = dp[0].rbegin();
 
     for ( int r = 0 ; r < R ; ++r ) {
         el; dbc("START ROW" , r ); el;
@@ -79,7 +79,7 @@ void solve() {
             continue;
         }
         auto& dprow = dp[r];
-        it1 = dprow.begin();
+        auto it1 = dprow.begin();
         if ( it1 == dprow.end() ) {
             dbc("no ladder ends");
             continue;
@@ -89,7 +89,7 @@ void solve() {
             Do some DP stuff to build the best cost
             at each ladder END on floor r.
         */
-        it2 = dprow.begin();
+        auto it2 = dprow.begin();
         ++it2;
         dbc("pre update" , dprow );
         while ( it2 != dprow.end() ) {
@@ -99,8 +99,8 @@ void solve() {
             );
             ++it1; ++it2;
         }
-        rit1 = dprow.rbegin();
-        rit2 = dprow.rbegin();
+        auto rit1 = dprow.rbegin();
+        auto rit2 = dprow.rbegin();
         ++rit2;
         while ( rit2 != dprow.rend() ) {
             rit2->second = min(
