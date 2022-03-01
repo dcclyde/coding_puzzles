@@ -28,23 +28,23 @@ typedef long long ll;
 ll INF = 2e18;
 
 struct Ladder {
-    int r1; int c1;
-    int r2; int c2;
-    int hp;
+    ll r1; ll c1;
+    ll r2; ll c2;
+    ll hp;
 };
 
 void solve() {
     int R, C, num_ladders;
     cin >> R >> C >> num_ladders;
-    vector<int> horiz_cost_per_floor( R );
+    vector<ll> horiz_cost_per_floor( R );
     for ( int k = 0 ; k < R ; ++k ) {
         cin >> horiz_cost_per_floor[k];
     }
     db( horiz_cost_per_floor );
 
-    vector<tuple<int, int, int, int, int>> ladders;
+    vector<tuple<int, int, int, int, ll>> ladders;
     for ( int k = 0 ; k < num_ladders ; ++k ) {
-        int r1, c1, r2, c2, hp;
+        int r1, c1, r2, c2; ll hp;
         cin >> r1 >> c1 >> r2 >> c2 >> hp;
         --r1; --c1; --r2; --c2;
         ladders.emplace_back( r1, c1, r2, c2, hp );
@@ -92,33 +92,22 @@ void solve() {
         it2 = dprow.begin();
         ++it2;
         dbc("pre update" , dprow );
-        db();
         while ( it2 != dprow.end() ) {
-            db();
             it2->second = min(
                 it2->second,
                 it1->second + horiz_cost_per_floor[r] * (it2->first - it1->first)
             );
             ++it1; ++it2;
         }
-        db();
         rit1 = dprow.rbegin();
         rit2 = dprow.rbegin();
         ++rit2;
         while ( rit2 != dprow.rend() ) {
-            // db();
-            // db(*rit1, *rit2);
-            // db(it2->second);
-            // db(it1->second);
-            // db(horiz_cost_per_floor[r]);
-            // db(it2->first);
-            // db(it1->first);
             rit2->second = min(
                 rit2->second,
-                rit1->second + horiz_cost_per_floor[r] * (rit2->first - rit1->first)
+                rit1->second + horiz_cost_per_floor[r] * (rit1->first - rit2->first)
             );
             ++rit1; ++rit2;
-            db();
         }
         dbc("post update" , dprow );
 
@@ -133,8 +122,10 @@ void solve() {
             }
             ++lidx;
             // find cheapest way to get to (r, lc1).
+            if ( dp[lr2].count( lc2 ) == 0 ) {
+                dp[lr2][lc2] = INF;
+            }
             auto& dpout = dp[lr2][lc2];
-            dpout = INF;
             it1 = dprow.lower_bound( lc1 );
             dbc("dp ladder" , lr1 , lc1 );
             if ( it1 != dprow.end() ) {
