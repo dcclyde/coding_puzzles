@@ -34,6 +34,28 @@ void solve() {
     cin >> R >> C;
     db(R, C);
 
+    vector<int> dist_from_center_counts( R*C , 0 );
+    for ( int r = 0 ; r < R ; ++r ) {
+        for ( int c = 0 ; c < C ; ++c ) {
+            int dr = min(abs(r-(R/2)), abs(r-((R-1)/2)));
+            int dc = min(abs(c-(C/2)), abs(c-((C-1)/2)));
+            dist_from_center_counts[ dr+dc ] += 1;
+        }
+    }
+    db( dist_from_center_counts );
+    int curr = (R/2) + (C/2);
+    int idx = 0;
+    for ( int k = 0 ; k < R*C ; ++k ) {
+        while ( dist_from_center_counts[idx] == 0 ) {
+            ++idx;
+            ++curr;
+        }
+        cout << curr << ' ';
+        --dist_from_center_counts[idx];
+    }
+    cout << '\n';
+    return;
+
     int total = 0;
     int prefix_total = 0;
     vector<int> diag_lengths;

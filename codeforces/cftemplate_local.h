@@ -18,6 +18,9 @@ string to_string(tuple<A, B, C> p);
 template <typename A, typename B, typename C, typename D>
 string to_string(tuple<A, B, C, D> p);
 
+template <typename A, typename B, typename C, typename D, typename E>
+string to_string(tuple<A, B, C, D, E> p);
+
 string to_string(const string& s) {
     return '"' + s + '"';
 }
@@ -85,6 +88,11 @@ string to_string(tuple<A, B, C> p) {
 template <typename A, typename B, typename C, typename D>
 string to_string(tuple<A, B, C, D> p) {
     return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ")";
+}
+
+template <typename A, typename B, typename C, typename D, typename E>
+string to_string(tuple<A, B, C, D, E> p) {
+    return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
 }
 
 void debug_out() { cerr << endl; }
