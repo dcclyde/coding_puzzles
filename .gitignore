@@ -3,4 +3,4 @@
 *.out
 *.o
 
-algorithm_library/benq/*
+library_algorithms/benq

@@ -1,0 +1,8 @@
+
+f(
+    num segments looked at so far,
+    idx of most recent segment used
+) = best num segments at this point
+
+
+.
