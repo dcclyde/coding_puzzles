@@ -1,0 +1,8 @@
+Given a list of incomes.
+Given some super simplified tax bracket rules. (Maybe just replace brackets with a quadratic function?)
+
+Choose the optimal marriages to minimize the total collective tax bill.
+
+Option: You can set up "men" vs "women" lists and match em up, or just go progressive and have one big list with gender being irrelevant and thus not modelled. 2nd version sounds like a simpler problem so I go with that for now?
+
+.
