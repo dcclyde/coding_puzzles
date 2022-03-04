@@ -15,7 +15,6 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
-#define MP make_pair
 #define f first
 #define s second
 
@@ -358,8 +357,8 @@ void debug_out(Head H, Tail... T) {
     #define el cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, ...) cerr << OUT_RED \
-        << std::right << setw(20) << A \
-        << std::right << setw(8) << __LINE__        \
+        << right << setw(20) << A \
+        << right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
@@ -396,16 +395,12 @@ void solve() {
     dbg(N, dat);
 
 
-
-
-
-	return;
 }
 
-// ! Read the sample cases before writing code!
 #pragma region
 int main() {
 	setIO();
+    // ! Read the sample cases before writing code!
 
     int T = 1;
     std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.

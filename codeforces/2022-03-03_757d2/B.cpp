@@ -15,7 +15,6 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
-#define MP make_pair
 #define f first
 #define s second
 
@@ -358,8 +357,8 @@ void debug_out(Head H, Tail... T) {
     #define el cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, ...) cerr << OUT_RED \
-        << std::right << setw(20) << A \
-        << std::right << setw(8) << __LINE__        \
+        << right << setw(20) << A \
+        << right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
@@ -391,26 +390,49 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     ints(N);
-    vector<ll> dat;
-    rv(N,dat);
+    vector<pll> dat;
+	F0R( k , N ) {
+		ll dummy; cin >> dummy;
+		dat.emplace_back( dummy , k );
+	}
     dbg(N, dat);
 
+	sort(rall(dat));
+	ll out = 0;
+	vector<ll> positions( N , -1e18);
+	ll curr_position = 1;
+	dbg(dat);
+	for ( auto& [num_visits, idx] : dat ) {
+		dbg(num_visits, idx, curr_position);
+		// put this building in slot curr_position
+		positions[ idx ] = curr_position;
+		out += num_visits * 2 * abs(curr_position);
 
-
-
+		// update curr_position
+		curr_position *= -1;
+		if ( curr_position > 0 ) {
+			++curr_position;
+		}
+	}
+	cout << out << '\n';
+	cout << 0 << ' ';  // place the HQ
+	for ( auto& x : positions ) {
+		cout << x << ' ';
+	}
+	cout << '\n';
 
 	return;
 }
 
-// ! Read the sample cases before writing code!
 #pragma region
 int main() {
 	setIO();
+    // ! Read the sample cases before writing code!
 
     int T = 1;
     std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
-        el; dbgc("CASE" , k ); el;
+        el; dbgc("CASE" , k );
         solve();
     }
 

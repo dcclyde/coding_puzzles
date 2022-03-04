@@ -15,7 +15,6 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
-#define MP make_pair
 #define f first
 #define s second
 
@@ -358,8 +357,8 @@ void debug_out(Head H, Tail... T) {
     #define el cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, ...) cerr << OUT_RED \
-        << std::right << setw(20) << A \
-        << std::right << setw(8) << __LINE__        \
+        << right << setw(20) << A \
+        << right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
@@ -383,32 +382,176 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
+///// ! Fancy factorization code.
+
+/**
+ * Description: Multiply two 64-bit integers mod another if 128-bit is not available.
+	* modMul is equivalent to \texttt{(ul)(\_\_int128(a)*b\%mod)}.
+	* Works for $0\le a,b<mod<2^{63}.$
+ * Source: KACTL
+ * Verification: see "Faster Factoring"
+ */
+
+/// using db = long double;
+using ul = uint64_t;
+ul modMul(ul a, ul b, const ul mod) {
+	ll ret = a*b-mod*(ul)((db)a*b/mod);
+	return ret+((ret<0)-(ret>=(ll)mod))*mod; }
+ul modPow(ul a, ul b, const ul mod) {
+	if (b == 0) return 1;
+	ul res = modPow(a,b/2,mod); res = modMul(res,res,mod);
+	return b&1 ? modMul(res,a,mod) : res;
+}
+
+/**
+ * Description: Deterministic primality test, works up to $2^{64}$.
+ 	* For larger numbers, extend $A$ randomly.
+ * Source: KACTL
+	* https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
+ * Verification: https://www.spoj.com/problems/FACT0/
+ */
+
+// #include "ModMulLL.h"
+
+bool prime(ul n) { // not ll!
+	if (n < 2 || n % 6 % 4 != 1) return n-2 < 2;
+	ul A[] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022},
+	    s = __builtin_ctzll(n-1), d = n>>s;
+	each(a,A) {   // ^ count trailing zeroes
+		ul p = modPow(a,d,n), i = s;
+		while (p != 1 && p != n-1 && a%n && i--) p = modMul(p,p,n);
+		if (p != n-1 && i != s) return 0;
+	}
+	return 1;
+}
+
+// #include "MillerRabin.h"
+// #include "../Modular Arithmetic/ModMulLL.h"
+
+ul pollard(ul n) { // return some nontrivial factor of n
+	auto f = [n](ul x) { return modMul(x, x, n) + 1; };
+	ul x = 0, y = 0, t = 30, prd = 2, i = 1, q;
+	while (t++ % 40 || gcd(prd, n) == 1) { /// speedup: don't take gcd every it
+		if (x == y) x = ++i, y = f(x);
+		if ((q = modMul(prd, max(x,y)-min(x,y), n))) prd = q;
+		x = f(x), y = f(f(y));
+	}
+	return gcd(prd, n);
+}
+void factor_rec(ul n, map<ul,int>& cnt) {
+	if (n == 1) return;
+	if (prime(n)) { ++cnt[n]; return; }
+	ul u = pollard(n);
+	factor_rec(u,cnt), factor_rec(n/u,cnt);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+map<int, int> divisor_counts;
+int patience = 10;
+void get_divisors_helper(
+	map<ul,int>::iterator& it,
+	const map<ul,int>::iterator& endit,
+	set<int>& divisors,
+	ll curr
+) {
+	// --patience;
+	// if ( patience == 0 ) {
+	// 	exit(1);
+	// }
+	if ( it == endit ) {
+		divisors.insert(curr);
+		return;
+	}
+	auto& [p, max_pow] = *it;
+	++it;
+	for ( int pow = 0 ; pow <= max_pow ; ++pow ) {
+		get_divisors_helper(it, endit, divisors, curr);
+		curr *= p;
+	}
+	--it;
+}
+
+map<int, set<int>> divisors_memo;
+set<int> get_divisors(ll N) {
+	if ( divisors_memo.count( N ) ) {
+		return divisors_memo[ N ];
+	}
+	map<ul,int> prime_divisors;
+	factor_rec( N , prime_divisors );
+	auto it = prime_divisors.begin();
+	set<int> divisors;
+	get_divisors_helper(it, prime_divisors.end() , divisors , 1 );
+	divisors_memo[ N ] = move(divisors);
+	return divisors_memo[ N ];
+}
 
 
 
+///////////
 
+ll helper(
+	map<int,ll>& dp,
+	ll curr_pos
+) {
+	if ( dp.count(curr_pos) ) {
+		return dp[curr_pos];
+	}
+	int N = divisor_counts[ 1 ];
+	dbgc("DOWN" , curr_pos )
+
+	if ( divisor_counts[ curr_pos ] == N ) {
+		// done.
+		dp[curr_pos] = N * curr_pos;
+		dbgc("BOTTOM" , N , curr_pos , dp[curr_pos])
+		return dp[curr_pos];
+	}
+
+	set<int> divisors = get_divisors( curr_pos );
+	ll value_here = 0;
+	for ( auto& d : divisors ) {
+		if ( d == curr_pos ) {
+			continue;
+		}
+		ll subvalue = helper(dp, d);
+		value_here = max(value_here, subvalue + (curr_pos - d) * divisor_counts[curr_pos]);
+	}
+	dbgc("UP" , curr_pos , value_here ); el;
+	dp[curr_pos] = value_here;
+	return dp[curr_pos];
+}
 
 
 void solve() {
     ints(N);
     vector<ll> dat;
     rv(N,dat);
-    dbg(N, dat);
+    // dbg(N, dat);
 
+	for ( auto& x : dat ) {
+		const set<int>& divisors = get_divisors( x );
+		each ( d , divisors ) {
+			++divisor_counts[d];
+		}
+	}
 
-
-
-
+	ll out = -1;
+	map<int,ll> dp;
+	each( x , dat ) {
+		ll curr = helper( dp , x );
+		out = max(out, curr);
+	}
+	cout << out << '\n';
 	return;
 }
 
-// ! Read the sample cases before writing code!
 #pragma region
 int main() {
 	setIO();
+    // ! Read the sample cases before writing code!
 
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k ); el;
         solve();

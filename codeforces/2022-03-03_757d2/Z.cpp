@@ -60,7 +60,7 @@ tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 #define rep(a) F0R(_,a)
 #define each(a,x) for (auto& a: x)
 
-const int MOD = 1e9+7; // 998244353;
+const int MOD = 1e9+1; // 998244353;
 const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
@@ -358,8 +358,8 @@ void debug_out(Head H, Tail... T) {
     #define el cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, ...) cerr << OUT_RED \
-        << std::right << setw(20) << A \
-        << std::right << setw(8) << __LINE__        \
+        << right << setw(20) << A \
+        << right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
@@ -384,31 +384,298 @@ void debug_out(Head H, Tail... T) {
 #pragma endregion
 
 
+// tcT> struct SegTree { // cmb(ID,b) = b
+// 	const T ID = -1;
+//     T cmb(T a, T b) { return a+b; }
+// 	int n; V<T> seg;
+// 	void init(int _n) { // upd, query also work if n = _n
+// 		for (n = 1; n < _n; ) n *= 2;
+// 		seg.assign(2*n,ID); }
+// 	void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
+// 	void upd(int p, T val) { // set val at position p
+// 		seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p);
+//     }
+// 	T query(int l, int r) {	// associative op on [l, r]
+// 		T ra = ID, rb = ID;
+// 		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+// 			if (l&1) ra = cmb(ra,seg[l++]);
+// 			if (r&1) rb = cmb(seg[--r],rb);
+// 		}
+// 		return cmb(ra,rb);
+// 	}
+
+//     void upd_custom(int p, int l, int r) {
+//         // this should look like "query", but instead of aggregating,
+//         // we'll just drop `p` in all those slots.
+
+// 		// T ra = ID, rb = ID;
+// 		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+// 			if (l&1) {
+//                 // ra = cmb(ra,seg[l++]);
+//                 seg[l++] = p;
+//             }
+// 			if (r&1) {
+//                 // rb = cmb(seg[--r],rb);
+//                 seg[--r] = p;
+//             }
+// 		}
+// 		// return cmb(ra,rb);
+//     }
+
+//     T query_custom(int p) {
+//         // this should look like upd, but instead of changing values,
+//         // we'll just return max over those values.
+
+// 		// seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p);
+//         p += n;
+//         T out = seg[p];
+//         for (p /= 2; p; p /= 2) {
+//             out = max( out , seg[p] );
+//         }
+//         return out;
+//     }
+// };
+
+// struct Query {
+//     int idxA;
+//     int idxB;
+//     int len;
+// };
+
+// void solve() {
+
+//     int N, Q;
+//     cin >> N >> Q;
+//     vector<ll> A( N ), B( N );
+//     for ( int k = 0 ; k < N ; ++k ) {
+//         cin >> A[k];
+//     }
+//     for ( int k = 0 ; k < N ; ++k ) {
+//         cin >> B[k];
+//     }
+
+//     // initialize a segtree.
+//     SegTree<int> st;
+//     st.init( N );  // all values initially set to -1.
+
+//     vector<Query> queries( Q );
+//     for ( int qid = 0 ; qid < Q ; ++qid ) {
+//         int qtype; cin >> qtype;
+//         if ( qtype == 1 ) {
+//             cin >> queries[qid].idxA >> queries[qid].idxB >> queries[qid].len;
+//             --queries[qid].idxA;
+//             --queries[qid].idxB;
+//             int L = queries[qid].idxB;
+//             int R = queries[qid].idxB + queries[qid].len - 1;
+//             st.upd_custom( qid , L , R );
+
+//             dbgc("type 1" , qid , qtype , L , R );
+
+//         } else {
+//             int p;
+//             cin >> p;
+//             --p;  // zero based
+//             int op_idx = st.query_custom( p );
+
+//             dbgc("type 2", qid , qtype, p, op_idx);
+
+//             if ( op_idx == -1 ) {
+//                 cout << B[p] << '\n';
+//             } else {
+//                 Query &op = queries[op_idx];
+//                 int offset = p - op.idxB;
+//                 int out = A[op.idxA + offset];
+//                 cout << out << '\n';
+//             }
+//         }
+//     }
+
+//     return;
+// }
 
 
+// SLST = Sparse Lazy Segment Tree.
+// Based on benq's LazySeg and SparseSeg.
+
+// T = data, F = functional
+const int SUGGESTED_SEGTREE_MAX_VAL = (1<<30) - 1;  // ~ 1.07e9
+// const int SUGGESTED_SEGTREE_MAX_VAL = (1<<4) - 1;  // testing only
+constexpr int NUM_PREALLOCATED = 1'000'000;
+int SEGTREE_ALLOC_CTR = 10;
+struct SLSTnode {
+	struct F { // lazy update
+        static const int SENTINEL = -2e9;
+		ll fdat = SENTINEL;
+		F() {}  //! default/identity state
+		F(int x) { fdat = x; }
+		F& operator*=(const F& a) { if (a.fdat !=F::SENTINEL) fdat = a.fdat; return *this; }  //! FoF
+	};
+	struct T { // data you need to store for each interval
+		ll tdat = -10;
+		T() {}  //! default/identity state
+		T(ll x) { tdat = x; }
+		friend T operator+(const T& a, const T& b) { return {max(a.tdat, b.tdat)}; }  //! T+T
+		T& operator*=(const F& a) { if (a.fdat != F::SENTINEL) tdat = a.fdat; return *this; }  //! F(T)
+	};
+    T t; F f;
+    int L, R;
+    // subtrees
+    SLSTnode* c[2];
+
+    SLSTnode(int L_, int R_) : L(L_), R(R_) {c[0] = c[1] = 0;}
+
+	void push() { /// modify values for current node
+        dbgc("push START", L, R, t.tdat, f.fdat);
+        t *= f;
+        if (L < R) {
+            int M = (L+R)/2;
+            if (!c[0]) c[0] = new SLSTnode(L  , M);
+            c[0]->f *= f;
+            if (!c[1]) c[1] = new SLSTnode(M+1, R);
+            c[1]->f *= f;
+        }
+        f = F();
+	}
+    // recalc values for current node
+	void pull() {
+        dbgc("pull START", L, R, t.tdat, f.fdat);
+        t = T();
+        F0R(i,2) if (c[i]) t = t + c[i]->t;
+        dbgc("pull END",L,R,t.tdat,f.fdat);
+    }
+
+    void upd(int lo, int hi, const F& fother) {
+        dbgc("upd", lo, hi, L, R, fother.fdat);
+		// spend O(1) time to un-lazy this node.
+        push();
+        // quit if this subtree needs no update.
+        if ( hi < L || R < lo ) {
+            dbgc("upd none");
+            return;
+        }
+        // if this subtree is fully contained in [lo, hi] then Just Do It and quit.
+        if ( lo <= L && R <= hi ) {
+            dbgc("upd contained");
+            f = fother; push(); return;
+        }
+        // recurse
+        int M = (L+R)/2;
+        dbgc("upd recurse", MP(L, M), MP(M+1, R));
+        if (!c[0]) c[0] = new SLSTnode(L  , M);
+        c[0]->upd(lo,hi,fother);
+        if (!c[1]) c[1] = new SLSTnode(M+1, R);
+        c[1]->upd(lo,hi,fother);
+        pull();
+    }
+
+	T query(int lo, int hi) {
+        dbgc("query", lo , hi , L , R , t.tdat, f.fdat );
+		push();
+        if (lo > R || L > hi) return T();
+		if (lo <= L && R <= hi) return t;
+        return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
+	}
+
+};
+SLSTnode preallocated[NUM_PREALLOCATED];
 
 
+struct Query {
+    int idxA;
+    int idxB;
+    int len;
+};
 
 void solve() {
-    ints(N);
-    vector<ll> dat;
-    rv(N,dat);
-    dbg(N, dat);
+
+    int N, Q;
+    cin >> N >> Q;
+    vector<ll> A( N ), B( N );
+    for ( int k = 0 ; k < N ; ++k ) {
+        cin >> A[k];
+    }
+    for ( int k = 0 ; k < N ; ++k ) {
+        cin >> B[k];
+    }
+
+    // initialize a segtree.
+    // SegTree<int> st;
+    // st.init( N );  // all values initially set to -1.
+    SLSTnode st(0, SUGGESTED_SEGTREE_MAX_VAL);
+    F0R(k,N) {
+        st.upd(k, k, {-1});
+        {
+        el; dbgc("Print segtree");
+        deque<SLSTnode> todo;
+        todo.push_back( st );
+        while ( todo.size() > 0 ) {
+            auto& curr = todo.front();
+            todo.pop_front();
+            dbg( curr.L , curr.R , curr.t.tdat , curr.f.fdat );
+            F0R(i,2) if ( curr.c[i] ) todo.push_back( *curr.c[i] );
+        } el;
+        }
+    }
+
+
+    vector<Query> queries( Q );
+    for ( int qid = 0 ; qid < Q ; ++qid ) {
+        {
+        el; dbgc("Print segtree");
+        deque<SLSTnode> todo;
+        todo.push_back( st );
+        while ( todo.size() > 0 ) {
+            auto& curr = todo.front();
+            todo.pop_front();
+            dbg( curr.L , curr.R , curr.t.tdat , curr.f.fdat );
+            F0R(i,2) if ( curr.c[i] ) todo.push_back( *curr.c[i] );
+        } el;
+        }
+        int qtype; cin >> qtype;
+        if ( qtype == 1 ) {
+            cin >> queries[qid].idxA >> queries[qid].idxB >> queries[qid].len;
+            --queries[qid].idxA;
+            --queries[qid].idxB;
+            int L = queries[qid].idxB;
+            int R = queries[qid].idxB + queries[qid].len - 1;
+            // st.upd_custom( qid , L , R );
+            dbgc("type 1 START" , qid , queries[qid].idxA , L , R );
+            st.upd( L , R , {qid} );
+            dbgc("type 1 DONE" , qid , queries[qid].idxA , L , R ); el;
 
 
 
+        } else {
+            int p;
+            cin >> p;
+            --p;  // zero based
+            // int op_idx = st.query_custom( p );
+            dbgc("type 2 START", qid , qtype, p); el;
+            int op_idx = st.query( p , p ).tdat;
+            dbgc("type 2 DONE", qid , qtype, p, op_idx); el;
 
+            if ( op_idx == -1 ) {
+                cout << B[p] << '\n';
+            } else {
+                Query &op = queries[op_idx];
+                int offset = p - op.idxB;
+                int out = A[op.idxA + offset];
+                cout << out << '\n';
+            }
+        }
+    }
 
-	return;
+    return;
 }
 
-// ! Read the sample cases before writing code!
-#pragma region
-int main() {
-	setIO();
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0); std::cout.tie(0);
 
+    dbg( sizeof(SLSTnode) ); exit(1);
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    // std::cin >> T;  // just comment this for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k ); el;
         solve();
@@ -416,4 +683,3 @@ int main() {
 
     return 0;
 }
-#pragma endregion

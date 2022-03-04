@@ -15,7 +15,7 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
-#define MP make_pair
+#define MP make_pair /////
 #define f first
 #define s second
 
@@ -358,8 +358,8 @@ void debug_out(Head H, Tail... T) {
     #define el cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, ...) cerr << OUT_RED \
-        << std::right << setw(20) << A \
-        << std::right << setw(8) << __LINE__        \
+        << right << setw(20) << A \
+        << right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
@@ -383,21 +383,313 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
+// /**
+//  * Description: 1D range increment and sum query.
+//  * Source: USACO Counting Haybales
+//  	* https://codeforces.com/blog/entry/82400
+//  * Verification: USACO Counting Haybales
+//  */
+
+// struct LazySeg {
+// 	struct F { // lazy update
+// 		ll inc = 0;
+// 		F() {}
+// 		F(int x) { inc = x; }
+// 		F& operator*=(const F& a) { inc += a.inc; return *this; }
+// 	}; V<F> lazy;
+// 	struct T { // data you need to store for each interval
+// 		ll sz = 1, mn = 1e18, sum = 0;
+// 		T() {}
+// 		T(int x) { mn = sum = x; }
+// 		friend T operator+(const T& a, const T& b) {
+// 			T res; res.sz = a.sz+b.sz;
+// 			res.mn = min(a.mn,b.mn), res.sum = a.sum+b.sum;
+// 			return res;
+// 		}
+// 		T& operator*=(const F& a) {
+// 			mn += a.inc; sum += (ll)sz*a.inc; return *this; }
+// 	}; V<T> seg;
+// 	int SZ = 1;
+// 	void init(const V<T>& _seg) {
+// 		while (SZ < sz(_seg)) SZ *= 2;
+// 		seg.rsz(2*SZ); lazy.rsz(2*SZ);
+// 		F0R(i,SZ) seg[SZ+i] = _seg[i];
+// 		ROF(i,1,SZ) pull(i);
+// 	}
+// 	void push(int ind) { /// modify values for current node
+// 		seg[ind] *= lazy[ind];
+// 		if (ind < SZ) F0R(i,2) lazy[2*ind+i] *= lazy[ind];
+// 		lazy[ind] = F();
+// 	} // recalc values for current node
+// 	void pull(int ind) { seg[ind] = seg[2*ind]+seg[2*ind+1]; }
+// 	void upd(int lo, int hi, F inc, int ind, int L, int R) {
+// 		push(ind); if (hi < L || R < lo) return;
+// 		if (lo <= L && R <= hi) {
+// 			lazy[ind] = inc; push(ind); return; }
+// 		int M = (L+R)/2; upd(lo,hi,inc,2*ind,L,M);
+// 		upd(lo,hi,inc,2*ind+1,M+1,R); pull(ind);
+// 	}
+// 	void upd(int lo, int hi, int inc) { upd(lo,hi,{inc},1,0,SZ-1); }
+// 	T query(int lo, int hi, int ind, int L, int R) {
+// 		push(ind); if (lo > R || L > hi) return T();
+// 		if (lo <= L && R <= hi) return seg[ind];
+// 		int M = (L+R)/2;
+// 		return query(lo,hi,2*ind,L,M)+query(lo,hi,2*ind+1,M+1,R);
+// 	}
+// 	T query(int lo, int hi) { return query(lo,hi,1,0,SZ-1); }
+// };
 
 
 
+// /*
+//     Track a collection of intervals.
+//     Example usage: codeforces/2022-02-23/E_working_on_data_structure.cpp
+// */
+
+// template<class T, bool MERGE_ADJACENT = false>
+// struct IntervalUnion {
+// 	using interval = pair<pair<T, T>, ll>;
+//     set<interval> x;
+
+//     // internal helper
+//     vector<interval> merge_intervals(const interval& a, const interval& b) {
+// 		vector<interval> out;
+// 		if ( a.f.f <= b.f.f ) {
+// 			out.emplace_back( MP(a.f.f , b.f.f-1) , a.s );
+// 		} else {
+// 			out.emplace_back( MP(b.f.f , a.f.f-1) , b.s );
+// 		}
+// 		out.emplace_back(
+// 			MP(
+// 				max(a.f.f, b.f.f),
+// 				min(a.f.s, b.f.s)
+// 			),
+// 			a.s & b.s
+// 		);
+// 		if ( a.f.s <= b.f.s ) {
+// 			out.emplace_back( MP(a.f.s+1 , b.f.s) , b.s );
+// 		} else {
+// 			out.emplace_back( MP(b.f.s+1 , a.f.s) , a.s );
+// 		}
+// 		vector<interval> outReal;
+// 		each( t , out ) {
+// 			if ( t.f.f <= t.f.s ) {
+// 				outReal.push_back( t );
+// 			}
+// 		}
+// 		return outReal;
+//     }
+
+//     void insert(interval& pr) {
+//         while ( true ) {
+//             auto it = x.lower_bound( pr );
+//             if ( it != x.end() && it->f.first <= pr.f.second + MERGE_ADJACENT ) {
+//                 // found an adjacent interval that's ">=" mine.
+//                 pr = merge_intervals(pr, *it);
+//                 x.erase( it );
+//                 continue;
+//             }
+//             if ( it == x.begin() ) {
+//                 break;
+//             }
+//             --it;
+//             if ( it->second >= pr.first - MERGE_ADJACENT ) {
+//                 pr = merge_intervals(pr, *it);
+//                 x.erase(it);
+//                 continue;
+//             }
+//             break;
+//         }
+//         x.insert( pr );
+//     }
+
+//     set<pair<T,T>>::const_iterator query(T p) {
+//         it = x.lower_bound(MP(p,p));
+//         if ( it != x.end() && it->first == p ) {
+//             return it;
+//         }
+//         if ( it == x.begin() ) {
+//             return x.end();
+//         }
+//         --it;
+//         if ( it->second >= p ) {
+//             return it;
+//         }
+//         return x.end();
+//     }
+// };
+
+/**
+ * Description: 1D point update, range query where \texttt{cmb} is
+ 	* any associative operation. If $N=2^p$ then \texttt{seg[1]==query(0,N-1)}.
+ * Time: O(\log N)
+ * Source:
+	* http://codeforces.com/blog/entry/18051
+	* KACTL
+ * Verification: SPOJ Fenwick
+ */
+
+constexpr int NUM_BITS = 30;
+// constexpr int NUM_BITS = 3;
+
+tcT> struct SegTree { // cmb(ID,b) = b
+	const T ID{(1<<NUM_BITS)-1}; T cmb(T a, T b) { return a+b; }
+	int n; V<T> seg;
+	void init(int _n) { // upd, query also work if n = _n
+		for (n = 1; n < _n; ) n *= 2;
+		seg.assign(2*n,ID); }
+	void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
+
+	void upd(int p, T val) { // set val at position p
+		seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p); }
+
+	T query(int l, int r) {	// associative op on [l, r]
+		T ra = ID, rb = ID;
+		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+			if (l&1) ra = cmb(ra,seg[l++]);
+			if (r&1) rb = cmb(seg[--r],rb);
+		}
+		return cmb(ra,rb);
+	}
+
+	void upd_custom(int l, int r, T val) {
+		// T ra = ID, rb = ID;
+		dbgc( "upd start" , l , r , val , seg );
+		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+			// if (l&1) ra = cmb(ra,seg[l++]);
+			// if (r&1) rb = cmb(seg[--r],rb);
+			if (l&1) {
+				seg[l] = seg[l] & val;
+				++l;
+			}
+			if (r&1) {
+				--r;
+				seg[r] = seg[r] & val;
+			}
+		}
+		dbgc( "upd end" , l , r , val , seg );
+		el;
+		// return cmb(ra,rb);
+	}
+	T query_custom(int p) {
+		// seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p); }
+		dbgc( "query start" , p , seg );
+		T out = seg[p += n];
+		for ( p /= 2 ; p ; p /= 2 ) {
+			out &= seg[ p ];
+			dbg( out , p );
+		}
+		dbgc( "query end" , p , out ); el;
+		return out;
+	}
+};
 
 
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
+
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 void solve() {
-    ints(N);
-    vector<ll> dat;
-    rv(N,dat);
-    dbg(N, dat);
+    ints(N, Q);
+	vector<tuple<ll,ll,ll>> dat( Q );
+	F0R( k , Q ) {
+		ints(L, R, val);
+		dat[k] = {L-1, R-1, val};
+		// cin >> get<0>(dat[k]) >> get<1>(dat[k]) >> get<2>(dat[k]);
+	}
+    dbg(Q, dat);
 
+	SegTree<ll> st;
+	st.init( N );
+	F0R( k , Q ) {
+		/*
+			Array starts as all 2^31-1.
+			Every time I receive a query result with 0s, I should remove those entry bits.
+			In other words I will & the given region by the query result?
+		*/
+		auto& [L, R, val] = dat[k];
+		st.upd_custom( L , R , val );
+	}
+	vector<ll> out_vector;
+	F0R( k , N ) {
+		out_vector.push_back( st.query_custom( k ) );
+	}
+	dbg( out_vector );
 
-
-
+	///// Part 2: do the XOR sum stuff.
+	vector<int> count_per_bit( NUM_BITS , 0 );
+	each( x , out_vector ) {
+		for ( int bit = 0 ; bit < NUM_BITS ; ++bit ) {
+			if ( (x>>bit) & 1 ) {
+				++count_per_bit[ bit ];
+			}
+		}
+	}
+	dbg( count_per_bit );
+	mi out = 0;
+	for ( int bit = 0 ; bit < NUM_BITS ; ++bit ) {
+		int num_ones = count_per_bit[ bit ];
+		int num_zeros = N - num_ones;
+		if ( num_ones == 0 ) {
+			continue;
+		}
+		mi contribution = pow( mi(2) , num_ones + num_zeros - 1 );
+		dbg( bit , num_ones , num_zeros , (int)contribution );
+		contribution *= (1<<bit);
+		out += contribution;
+	}
+	cout << (int)out << '\n';
 
 	return;
 }

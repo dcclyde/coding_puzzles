@@ -16,8 +16,8 @@ using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
 #define MP make_pair
-#define f first
-#define s second
+// #define f first
+// #define s second
 
 #define tcT template<class T
 #define tcTU tcT, class U
@@ -47,8 +47,8 @@ using vpd = V<pd>;
 #define ft front()
 #define bk back()
 
-#define lb lower_bound
-#define ub upper_bound
+// #define lb lower_bound
+// #define ub upper_bound
 tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
@@ -60,7 +60,7 @@ tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 #define rep(a) F0R(_,a)
 #define each(a,x) for (auto& a: x)
 
-const int MOD = 1e9+7; // 998244353;
+const int MOD = 1e9+1; // 998244353;
 const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
@@ -384,6 +384,211 @@ void debug_out(Head H, Tail... T) {
 #pragma endregion
 
 
+/**
+ * Description: modular arithmetic operations
+ * Source:
+	* KACTL
+	* https://codeforces.com/blog/entry/63903
+	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
+	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
+	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
+ * Verification:
+	* https://open.kattis.com/problems/modulararithmetic
+ */
+
+// #pragma once
+
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
+
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+
+
+
+ll INF = 2e18;
+// T = data, F = functional
+const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
+// const int SEGTREE_MAX = (1<<8) - 1;  // testing only
+const int SEGTREE_MIN = 0;
+struct SLSTnode {
+	struct F { // lazy update
+		ll fdat = 0;
+		F() {}  //! default/identity state
+		F(int x) { fdat = x; }
+		F& operator*=(const F& a) { fdat += a.fdat; return *this; }  //! FoF
+	};
+	struct T { // data you need to store for each interval
+		ll tmin = INF;
+		ll tmax = -INF;
+		T() {}  //! default/identity state
+		T(ll min_, ll max_) : tmin(min_), tmax(max_) {}
+		friend T operator+(const T& a, const T& b) {
+			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
+		}  //! T+T
+		T& operator*=(const F& a) { tmin += a.fdat; tmax += a.fdat; return *this; }  //! F(T)
+	};
+    T t; F f;
+    int L, R;
+    // subtrees
+    SLSTnode* c[2];
+
+    SLSTnode(int L_, int R_) : L(L_), R(R_) {
+		c[0] = c[1] = nullptr;
+		t.tmin = 0; t.tmax = 0;
+	}
+
+	void push() { /// modify values for current node
+        // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
+        t *= f;
+        if (L < R) {
+            int M = (L+R)/2;
+            if (!c[0]) c[0] = new SLSTnode(L  , M);
+            c[0]->f *= f;
+            if (!c[1]) c[1] = new SLSTnode(M+1, R);
+            c[1]->f *= f;
+        }
+        f = F();
+	}
+    // recalc values for current node
+	void pull() {
+        // dbgc("pull START", L, R, MP(t.tmin, t.tmax), f.fdat);
+        t = T();
+        F0R(i,2) if (c[i]) t = t + c[i]->t;
+        // dbgc("pull END",L,R,MP(t.tmin, t.tmax),f.fdat);
+    }
+
+    void upd(int lo, int hi, const F& fother) {
+        // dbgc("upd", lo, hi, L, R, fother.fdat);
+		// spend O(1) time to un-lazy this node.
+        push();
+        // quit if this subtree needs no update.
+        if ( hi < L || R < lo ) {
+            // dbgc("upd none");
+            return;
+        }
+        // if this subtree is fully contained in [lo, hi] then Just Do It and quit.
+        if ( lo <= L && R <= hi ) {
+            // dbgc("upd contained");
+            f = fother; push(); return;
+        }
+        // recurse
+        int M = (L+R)/2;
+        // dbgc("upd recurse", MP(L, M), MP(M+1, R));
+        if (!c[0]) c[0] = new SLSTnode(L  , M);
+        c[0]->upd(lo,hi,fother);
+        if (!c[1]) c[1] = new SLSTnode(M+1, R);
+        c[1]->upd(lo,hi,fother);
+        pull();
+    }
+
+	T query(int lo, int hi) {
+        dbgc("query START", MP(lo , hi) , MP(L , R) , MP(t.tmin, t.tmax), f.fdat );
+		push();
+        if (lo > R || L > hi) {
+			dbgc("query END 0"); el;
+			return T();
+		}
+		if (lo <= L && R <= hi) {
+			dbgc("query END contained" , MP(t.tmin, t.tmax)); el;
+			return t;
+		}
+		T left;
+		if ( c[0] ) {
+			dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
+			left = left + c[0]->query(lo,hi);
+		} else {
+			dbgc("query RECURSE LEFT" , "empty" );
+		}
+		T right;
+		if ( c[1] ) {
+			dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
+			right = right + c[1]->query(lo,hi);
+		} else {
+			dbgc("query RECURSE RIGHT" , "empty" );
+		}
+		dbgc("query RECURSE COMB" , L , R );  el;
+		return left + right;
+        // return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
+	}
+
+	// ! Need seg to store max.
+	// ! This version has some jank specific to 757d2-E.
+	int first_at_least(int targ) {
+		dbgc("f_a_l" , targ , MP(L, R), MP(t.tmin, t.tmax) , f.fdat );
+		push();
+		if ( targ > R + (t.tmax < -INF/2 ? 0 : t.tmax) ) {
+			// targ is above my range, i.e. there is no valid answer.
+			return -1;
+		}
+		if ( targ <= L + (t.tmin > INF/2 ? 0 : t.tmin) ) {
+			// targ is below my range.
+			return L;
+		}
+        int M = (L+R)/2;
+		int result;
+		if ( !c[0] ) c[0] = new SLSTnode(L  , M);
+		dbgc("f_a_l LEFT" , targ , MP(L,R));
+		result = c[0]->first_at_least( targ );
+		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
+		if ( result != -1 ) {
+			return result;
+		}
+		if ( !c[1] ) c[1] = new SLSTnode(M+1, R);
+		dbgc("f_a_l RIGHT" , targ , MP(L,R));
+		result = c[1]->first_at_least( targ );
+		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
+		return result;
+	}
+};
 
 
 
@@ -391,13 +596,74 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     ints(N);
-    vector<ll> dat;
-    rv(N,dat);
-    dbg(N, dat);
+    vector<int> temps( N );
+	vector<vector<int>> queries( N );
 
+	F0R( k , N ) {
+		cin >> temps[k];
+		int num_queries;
+		cin >> num_queries;
+		queries[k].resize(num_queries);
+		F0R( j , num_queries ) {
+			cin >> queries[k][j];
+		}
+		dbg( k , temps[k] , queries[k] );
+	}
+	dbg(temps);
+	el;
 
+	SLSTnode st(0, SEGTREE_MAX);
+	// each ( daytemp , temps ) {
+	// 	st.upd( daytemp , daytemp , {daytemp} );
+	// }
 
+	// now iterate through days.
+	mi lastans = 0;
+	F0R( day , N ) {
+		el; el; el; el; el;
+		dbgc("START DAY" , day );
+		int temp = temps[day];
+		/*
+			Need to find the segtree positions [L, R] describing points s.t. k+v = temp.
+		*/
+		int lb = st.first_at_least( temp );
+		el;
+		int ub = st.first_at_least( temp+1 );
+		dbg( temp , lb , ub );
+		if ( lb == - 1 ) {
+			lb = SEGTREE_MAX + 1;
+		}
+		if ( ub == -1 ) {
+			ub = SEGTREE_MAX + 1;
+		}
 
+		#ifdef DCCLYDE_LOCAL
+		{
+        el; dbgc("Print segtree");
+        deque<SLSTnode> todo;
+        todo.push_back( st );
+        while ( todo.size() > 0 ) {
+            auto& curr = todo.front();
+            todo.pop_front();
+            dbg( MP(curr.L , curr.R) , MP(curr.t.tmin, curr.t.tmax) , curr.f.fdat );
+            F0R(i,2) if ( curr.c[i] ) todo.push_back( *curr.c[i] );
+        } el;
+        }
+		#endif
+
+		st.upd( 0 , lb-1 , {1} );
+		st.upd( ub , SEGTREE_MAX , {-1} );
+
+		each( q , queries[day] ) {
+			lastans += q;
+			int qx = (int)lastans;
+			int qout = st.query( qx , qx ).tmin;
+			int result = qout + qx;
+			lastans = result;
+			dbg( q , qx , qout , result );
+			cout << result << '\n';
+		}
+	}
 
 	return;
 }
@@ -408,7 +674,7 @@ int main() {
 	setIO();
 
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k ); el;
         solve();
