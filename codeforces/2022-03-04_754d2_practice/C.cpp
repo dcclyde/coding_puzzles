@@ -387,17 +387,37 @@ void debug_out(Head H, Tail... T) {
 
 
 
-
+const int INF = 2e9;
 
 void solve() {
     ints(N);
-    vector<ll> dat;
-    rv(N,dat);
+	string dat; cin >> dat;
     dbg(N, dat);
 
-
-
-
+	int out = INF;
+	for ( int start = 0 ; start < N ; ++start ) {
+		map<char,int> counters;
+		for ( int dist = 0 ; dist < 10 ; ++dist ) {
+			if ( start + dist >= N ) {
+				break;
+			}
+			++counters[ dat[start+dist] ];
+			if (
+				dist+1 >= 2
+				&&
+				counters['a'] > counters['b']
+				&&
+				counters['a'] > counters['c'] )
+			{
+				out = min(out, dist+1);
+			}
+		}
+	}
+	if ( out == INF ) {
+		cout << -1 << '\n';
+	} else {
+		cout << out << '\n';
+	}
 
 	return;
 }

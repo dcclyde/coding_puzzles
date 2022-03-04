@@ -16,8 +16,8 @@ using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 #define mp make_pair
 #define MP make_pair
-///// #define f first
-///// #define s second
+#define f first
+#define s second
 
 #define tcT template<class T
 #define tcTU tcT, class U
@@ -391,13 +391,157 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     ints(N);
-    vector<ll> dat;
-    rv(N,dat);
-    dbg(N, dat);
+    vector<ll> A(N+1), B(N+1);  // use 1-indexing.
+	for ( int k = 1 ; k <= N ; ++k ) {
+		cin >> A[k];
+	}
+	for ( int k = 1 ; k <= N ; ++k ) {
+		cin >> B[k];
+	}
+    dbg(N, A, B); el;
 
+	vector<ll> R( N+1 ), S( N+1 , -1 );
+	/*
+		Let c[k] = signed num moves with multiple k.
+		Set up c[k] = R[k] + S[k]*c[1].
+		I think this costs N*log(N) because euler constant stuff
+	*/
+	for ( int k = 2 ; k <= N ; ++k ) {
+		R[k] += B[k] - A[k];
+		// apply this move to all future positions.
+		for ( int m = 2 ; m*k <= N ; ++m ) {
+			R[m] -= R[k];
+			S[m] -= S[k];
+		}
+	}
+	dbg( R );
+	dbg( S );
 
+	// position -> (baseFromL, baseFromR, linear left, linear right)
+	map<ll, tuple<ll,ll,ll,ll>> ds;
+	ll from_flat = 0;
+	for ( int k = 2 ; k <= N ; ++k ) {
+		if ( S[k] == 0 ) {
+			from_flat += abs(R[k]);
+			continue;
+		}
+		if ( R[k] % S[k] == 0 ) {
+			auto& [baseL, baseR, l, r] = ds[ -R[k] / S[k] ];
+			baseL += 0;
+			baseR += 0;
+			l += abs(S[k]);
+			r += abs(S[k]);
+			continue;
+		}
 
+		// be careful with division.
+		ll just_left = db(-R[k]) / S[k];
+		just_left -= 5;
+		while ( (just_left * S[k] + R[k]) * ((just_left+1) * S[k] + R[k]) > 0 ) {
+			++just_left;
+		}
+		{
+			auto& [baseL, baseR, l, r] = ds[ -R[just_left] / S[just_left] ];
+			baseL += abs(R[k] + S[k] * just_left);
+			baseR += abs(R[k] + S[k] * just_left);
+			l += abs(S[k]);
+			r += 0;
+		}
+		ll just_right = just_left + 1;
+		{
+			auto& [baseL, baseR, l, r] = ds[ -R[just_right] / S[just_right] ];
+			baseL += abs(R[k] + S[k] * just_right);
+			baseR += abs(R[k] + S[k] * just_right);
+			l += 0;
+			r += abs(S[k]);
+		}
+	}
 
+	dbgc("proc START" , ds );
+	const ll INF = 2e18;
+	{
+		ll prev_r = 0;
+		ll prev_pos = INF;
+		for ( auto& [pos, tup] : ds ) {
+			auto& [baseL, baseR, l, r] = tup;
+			ll dpos;
+			if ( prev_pos == INF ) {
+				dpos = pos;
+			} else {
+				dpos = pos - prev_pos;
+			}
+			r += prev_r;
+			baseR += dpos * prev_r;
+
+			prev_r = r;
+			prev_pos = pos;
+		}
+	}
+
+	dbgc("proc HALF" , ds );
+	{
+		ll prev_l = 0;
+		ll prev_pos = -INF;
+		for ( auto& [pos, tup] : ds | views::reverse ) {
+			auto& [baseL, baseR, l, r] = tup;
+			ll dpos;
+			if ( prev_pos == -INF ) {
+				dpos = pos;
+			} else {
+				dpos = prev_pos - pos;
+			}
+			l += prev_l;
+			baseL += dpos * prev_l;
+
+			prev_l = l;
+			prev_pos = pos;
+		}
+	}
+	dbgc("proc DONE" , ds );
+
+	ints( num_queries );
+	F0R( qidx , num_queries ) {
+		ints( q );
+		dbg(qidx, q);
+		ll c1 = q - A[1];
+		ll out = abs(c1) + from_flat;
+		if ( ds.size() == 0 ) {
+			// this can happen if lots of contributions were flat.
+			cout << out << '\n';
+			dbgc("flat" , out );
+			continue;
+		}
+
+		auto itL = ds.lower_bound( c1 );
+		if ( itL != ds.end() && itL->first == c1 ) {
+			out += get<0>( itL->second );
+			cout << out << '\n';
+			dbgc("exact" , out );
+			continue;
+		}
+		if ( itL != ds.begin() ) {
+			// we'll get a contribution from the left.
+			--itL;
+			ll pos = itL->first;
+			auto& [baseL, baseR, l, r] = itL->second;
+			ll contrib = (c1 - pos) * r + baseR;
+			out += contrib;
+			dbgc("L contrib" , contrib , out );
+		}
+
+		auto itR = ds.lower_bound( c1 );
+		if ( itR != ds.end() ) {
+			// we'll get a contribution from the right.
+			ll pos = itR->first;
+			auto& [baseL, baseR, l, r] = itR->second;
+			ll contrib = (pos - c1) * l + baseL;
+			out += contrib;
+			dbgc("R contrib" , contrib , out );
+		}
+		cout << out << '\n';
+		dbgc("hard" , out );
+		continue;
+	}
 
 	return;
 }
@@ -408,7 +552,7 @@ int main() {
 	setIO();
 
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k );
         solve();

@@ -391,13 +391,55 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     ints(N);
-    vector<ll> dat;
-    rv(N,dat);
+	string dat;
+	cin >> dat;
     dbg(N, dat);
 
+	// is it already in order?
+	bool ordered = true;
+	F0R ( k , N-1 ) {
+		if ( dat[k] > dat[k+1] ) {
+			ordered = false;
+			break;
+		}
+	}
+	if ( ordered ) {
+		cout << "0\n";
+		return;
+	}
 
-
-
+	int l = 0;
+	int r = N-1;
+	vector<int> indices_L;
+	vector<int> indices_R;
+	int ctr = 100;
+	while ( true ) {
+		dbg( ctr , l , r );
+		--ctr;
+		// if ( ctr <= 0 ) exit(1);
+		while ( l <= r && dat[l] == '0' ) {
+			++l;
+		}
+		while ( r >= l && dat[r] == '1' ) {
+			--r;
+		}
+		dbg( l , r );
+		if ( l < r ) {
+			indices_L.push_back( l );
+			indices_R.push_back( r );
+			++l;
+			--r;
+		} else {
+			break;
+		}
+	}
+	indices_L.insert( indices_L.end() , rall(indices_R) );
+	cout << 1 << '\n';
+	cout << indices_L.size() << ' ';
+	for ( auto& x : indices_L ) {
+		cout << x+1 << ' ';
+	}
+	cout << '\n';
 
 	return;
 }

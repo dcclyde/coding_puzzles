@@ -445,103 +445,45 @@ void factor_rec(ul n, map<ul,int>& cnt) {
 	factor_rec(u,cnt), factor_rec(n/u,cnt);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-map<int, int> divisor_counts;
-int patience = 10;
-void get_divisors_helper(
-	map<ul,int>::iterator& it,
-	const map<ul,int>::iterator& endit,
-	set<int>& divisors,
-	ll curr
-) {
-	// --patience;
-	// if ( patience == 0 ) {
-	// 	exit(1);
-	// }
-	if ( it == endit ) {
-		divisors.insert(curr);
-		return;
-	}
-	auto& [p, max_pow] = *it;
-	++it;
-	for ( int pow = 0 ; pow <= max_pow ; ++pow ) {
-		get_divisors_helper(it, endit, divisors, curr);
-		curr *= p;
-	}
-	--it;
-}
-
-map<int, set<int>> divisors_memo;
-set<int> get_divisors(ll N) {
-	if ( divisors_memo.count( N ) ) {
-		return divisors_memo[ N ];
-	}
-	map<ul,int> prime_divisors;
-	factor_rec( N , prime_divisors );
-	auto it = prime_divisors.begin();
-	set<int> divisors;
-	get_divisors_helper(it, prime_divisors.end() , divisors , 1 );
-	divisors_memo[ N ] = move(divisors);
-	return divisors_memo[ N ];
-}
-
-
-
-///////////
-
-ll helper(
-	map<int,ll>& dp,
-	ll curr_pos
-) {
-	if ( dp.count(curr_pos) ) {
-		return dp[curr_pos];
-	}
-	int N = divisor_counts[ 1 ];
-	dbgc("DOWN" , curr_pos )
-
-	if ( divisor_counts[ curr_pos ] == N ) {
-		// done.
-		dp[curr_pos] = N * curr_pos;
-		dbgc("BOTTOM" , N , curr_pos , dp[curr_pos])
-		return dp[curr_pos];
-	}
-
-	set<int> divisors = get_divisors( curr_pos );
-	ll value_here = 0;
-	for ( auto& d : divisors ) {
-		if ( d == curr_pos ) {
-			continue;
-		}
-		ll subvalue = helper(dp, d);
-		value_here = max(value_here, subvalue + (curr_pos - d) * divisor_counts[curr_pos]);
-	}
-	dbgc("UP" , curr_pos , value_here ); el;
-	dp[curr_pos] = value_here;
-	return dp[curr_pos];
-}
-
 
 void solve() {
     ints(N);
     vector<ll> dat;
+	unordered_map<ll,int> mdat;
+	vector<ll> dp;
+	dat.reserve( 100'000 );
+	dp.reserve( 20'000'000 );
     rv(N,dat);
     // dbg(N, dat);
 
+	each( x , dat ) {
+		++mdat[x];
+	}
+	remDup(dat);
+	sort(rall(dat));  // sort desc
+
+
+	int MAX = dat[0];
+	dp.resize( MAX+1 );
 	for ( auto& x : dat ) {
-		const set<int>& divisors = get_divisors( x );
-		each ( d , divisors ) {
-			++divisor_counts[d];
+		dp[x] = x * mdat[x];
+	}
+	map<ul, int> factors;
+	for ( int x = MAX ; x >= 0 ; --x ) {
+		if ( dp[x] == 0 ) {
+			continue;
+		}
+		dbg( x , dp[x] );
+		factors.clear();
+		factor_rec( x , factors );
+		for ( auto& [p, _] : factors ) {
+			auto nextX = x / p;
+			auto& nextDP = dp[nextX];
+			ll contribution = nextX * (mdat[nextX] - mdat[x]);
+			nextDP = max(nextDP , dp[x] + contribution);
 		}
 	}
-
-	ll out = -1;
-	map<int,ll> dp;
-	each( x , dat ) {
-		ll curr = helper( dp , x );
-		out = max(out, curr);
-	}
-	cout << out << '\n';
+	cout << dp[1] << '\n';
 	return;
 }
 

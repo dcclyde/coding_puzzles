@@ -390,10 +390,12 @@ void debug_out(Head H, Tail... T) {
 
 
 void solve() {
-    ints(N);
-    vector<ll> dat;
-    rv(N,dat);
-    dbg(N, dat);
+    ints(a, b, c);
+	if ( ( a+c-2*b ) % 3 == 0  ) {
+		cout << "0\n";
+	} else {
+		cout << "1\n";
+	}
 
 
 

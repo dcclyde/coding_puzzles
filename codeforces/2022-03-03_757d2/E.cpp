@@ -387,43 +387,35 @@ void debug_out(Head H, Tail... T) {
 
 int nodes_allocated = 0;
 
-ll INF = 2e18;
-bool boundstest(ll x) {
-	if ( x < -INF/2 || x > INF/2 ) {
-		return false;
-	}
-	return true;
-}
+int INF = 2e9+5;
 // T = data, F = functional
 const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
 // const int SEGTREE_MAX = (1<<8) - 1;  // testing only
 const int SEGTREE_MIN = 0;
 struct SLSTnode {
 	struct F { // lazy update
-		ll fdat = 0;
+		int fdat = 0;
 		F() {}  //! default/identity state
 		F(int x) { fdat = x; }
 		F& operator*=(const F& a) { fdat += a.fdat; return *this; }  //! FoF
 	};
 	struct T { // data you need to store for each interval
-		ll tmin = INF;
-		ll tmax = -INF;
+		int tmin = INF;
+		int tmax = -INF;
 		T() {}  //! default/identity state
-		T(ll min_, ll max_) : tmin(min_), tmax(max_) {}
+		T(int min_, int max_) : tmin(min_), tmax(max_) {}
 		friend T operator+(const T& a, const T& b) {
-			if ( !( boundstest(a.tmin), boundstest(a.tmax), boundstest(b.tmin), boundstest(b.tmax)) ) {
-				dbg(MP(a.tmin, a.tmax), MP(b.tmin, b.tmax));
-				exit(1);
-			}
 			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
 		}  //! T+T
 		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
 	};
+	static SLSTnode* new_node(int L_, int R_);
     T t; F f;
     int L, R;
     // subtrees
     SLSTnode* c[2];
 
+	SLSTnode() {}
     SLSTnode(int L_, int R_) : L(L_), R(R_) {
 		c[0] = c[1] = nullptr;
 		t.tmin = 0; t.tmax = 0;  //! All nodes should initially be 0, even though that is not ID
@@ -466,9 +458,9 @@ struct SLSTnode {
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
+        if (!c[0]) {c[0] = /*new SLSTnode*/new_node(L  , M); ++nodes_allocated;}
         c[0]->upd(lo,hi,fother);
-        if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
+        if (!c[1]) {c[1] = /*new SLSTnode*/new_node(M+1, R); ++nodes_allocated;}
         c[1]->upd(lo,hi,fother);
         pull();
     }
@@ -518,14 +510,14 @@ struct SLSTnode {
 		}
         int M = (L+R)/2;
 		int result;
-		if ( !c[0] ) c[0] = new SLSTnode(L  , M);
+		if ( !c[0] ) c[0] = /*new SLSTnode*/new_node(L  , M);
 		dbgc("f_a_l LEFT" , targ , MP(L,R));
 		result = c[0]->first_at_least( targ );
 		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		if ( !c[1] ) c[1] = new SLSTnode(M+1, R);
+		if ( !c[1] ) c[1] = /*new SLSTnode*/new_node(M+1, R);
 		dbgc("f_a_l RIGHT" , targ , MP(L,R));
 		result = c[1]->first_at_least( targ );
 		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
@@ -533,12 +525,23 @@ struct SLSTnode {
 	}
 };
 
+SLSTnode buffer[20'000'000];
+
+SLSTnode* SLSTnode::new_node(int L, int R) {
+	static int pos = -1;
+	++pos;
+	buffer[pos].L = L;
+	buffer[pos].R = R;
+	return &buffer[ pos ];
+}
 
 
-
-
+bool SPECIAL = false;
 void solve() {
     ints(N);
+	if ( N == 200'000 ) {
+		// SPECIAL = true;
+	}
     vector<int> temps( N );
 	vector<vector<int>> queries( N );
 
@@ -605,7 +608,9 @@ void solve() {
 			int result = qout + qx;
 			lastans = result;
 			dbg( q , qx , qout , result );
-			cout << result << '\n';
+			if ( !SPECIAL ) {
+				cout << result << '\n';
+			}
 		}
 	}
 
@@ -624,7 +629,11 @@ int main() {
         solve();
     }
 
-	dbg( sizeof(SLSTnode) , nodes_allocated );
+	dbg( sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
+	dbg( nodes_allocated );
+	if ( SPECIAL ) {
+		cout << sizeof(SLSTnode) << '\t' << nodes_allocated << '\n';
+	}
     return 0;
 }
 #pragma endregion
