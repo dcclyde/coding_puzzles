@@ -397,6 +397,10 @@ void solve() {
 	}
 	for ( int k = 1 ; k <= N ; ++k ) {
 		cin >> B[k];
+		if ( k > 1 ) {
+			B[k] -= A[k];
+			A[k] = 0;
+		}
 	}
     dbg(N, A, B); el;
 
@@ -410,8 +414,9 @@ void solve() {
 		R[k] += B[k] - A[k];
 		// apply this move to all future positions.
 		for ( int m = 2 ; m*k <= N ; ++m ) {
-			R[m] -= R[k];
-			S[m] -= S[k];
+			dbgc("apply" , k , S[k] , m*k , S[m*k] , S );
+			R[m*k] -= R[k];
+			S[m*k] -= S[k];
 		}
 	}
 	dbg( R );
@@ -433,7 +438,7 @@ void solve() {
 			r += abs(S[k]);
 			continue;
 		}
-
+		dbgc("?!?!?!?!?!?!?!?!?!");
 		// be careful with division.
 		ll just_left = db(-R[k]) / S[k];
 		just_left -= 5;
@@ -461,6 +466,7 @@ void solve() {
 	const ll INF = 2e18;
 	{
 		ll prev_r = 0;
+		ll prev_base = 0;
 		ll prev_pos = INF;
 		for ( auto& [pos, tup] : ds ) {
 			auto& [baseL, baseR, l, r] = tup;
@@ -471,16 +477,16 @@ void solve() {
 				dpos = pos - prev_pos;
 			}
 			r += prev_r;
-			baseR += dpos * prev_r;
+			baseR += prev_base + dpos * prev_r;
 
-			prev_r = r;
-			prev_pos = pos;
+			tie( prev_pos , prev_r , prev_base ) = tie( pos , r , baseR );
 		}
 	}
 
 	dbgc("proc HALF" , ds );
 	{
 		ll prev_l = 0;
+		ll prev_base = 0;
 		ll prev_pos = -INF;
 		for ( auto& [pos, tup] : ds | views::reverse ) {
 			auto& [baseL, baseR, l, r] = tup;
@@ -491,10 +497,9 @@ void solve() {
 				dpos = prev_pos - pos;
 			}
 			l += prev_l;
-			baseL += dpos * prev_l;
+			baseL += prev_base + dpos * prev_l;
 
-			prev_l = l;
-			prev_pos = pos;
+			tie( prev_pos , prev_l , prev_base ) = tie( pos , l , baseL );
 		}
 	}
 	dbgc("proc DONE" , ds );
@@ -502,9 +507,9 @@ void solve() {
 	ints( num_queries );
 	F0R( qidx , num_queries ) {
 		ints( q );
-		dbg(qidx, q);
 		ll c1 = q - A[1];
 		ll out = abs(c1) + from_flat;
+		el; dbg(qidx, q, out);
 		if ( ds.size() == 0 ) {
 			// this can happen if lots of contributions were flat.
 			cout << out << '\n';
@@ -514,9 +519,11 @@ void solve() {
 
 		auto itL = ds.lower_bound( c1 );
 		if ( itL != ds.end() && itL->first == c1 ) {
-			out += get<0>( itL->second );
-			cout << out << '\n';
 			dbgc("exact" , out );
+			// I guess we get contributions from both sides just at this one node.
+			auto& [baseL, baseR, l, r] = itL->second;
+			out += baseL + baseR;
+			cout << out << '\n';
 			continue;
 		}
 		if ( itL != ds.begin() ) {
