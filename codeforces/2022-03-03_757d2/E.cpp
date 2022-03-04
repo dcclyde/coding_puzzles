@@ -384,77 +384,16 @@ void debug_out(Head H, Tail... T) {
 #pragma endregion
 
 
-/**
- * Description: modular arithmetic operations
- * Source:
-	* KACTL
-	* https://codeforces.com/blog/entry/63903
-	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
-	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
-	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
- * Verification:
-	* https://open.kattis.com/problems/modulararithmetic
- */
 
-// #pragma once
-
-template<int MOD, int RT> struct mint {
-	static const int mod = MOD;
-	static constexpr mint rt() { return RT; } // primitive root for FFT
-	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
-	mint():v(0) {}
-	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
-		if (v < 0) v += MOD; }
-	bool operator==(const mint& o) const {
-		return v == o.v; }
-	friend bool operator!=(const mint& a, const mint& b) {
-		return !(a == b); }
-	friend bool operator<(const mint& a, const mint& b) {
-		return a.v < b.v; }
-	friend void re(mint& a) { ll x; re(x); a = mint(x); }
-	friend str ts(mint a) { return ts(a.v); }
-
-	mint& operator+=(const mint& o) {
-		if ((v += o.v) >= MOD) v -= MOD;
-		return *this; }
-	mint& operator-=(const mint& o) {
-		if ((v -= o.v) < 0) v += MOD;
-		return *this; }
-	mint& operator*=(const mint& o) {
-		v = int((ll)v*o.v%MOD); return *this; }
-	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
-	friend mint pow(mint a, ll p) {
-		mint ans = 1; assert(p >= 0);
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
-		return ans; }
-	friend mint inv(const mint& a) { assert(a.v != 0);
-		return pow(a,MOD-2); }
-
-	mint operator-() const { return mint(-v); }
-	mint& operator++() { return *this += 1; }
-	mint& operator--() { return *this -= 1; }
-	friend mint operator+(mint a, const mint& b) { return a += b; }
-	friend mint operator-(mint a, const mint& b) { return a -= b; }
-	friend mint operator*(mint a, const mint& b) { return a *= b; }
-	friend mint operator/(mint a, const mint& b) { return a /= b; }
-};
-
-using mi = mint<MOD,5>; // 5 is primitive root for both common mods
-using vmi = V<mi>;
-using pmi = pair<mi,mi>;
-using vpmi = V<pmi>;
-
-V<vmi> scmb; // small combinations
-void genComb(int SZ) {
-	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
-	FOR(i,1,SZ) F0R(j,i+1)
-		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
-}
-
-
-
+int nodes_allocated = 0;
 
 ll INF = 2e18;
+bool boundstest(ll x) {
+	if ( x < -INF/2 || x > INF/2 ) {
+		return false;
+	}
+	return true;
+}
 // T = data, F = functional
 const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
 // const int SEGTREE_MAX = (1<<8) - 1;  // testing only
@@ -472,9 +411,13 @@ struct SLSTnode {
 		T() {}  //! default/identity state
 		T(ll min_, ll max_) : tmin(min_), tmax(max_) {}
 		friend T operator+(const T& a, const T& b) {
+			if ( !( boundstest(a.tmin), boundstest(a.tmax), boundstest(b.tmin), boundstest(b.tmax)) ) {
+				dbg(MP(a.tmin, a.tmax), MP(b.tmin, b.tmax));
+				exit(1);
+			}
 			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
 		}  //! T+T
-		T& operator*=(const F& a) { tmin += a.fdat; tmax += a.fdat; return *this; }  //! F(T)
+		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
 	};
     T t; F f;
     int L, R;
@@ -483,7 +426,7 @@ struct SLSTnode {
 
     SLSTnode(int L_, int R_) : L(L_), R(R_) {
 		c[0] = c[1] = nullptr;
-		t.tmin = 0; t.tmax = 0;
+		t.tmin = 0; t.tmax = 0;  //! All nodes should initially be 0, even though that is not ID
 	}
 
 	void push() { /// modify values for current node
@@ -491,9 +434,9 @@ struct SLSTnode {
         t *= f;
         if (L < R) {
             int M = (L+R)/2;
-            if (!c[0]) c[0] = new SLSTnode(L  , M);
+            if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
             c[0]->f *= f;
-            if (!c[1]) c[1] = new SLSTnode(M+1, R);
+            if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
             c[1]->f *= f;
         }
         f = F();
@@ -523,39 +466,39 @@ struct SLSTnode {
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) c[0] = new SLSTnode(L  , M);
+        if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
         c[0]->upd(lo,hi,fother);
-        if (!c[1]) c[1] = new SLSTnode(M+1, R);
+        if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
         c[1]->upd(lo,hi,fother);
         pull();
     }
 
 	T query(int lo, int hi) {
-        dbgc("query START", MP(lo , hi) , MP(L , R) , MP(t.tmin, t.tmax), f.fdat );
+        // dbgc("query START", MP(lo , hi) , MP(L , R) , MP(t.tmin, t.tmax), f.fdat );
 		push();
         if (lo > R || L > hi) {
-			dbgc("query END 0"); el;
+			// dbgc("query END 0"); el;
 			return T();
 		}
 		if (lo <= L && R <= hi) {
-			dbgc("query END contained" , MP(t.tmin, t.tmax)); el;
+			// dbgc("query END contained" , MP(t.tmin, t.tmax)); el;
 			return t;
 		}
 		T left;
 		if ( c[0] ) {
-			dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
+			// dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
 			left = left + c[0]->query(lo,hi);
 		} else {
-			dbgc("query RECURSE LEFT" , "empty" );
+			// dbgc("query RECURSE LEFT" , "empty" );
 		}
 		T right;
 		if ( c[1] ) {
-			dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
+			// dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
 			right = right + c[1]->query(lo,hi);
 		} else {
-			dbgc("query RECURSE RIGHT" , "empty" );
+			// dbgc("query RECURSE RIGHT" , "empty" );
 		}
-		dbgc("query RECURSE COMB" , L , R );  el;
+		// dbgc("query RECURSE COMB" , L , R );  el;
 		return left + right;
         // return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
 	}
@@ -618,7 +561,7 @@ void solve() {
 	// }
 
 	// now iterate through days.
-	mi lastans = 0;
+	ll lastans = 0;
 	F0R( day , N ) {
 		el; el; el; el; el;
 		dbgc("START DAY" , day );
@@ -656,7 +599,8 @@ void solve() {
 
 		each( q , queries[day] ) {
 			lastans += q;
-			int qx = (int)lastans;
+			lastans %= MOD;
+			int qx = lastans;
 			int qout = st.query( qx , qx ).tmin;
 			int result = qout + qx;
 			lastans = result;
@@ -680,6 +624,7 @@ int main() {
         solve();
     }
 
+	dbg( sizeof(SLSTnode) , nodes_allocated );
     return 0;
 }
 #pragma endregion
