@@ -53,11 +53,13 @@ tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
 // loops
+#define CONCAT_INNER(a, b) a ## b
+#define CONCAT(a, b) CONCAT_INNER(a, b)
 #define FOR(i,a,b) for (int i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
 #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
-#define rep(a) F0R(_,a)
+#define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
 
 const int MOD = 1e9+1; // 998244353;
@@ -386,14 +388,13 @@ void debug_out(Head H, Tail... T) {
 
 
 
-struct SLSTnode; SLSTnode* buf; int buf_ctr = 0;
+
 
 int INF = 2e9+5;
 int ALMOST_INF = ll(INF)*3/4;
 // T = data, F = functional
 const int SEGTREE_MIN = 0;
 const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
-// const int SEGTREE_MAX = (1<<8) - 1;  // testing only
 struct SLSTnode {
 	struct F { // lazy update
 		int fdat = 0;
@@ -426,8 +427,6 @@ struct SLSTnode {
 	}
 
 	void push(int L, int R) { /// modify values for current node
-		// if ( f.fdat == 0 ) return;
-        // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t *= f;
         if (L < R) {
 			F0R(i,2) {
@@ -439,60 +438,31 @@ struct SLSTnode {
 	}
     // recalc values for current node
 	void pull() {
-        // dbgc("pull START", L, R, MP(t.tmin, t.tmax), f.fdat);
 		t = c[0]->t + c[1]->t;
-        // dbgc("pull END",L,R,MP(t.tmin, t.tmax),f.fdat);
     }
 
     void upd(int lo, int hi, const F& fother, int L, int R) {
-        // dbgc("upd", lo, hi, L, R, fother.fdat);
 		// spend O(1) time to un-lazy this node.
         push(L, R);
         // quit if this subtree needs no update.
         if ( hi < L || R < lo ) {
-            // dbgc("upd none");
             return;
         }
         // if this subtree is fully contained in [lo, hi] then Just Do It and quit.
         if ( lo <= L && R <= hi ) {
-            // dbgc("upd contained");
             f = fother; push(L, R); return;
         }
         // recurse
         int M = (L+R)/2;
-        // dbgc("upd recurse", MP(L, M), MP(M+1, R));
         c[0]->upd(lo, hi, fother, L, M);
         c[1]->upd(lo, hi, fother, M+1, R);
         pull();
     }
 
 	T query(int lo, int hi, int L, int R) {
-        // dbgc("query START", MP(lo , hi) , MP(L , R) , MP(t.tmin, t.tmax), f.fdat );
 		push(L, R);
-        if (lo > R || L > hi) {
-			// dbgc("query END 0"); el;
-			return T();
-		}
-		if (lo <= L && R <= hi) {
-			// dbgc("query END contained" , MP(t.tmin, t.tmax)); el;
-			return t;
-		}
-		// T left;
-		// if ( c[0] ) {
-		// 	// dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
-		// 	left = left + c[0]->query(lo,hi);
-		// } else {
-		// 	// dbgc("query RECURSE LEFT" , "empty" );
-		// }
-		// T right;
-		// if ( c[1] ) {
-		// 	// dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
-		// 	right = right + c[1]->query(lo,hi);
-		// } else {
-		// 	// dbgc("query RECURSE RIGHT" , "empty" );
-		// }
-		// // dbgc("query RECURSE COMB" , L , R );  el;
-		// return left + right;
+        if (lo > R || L > hi) {return T();}
+		if (lo <= L && R <= hi) {return t;}
         int M = (L+R)/2;
         return c[0]->query(lo,hi,L,M) + c[1]->query(lo,hi,M+1,R);
 	}
@@ -500,7 +470,6 @@ struct SLSTnode {
 	// ! Need seg to store max.
 	// ! This version has some jank specific to 757d2-E.
 	int first_at_least(int targ, int L, int R) {
-		dbgc("f_a_l" , targ , MP(L, R), MP(t.tmin, t.tmax) , f.fdat );
 		push(L, R);
 		if ( targ > R + (t.unset() ? 0 : t.tmax) ) {
 			// targ is above my range, i.e. there is no valid answer.
@@ -511,15 +480,11 @@ struct SLSTnode {
 			return L;
 		}
         int M = (L+R)/2;
-		dbgc("f_a_l LEFT" , targ , MP(L,R));
 		int result = c[0]->first_at_least(targ, L, M);
-		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		dbgc("f_a_l RIGHT" , targ , MP(L,R));
 		result = c[1]->first_at_least(targ, M+1, R);
-		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
 		return result;
 	}
 };
@@ -527,41 +492,18 @@ struct SLSTnode {
 
 
 void solve() {
-    ints(N);
-    vector<int> temps( N );
-	vector<vector<int>> queries( N );
-
-	F0R( k , N ) {
-		cin >> temps[k];
-		int num_queries;
-		cin >> num_queries;
-		queries[k].resize(num_queries);
-		F0R( j , num_queries ) {
-			cin >> queries[k][j];
-		}
-		dbg( k , temps[k] , queries[k] );
-	}
-	dbg(temps);
-	el;
-
+    ints(num_days);
 	SLSTnode st;
-	// each ( daytemp , temps ) {
-	// 	st.upd( daytemp , daytemp , {daytemp} );
-	// }
 
 	// now iterate through days.
 	ll lastans = 0;
-	F0R( day , N ) {
-		el; el; el; el; el;
-		dbgc("START DAY" , day );
-		int temp = temps[day];
+	rep( num_days ) {
+		int temp; cin >> temp;
 		/*
 			Need to find the segtree positions [L, R] describing points s.t. k+v = temp.
 		*/
 		int lb = st.first_at_least( temp   , SEGTREE_MIN , SEGTREE_MAX );
-		el;
 		int ub = st.first_at_least( temp+1 , SEGTREE_MIN , SEGTREE_MAX );
-		dbg( temp , lb , ub );
 		if ( lb == - 1 ) {
 			lb = SEGTREE_MAX + 1;
 		}
@@ -569,38 +511,21 @@ void solve() {
 			ub = SEGTREE_MAX + 1;
 		}
 
-		#ifdef DCCLYDE_LOCAL
-		{
-        el; dbgc("Print segtree");
-        deque<pair<pii, SLSTnode>> todo;
-        todo.emplace_back( MP(SEGTREE_MIN, SEGTREE_MAX) , st );
-        while ( todo.size() > 0 ) {
-            auto& [LR, curr] = todo.front();
-			auto& [L, R] = LR;
-			int M = (L+R)/2;
-			int D = (R+1-L)/2;
-            todo.pop_front();
-            dbg( LR , MP(curr.t.tmin, curr.t.tmax) , curr.f.fdat );
-            F0R(i,2) if ( curr.c[i] ) todo.emplace_back( MP(L+i*D, M+i*D) , *curr.c[i] );
-        } el;
-        }
-		#endif
-
 		st.upd( 0 , lb-1 , {1} , SEGTREE_MIN , SEGTREE_MAX );
 		st.upd( ub , SEGTREE_MAX , {-1} , SEGTREE_MIN , SEGTREE_MAX );
 
-		each( q , queries[day] ) {
+		int num_queries; cin >> num_queries;
+		rep( num_queries ) {
+			int q; cin >> q;
 			lastans += q;
 			lastans %= MOD;
 			int qx = lastans;
 			int qout = st.query( qx , qx , SEGTREE_MIN , SEGTREE_MAX ).tmin;
 			int result = qout + qx;
 			lastans = result;
-			dbg( q , qx , qout , result );
 			cout << result << '\n';
 		}
 	}
-
 	return;
 }
 
@@ -612,11 +537,8 @@ int main() {
     int T = 1;
     // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
-        el; dbgc("CASE" , k ); el;
         solve();
     }
-
-	dbgc( OUT_MARK << "test" , sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
     return 0;
 }
 #pragma endregion
