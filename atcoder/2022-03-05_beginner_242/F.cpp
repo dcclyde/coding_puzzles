@@ -383,50 +383,34 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
+ll MOD = 998244353;
 
 
 
 
-const ll MOD = 998244353;
 
 void solve() {
-    ints(N);
-	string S; cin >> S;
+	ints(R, C, B, W);  // R, C <= 50
+	/*
+		I think it's DP.
+		State could be like:
+			# columns filled in so far
+			# rows claimed for black
+			# rows claimed for white
+			# black rooks
+			# white rooks
 
-	// num places we can actually modify without breaking palindrome
-	ll halfN = cdiv( N , 2 );
+		I need to clean it up slightly though, that's too many states.
 
-	vector<ll> palindrome_constraint_only( halfN + 1 , 0 );
-	palindrome_constraint_only[0] = 1;
-	FOR( n , 1 , halfN+1 ) {
-		palindrome_constraint_only[n] =
-			(palindrome_constraint_only[n-1] * 26) % MOD;
-	}
-	dbg(halfN , palindrome_constraint_only);
 
-	ll out = 0;
-	FOR( n , 0 , halfN ) {
-		// assume we matched S at all points until now.
-		// ll local_options_below_S = min( S[n]-'A' , S[N-1-n] - 'A' );
-		ll local_options_below_S = S[n]-'A';
-		ll contribution =
-			palindrome_constraint_only[ halfN-1 - n ] * local_options_below_S;
-		out += contribution;
-		out %= MOD;
-		dbg(n, local_options_below_S, contribution, out);
-	}
-	// is it OK to just perfectly match the first half of S?
-	string other = S;
-	for ( int k = 0 ; k < halfN ; ++k ) {
-		dbg(k, N-1-k, other[N-1-k], other[k]);
-		other[N-1-k] = other[k];
-	}
-	dbgc( "extra" , other<=S , S , other );
-	if ( other <= S ) {
-		out += 1;
-	}
-	out %= MOD;
-	cout << out << '\n';
+		Alternate strategy:
+		W and B will each get a subset of the rows and subset of the cols.
+		Yeah ok this seems better.
+	*/
+
+
+
+
 
 	return;
 }
