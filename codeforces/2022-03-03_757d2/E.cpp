@@ -414,7 +414,6 @@ struct SLSTnode {
 		// T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
 		T& operator*=(const F& a) { if (tmin != INF) {tmin += a.fdat; tmax += a.fdat;} return *this; }  //! F(T)
 	};
-	static SLSTnode* new_node(int L_, int R_);
     T t; F f;
     int L, R;
     // subtrees
@@ -431,9 +430,9 @@ struct SLSTnode {
         t *= f;
         if (L < R) {
             int M = (L+R)/2;
-            if (!c[0]) {c[0] = /*new SLSTnode*/new_node(L  , M); ++nodes_allocated;}
+            if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
             c[0]->f *= f;
-            if (!c[1]) {c[1] = /*new SLSTnode*/new_node(M+1, R); ++nodes_allocated;}
+            if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
             c[1]->f *= f;
         }
         f = F();
@@ -463,9 +462,9 @@ struct SLSTnode {
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) {c[0] = /*new SLSTnode*/new_node(L  , M); ++nodes_allocated;}
+        if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
         c[0]->upd(lo,hi,fother);
-        if (!c[1]) {c[1] = /*new SLSTnode*/new_node(M+1, R); ++nodes_allocated;}
+        if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
         c[1]->upd(lo,hi,fother);
         pull();
     }
@@ -515,32 +514,20 @@ struct SLSTnode {
 		}
         int M = (L+R)/2;
 		int result;
-		if ( !c[0] ) c[0] = /*new SLSTnode*/new_node(L  , M);
+		if ( !c[0] ) c[0] = new SLSTnode(L  , M);
 		dbgc("f_a_l LEFT" , targ , MP(L,R));
 		result = c[0]->first_at_least( targ );
 		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		if ( !c[1] ) c[1] = /*new SLSTnode*/new_node(M+1, R);
+		if ( !c[1] ) c[1] = new SLSTnode(M+1, R);
 		dbgc("f_a_l RIGHT" , targ , MP(L,R));
 		result = c[1]->first_at_least( targ );
 		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
 		return result;
 	}
 };
-
-SLSTnode buffer[20'000'000];
-
-SLSTnode* SLSTnode::new_node(int L, int R) {
-	static int pos = -1;
-	++pos;
-	buffer[pos].L = L;
-	buffer[pos].R = R;
-	buffer[pos].t.tmin = 0;
-	buffer[pos].t.tmax = 0;
-	return &buffer[ pos ];
-}
 
 
 bool SPECIAL = false;
