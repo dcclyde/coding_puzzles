@@ -343,15 +343,16 @@ void debug_out(Head H, Tail... T) {
 }
 
 // #define BOLD_MAYBE ""    // NOT bold
-#define BOLD_MAYBE ";1"  // YES bold
+#define BOLD_MAYBE     ";1"  // YES bold
 
-#define OUT_RESET   "\033[0m"
-#define OUT_BOLD    "\033[" << BOLD_MAYBE << "m"
-#define OUT_RED     "\033[31" << BOLD_MAYBE << "m"
-#define OUT_CYAN    "\033[36" << BOLD_MAYBE << "m"
-// #define OUT_GREEN   "\033[32" << BOLD_MAYBE << "m"
-#define OUT_GREEN   "\033[32" << "m"
-#define OUT_BLUE    "\033[34" << BOLD_MAYBE << "m"
+#define OUT_RESET       "\033[0m"
+#define OUT_BOLD        "\033[" << BOLD_MAYBE << "m"
+#define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
+#define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
+// #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
+#define OUT_GREEN       "\033[32" << "m"
+#define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
+#define OUT_MARK        "\033[0;30;41m"
 
 
 #ifdef DCCLYDE_LOCAL
@@ -405,6 +406,7 @@ struct SLSTnode {
 		int tmax = -INF;
 		T() {}  //! default/identity state
 		T(int min_, int max_) : tmin(min_), tmax(max_) {}
+		bool unset() {return tmin > ALMOST_INF;}
 		T& operator+=(const T& other) {
 			tmin = min(tmin, other.tmin); tmax = max(tmax, other.tmax);
 			return *this;
@@ -428,18 +430,17 @@ struct SLSTnode {
         // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t *= f;
         if (L < R) {
-            if (!c[0]) {c[0] = new SLSTnode();}
-            c[0]->f *= f;
-            if (!c[1]) {c[1] = new SLSTnode();}
-            c[1]->f *= f;
+			F0R(i,2) {
+				if (!c[i]) c[i] = new SLSTnode();
+				c[i]->f *= f;
+			}
         }
         f = F();
 	}
     // recalc values for current node
 	void pull() {
         // dbgc("pull START", L, R, MP(t.tmin, t.tmax), f.fdat);
-        t = T();
-        F0R(i,2) if (c[i]) t += c[i]->t;
+		t = c[0]->t + c[1]->t;
         // dbgc("pull END",L,R,MP(t.tmin, t.tmax),f.fdat);
     }
 
@@ -460,9 +461,7 @@ struct SLSTnode {
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) {c[0] = new SLSTnode();}
         c[0]->upd(lo, hi, fother, L, M);
-        if (!c[1]) {c[1] = new SLSTnode();}
         c[1]->upd(lo, hi, fother, M+1, R);
         pull();
     }
@@ -495,7 +494,7 @@ struct SLSTnode {
 		// // dbgc("query RECURSE COMB" , L , R );  el;
 		// return left + right;
         int M = (L+R)/2;
-        return (c[0]?c[0]->query(lo,hi,L,M):T()) + (c[1]?c[1]->query(lo,hi,M+1,R):T());
+        return c[0]->query(lo,hi,L,M) + c[1]->query(lo,hi,M+1,R);
 	}
 
 	// ! Need seg to store max.
@@ -503,24 +502,21 @@ struct SLSTnode {
 	int first_at_least(int targ, int L, int R) {
 		dbgc("f_a_l" , targ , MP(L, R), MP(t.tmin, t.tmax) , f.fdat );
 		push(L, R);
-		if ( targ > R + (t.tmax < -ALMOST_INF ? 0 : t.tmax) ) {
+		if ( targ > R + (t.unset() ? 0 : t.tmax) ) {
 			// targ is above my range, i.e. there is no valid answer.
 			return -1;
 		}
-		if ( targ <= L + (t.tmin > ALMOST_INF ? 0 : t.tmin) ) {
+		if ( targ <= L + (t.unset() ? 0 : t.tmin) ) {
 			// targ is below my range.
 			return L;
 		}
         int M = (L+R)/2;
-		int result;
-		if ( !c[0] ) {c[0] = new SLSTnode();}
 		dbgc("f_a_l LEFT" , targ , MP(L,R));
-		result = c[0]->first_at_least(targ, L, M);
+		int result = c[0]->first_at_least(targ, L, M);
 		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		if ( !c[1] ) {c[1] = new SLSTnode();}
 		dbgc("f_a_l RIGHT" , targ , MP(L,R));
 		result = c[1]->first_at_least(targ, M+1, R);
 		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
@@ -620,7 +616,7 @@ int main() {
         solve();
     }
 
-	dbg( sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
+	dbgc( OUT_MARK << "test" , sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
     return 0;
 }
 #pragma endregion
