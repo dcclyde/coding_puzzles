@@ -1,3 +1,7 @@
+
+#include <sys/time.h>
+#include <sys/resource.h>
+
 #pragma region
 #include <bits/stdc++.h>
 using namespace std;
@@ -407,7 +411,8 @@ struct SLSTnode {
 		friend T operator+(const T& a, const T& b) {
 			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
 		}  //! T+T
-		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
+		// T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
+		T& operator*=(const F& a) { if (tmin != INF) {tmin += a.fdat; tmax += a.fdat;} return *this; }  //! F(T)
 	};
 	static SLSTnode* new_node(int L_, int R_);
     T t; F f;
@@ -426,9 +431,9 @@ struct SLSTnode {
         t *= f;
         if (L < R) {
             int M = (L+R)/2;
-            if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
+            if (!c[0]) {c[0] = /*new SLSTnode*/new_node(L  , M); ++nodes_allocated;}
             c[0]->f *= f;
-            if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
+            if (!c[1]) {c[1] = /*new SLSTnode*/new_node(M+1, R); ++nodes_allocated;}
             c[1]->f *= f;
         }
         f = F();
@@ -532,6 +537,8 @@ SLSTnode* SLSTnode::new_node(int L, int R) {
 	++pos;
 	buffer[pos].L = L;
 	buffer[pos].R = R;
+	buffer[pos].t.tmin = 0;
+	buffer[pos].t.tmax = 0;
 	return &buffer[ pos ];
 }
 
@@ -540,7 +547,7 @@ bool SPECIAL = false;
 void solve() {
     ints(N);
 	if ( N == 200'000 ) {
-		// SPECIAL = true;
+		SPECIAL = true;
 	}
     vector<int> temps( N );
 	vector<vector<int>> queries( N );
@@ -634,6 +641,12 @@ int main() {
 	if ( SPECIAL ) {
 		cout << sizeof(SLSTnode) << '\t' << nodes_allocated << '\n';
 	}
+
+	// struct rusage usage;
+	// int rusage_out = getrusage( RUSAGE_SELF , &usage );
+	// dbgc( "rusage" , rusage_out , usage.ru_idrss , usage.ru_isrss );
+
+
     return 0;
 }
 #pragma endregion
