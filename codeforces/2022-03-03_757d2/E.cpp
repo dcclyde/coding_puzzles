@@ -389,9 +389,9 @@ int nodes_allocated = 0;
 
 int INF = 2e9+5;
 // T = data, F = functional
+const int SEGTREE_MIN = 0;
 const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
 // const int SEGTREE_MAX = (1<<8) - 1;  // testing only
-const int SEGTREE_MIN = 0;
 struct SLSTnode {
 	struct F { // lazy update
 		int fdat = 0;
@@ -410,24 +410,22 @@ struct SLSTnode {
 		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
 	};
     T t; F f;
-    int L, R;
     // subtrees
     SLSTnode* c[2];
 
-    SLSTnode(int L_, int R_) : L(L_), R(R_) {
+    SLSTnode() {
 		c[0] = c[1] = nullptr;
 		t.tmin = 0; t.tmax = 0;  //! All nodes should initially be 0, even though that is not ID
 	}
 
-	void push() { /// modify values for current node
+	void push(int L, int R) { /// modify values for current node
 		// if ( f.fdat == 0 ) return;
         // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t *= f;
         if (L < R) {
-            int M = (L+R)/2;
-            if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
+            if (!c[0]) {c[0] = new SLSTnode(); ++nodes_allocated;}
             c[0]->f *= f;
-            if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
+            if (!c[1]) {c[1] = new SLSTnode(); ++nodes_allocated;}
             c[1]->f *= f;
         }
         f = F();
@@ -440,10 +438,10 @@ struct SLSTnode {
         // dbgc("pull END",L,R,MP(t.tmin, t.tmax),f.fdat);
     }
 
-    void upd(int lo, int hi, const F& fother) {
+    void upd(int lo, int hi, const F& fother, int L, int R) {
         // dbgc("upd", lo, hi, L, R, fother.fdat);
 		// spend O(1) time to un-lazy this node.
-        push();
+        push(L, R);
         // quit if this subtree needs no update.
         if ( hi < L || R < lo ) {
             // dbgc("upd none");
@@ -452,21 +450,21 @@ struct SLSTnode {
         // if this subtree is fully contained in [lo, hi] then Just Do It and quit.
         if ( lo <= L && R <= hi ) {
             // dbgc("upd contained");
-            f = fother; push(); return;
+            f = fother; push(L, R); return;
         }
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) {c[0] = new SLSTnode(L  , M); ++nodes_allocated;}
-        c[0]->upd(lo,hi,fother);
-        if (!c[1]) {c[1] = new SLSTnode(M+1, R); ++nodes_allocated;}
-        c[1]->upd(lo,hi,fother);
+        if (!c[0]) {c[0] = new SLSTnode(); ++nodes_allocated;}
+        c[0]->upd(lo, hi, fother, L, M);
+        if (!c[1]) {c[1] = new SLSTnode(); ++nodes_allocated;}
+        c[1]->upd(lo, hi, fother, M+1, R);
         pull();
     }
 
-	T query(int lo, int hi) {
+	T query(int lo, int hi, int L, int R) {
         // dbgc("query START", MP(lo , hi) , MP(L , R) , MP(t.tmin, t.tmax), f.fdat );
-		push();
+		push(L, R);
         if (lo > R || L > hi) {
 			// dbgc("query END 0"); el;
 			return T();
@@ -491,14 +489,15 @@ struct SLSTnode {
 		// }
 		// // dbgc("query RECURSE COMB" , L , R );  el;
 		// return left + right;
-        return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
+        int M = (L+R)/2;
+        return (c[0]?c[0]->query(lo,hi,L,M):T()) + (c[1]?c[1]->query(lo,hi,M+1,R):T());
 	}
 
 	// ! Need seg to store max.
 	// ! This version has some jank specific to 757d2-E.
-	int first_at_least(int targ) {
+	int first_at_least(int targ, int L, int R) {
 		dbgc("f_a_l" , targ , MP(L, R), MP(t.tmin, t.tmax) , f.fdat );
-		push();
+		push(L, R);
 		if ( targ > R + (t.tmax < -INF/2 ? 0 : t.tmax) ) {
 			// targ is above my range, i.e. there is no valid answer.
 			return -1;
@@ -509,16 +508,16 @@ struct SLSTnode {
 		}
         int M = (L+R)/2;
 		int result;
-		if ( !c[0] ) c[0] = new SLSTnode(L  , M);
+		if ( !c[0] ) {c[0] = new SLSTnode(); ++nodes_allocated;}
 		dbgc("f_a_l LEFT" , targ , MP(L,R));
-		result = c[0]->first_at_least( targ );
+		result = c[0]->first_at_least(targ, L, M);
 		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		if ( !c[1] ) c[1] = new SLSTnode(M+1, R);
+		if ( !c[1] ) {c[1] = new SLSTnode(); ++nodes_allocated;}
 		dbgc("f_a_l RIGHT" , targ , MP(L,R));
-		result = c[1]->first_at_least( targ );
+		result = c[1]->first_at_least(targ, M+1, R);
 		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
 		return result;
 	}
@@ -544,7 +543,7 @@ void solve() {
 	dbg(temps);
 	el;
 
-	SLSTnode st(0, SEGTREE_MAX);
+	SLSTnode st;
 	// each ( daytemp , temps ) {
 	// 	st.upd( daytemp , daytemp , {daytemp} );
 	// }
@@ -558,9 +557,9 @@ void solve() {
 		/*
 			Need to find the segtree positions [L, R] describing points s.t. k+v = temp.
 		*/
-		int lb = st.first_at_least( temp );
+		int lb = st.first_at_least( temp   , SEGTREE_MIN , SEGTREE_MAX );
 		el;
-		int ub = st.first_at_least( temp+1 );
+		int ub = st.first_at_least( temp+1 , SEGTREE_MIN , SEGTREE_MAX );
 		dbg( temp , lb , ub );
 		if ( lb == - 1 ) {
 			lb = SEGTREE_MAX + 1;
@@ -572,25 +571,28 @@ void solve() {
 		#ifdef DCCLYDE_LOCAL
 		{
         el; dbgc("Print segtree");
-        deque<SLSTnode> todo;
-        todo.push_back( st );
+        deque<pair<pii, SLSTnode>> todo;
+        todo.emplace_back( MP(SEGTREE_MIN, SEGTREE_MAX) , st );
         while ( todo.size() > 0 ) {
-            auto& curr = todo.front();
+            auto& [LR, curr] = todo.front();
+			auto& [L, R] = LR;
+			int M = (L+R)/2;
+			int D = (R+1-L)/2;
             todo.pop_front();
-            dbg( MP(curr.L , curr.R) , MP(curr.t.tmin, curr.t.tmax) , curr.f.fdat );
-            F0R(i,2) if ( curr.c[i] ) todo.push_back( *curr.c[i] );
+            dbg( LR , MP(curr.t.tmin, curr.t.tmax) , curr.f.fdat );
+            F0R(i,2) if ( curr.c[i] ) todo.emplace_back( MP(L+i*D, M+i*D) , *curr.c[i] );
         } el;
         }
 		#endif
 
-		st.upd( 0 , lb-1 , {1} );
-		st.upd( ub , SEGTREE_MAX , {-1} );
+		st.upd( 0 , lb-1 , {1} , SEGTREE_MIN , SEGTREE_MAX );
+		st.upd( ub , SEGTREE_MAX , {-1} , SEGTREE_MIN , SEGTREE_MAX );
 
 		each( q , queries[day] ) {
 			lastans += q;
 			lastans %= MOD;
 			int qx = lastans;
-			int qout = st.query( qx , qx ).tmin;
+			int qout = st.query( qx , qx , SEGTREE_MIN , SEGTREE_MAX ).tmin;
 			int result = qout + qx;
 			lastans = result;
 			dbg( q , qx , qout , result );
