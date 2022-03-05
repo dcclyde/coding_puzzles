@@ -385,7 +385,18 @@ void debug_out(Head H, Tail... T) {
 
 
 
+
+
+// static char buf[450 << 20] alignas(alignof(;
+// void* operator new(size_t s) {
+// 	static size_t i = sizeof buf; assert(s < i);
+// 	return (void*)&buf[i -= s];
+// }
+// void operator delete(void*) {}
+
 int nodes_allocated = 0;
+
+struct SLSTnode; SLSTnode* buf; int buf_ctr = 0;
 
 int INF = 2e9+5;
 // T = data, F = functional
@@ -414,9 +425,18 @@ struct SLSTnode {
     // subtrees
     SLSTnode* c[2];
 
-    SLSTnode(int L_, int R_) : L(L_), R(R_) {
+	void init(int L_, int R_) {
+		L = L_; R = R_;
+		t.tmin = t.tmax = 0;
 		c[0] = c[1] = nullptr;
-		t.tmin = 0; t.tmax = 0;  //! All nodes should initially be 0, even though that is not ID
+	}
+	SLSTnode() {}
+    SLSTnode(int L_, int R_) {
+		init(L_, R_);
+	}
+	static SLSTnode* new_node(int L, int R) {
+		buf[buf_ctr].init(L, R);
+		return &buf[buf_ctr++];
 	}
 
 	void push() { /// modify values for current node
@@ -523,6 +543,7 @@ struct SLSTnode {
 		return result;
 	}
 };
+SLSTnode pool[2'000'000];
 
 
 
@@ -605,6 +626,7 @@ void solve() {
 #pragma region
 int main() {
 	setIO();
+	buf = pool;
 
     int T = 1;
     // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
