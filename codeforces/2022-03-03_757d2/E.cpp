@@ -1,7 +1,3 @@
-
-#include <sys/time.h>
-#include <sys/resource.h>
-
 #pragma region
 #include <bits/stdc++.h>
 using namespace std;
@@ -389,7 +385,18 @@ void debug_out(Head H, Tail... T) {
 
 
 
+
+
+// static char buf[450 << 20] alignas(alignof(;
+// void* operator new(size_t s) {
+// 	static size_t i = sizeof buf; assert(s < i);
+// 	return (void*)&buf[i -= s];
+// }
+// void operator delete(void*) {}
+
 int nodes_allocated = 0;
+
+struct SLSTnode; SLSTnode* buf; int buf_ctr = 0;
 
 int INF = 2e9+5;
 // T = data, F = functional
@@ -411,21 +418,29 @@ struct SLSTnode {
 		friend T operator+(const T& a, const T& b) {
 			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
 		}  //! T+T
-		// T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
-		T& operator*=(const F& a) { if (tmin != INF) {tmin += a.fdat; tmax += a.fdat;} return *this; }  //! F(T)
+		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
 	};
     T t; F f;
     int L, R;
     // subtrees
     SLSTnode* c[2];
 
-	SLSTnode() {}
-    SLSTnode(int L_, int R_) : L(L_), R(R_) {
+	void init(int L_, int R_) {
+		L = L_; R = R_;
+		t.tmin = t.tmax = 0;
 		c[0] = c[1] = nullptr;
-		t.tmin = 0; t.tmax = 0;  //! All nodes should initially be 0, even though that is not ID
+	}
+	SLSTnode() {}
+    SLSTnode(int L_, int R_) {
+		init(L_, R_);
+	}
+	static SLSTnode* new_node(int L, int R) {
+		buf[buf_ctr].init(L, R);
+		return &buf[buf_ctr++];
 	}
 
 	void push() { /// modify values for current node
+		// if ( f.fdat == 0 ) return;
         // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t *= f;
         if (L < R) {
@@ -480,23 +495,23 @@ struct SLSTnode {
 			// dbgc("query END contained" , MP(t.tmin, t.tmax)); el;
 			return t;
 		}
-		T left;
-		if ( c[0] ) {
-			// dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
-			left = left + c[0]->query(lo,hi);
-		} else {
-			// dbgc("query RECURSE LEFT" , "empty" );
-		}
-		T right;
-		if ( c[1] ) {
-			// dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
-			right = right + c[1]->query(lo,hi);
-		} else {
-			// dbgc("query RECURSE RIGHT" , "empty" );
-		}
-		// dbgc("query RECURSE COMB" , L , R );  el;
-		return left + right;
-        // return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
+		// T left;
+		// if ( c[0] ) {
+		// 	// dbgc("query RECURSE LEFT" , MP(c[0]->L , c[0]->R));
+		// 	left = left + c[0]->query(lo,hi);
+		// } else {
+		// 	// dbgc("query RECURSE LEFT" , "empty" );
+		// }
+		// T right;
+		// if ( c[1] ) {
+		// 	// dbgc("query RECURSE RIGHT" , MP(c[1]->L , c[1]->R));
+		// 	right = right + c[1]->query(lo,hi);
+		// } else {
+		// 	// dbgc("query RECURSE RIGHT" , "empty" );
+		// }
+		// // dbgc("query RECURSE COMB" , L , R );  el;
+		// return left + right;
+        return (c[0]?c[0]->query(lo,hi):T()) + (c[1]?c[1]->query(lo,hi):T());
 	}
 
 	// ! Need seg to store max.
@@ -528,14 +543,12 @@ struct SLSTnode {
 		return result;
 	}
 };
+SLSTnode pool[2'000'000];
 
 
-bool SPECIAL = false;
+
 void solve() {
     ints(N);
-	if ( N == 200'000 ) {
-		SPECIAL = true;
-	}
     vector<int> temps( N );
 	vector<vector<int>> queries( N );
 
@@ -602,9 +615,7 @@ void solve() {
 			int result = qout + qx;
 			lastans = result;
 			dbg( q , qx , qout , result );
-			if ( !SPECIAL ) {
-				cout << result << '\n';
-			}
+			cout << result << '\n';
 		}
 	}
 
@@ -615,6 +626,7 @@ void solve() {
 #pragma region
 int main() {
 	setIO();
+	buf = pool;
 
     int T = 1;
     // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
@@ -625,15 +637,6 @@ int main() {
 
 	dbg( sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
 	dbg( nodes_allocated );
-	if ( SPECIAL ) {
-		cout << sizeof(SLSTnode) << '\t' << nodes_allocated << '\n';
-	}
-
-	// struct rusage usage;
-	// int rusage_out = getrusage( RUSAGE_SELF , &usage );
-	// dbgc( "rusage" , rusage_out , usage.ru_idrss , usage.ru_isrss );
-
-
     return 0;
 }
 #pragma endregion
