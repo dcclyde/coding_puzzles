@@ -385,9 +385,10 @@ void debug_out(Head H, Tail... T) {
 
 
 
-int nodes_allocated = 0;
+struct SLSTnode; SLSTnode* buf; int buf_ctr = 0;
 
 int INF = 2e9+5;
+int ALMOST_INF = ll(INF)*3/4;
 // T = data, F = functional
 const int SEGTREE_MIN = 0;
 const int SEGTREE_MAX = (1<<30) - 1;  // ~ 1.07e9
@@ -407,7 +408,7 @@ struct SLSTnode {
 		friend T operator+(const T& a, const T& b) {
 			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
 		}  //! T+T
-		T& operator*=(const F& a) { if (tmin != INF) tmin += a.fdat; if (tmax != -INF) tmax += a.fdat; return *this; }  //! F(T)
+		T& operator*=(const F& a) { tmin += a.fdat; tmax += a.fdat; return *this; }  //! F(T)
 	};
     T t; F f;
     // subtrees
@@ -423,9 +424,9 @@ struct SLSTnode {
         // dbgc("push START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t *= f;
         if (L < R) {
-            if (!c[0]) {c[0] = new SLSTnode(); ++nodes_allocated;}
+            if (!c[0]) {c[0] = new SLSTnode();}
             c[0]->f *= f;
-            if (!c[1]) {c[1] = new SLSTnode(); ++nodes_allocated;}
+            if (!c[1]) {c[1] = new SLSTnode();}
             c[1]->f *= f;
         }
         f = F();
@@ -455,9 +456,9 @@ struct SLSTnode {
         // recurse
         int M = (L+R)/2;
         // dbgc("upd recurse", MP(L, M), MP(M+1, R));
-        if (!c[0]) {c[0] = new SLSTnode(); ++nodes_allocated;}
+        if (!c[0]) {c[0] = new SLSTnode();}
         c[0]->upd(lo, hi, fother, L, M);
-        if (!c[1]) {c[1] = new SLSTnode(); ++nodes_allocated;}
+        if (!c[1]) {c[1] = new SLSTnode();}
         c[1]->upd(lo, hi, fother, M+1, R);
         pull();
     }
@@ -498,24 +499,24 @@ struct SLSTnode {
 	int first_at_least(int targ, int L, int R) {
 		dbgc("f_a_l" , targ , MP(L, R), MP(t.tmin, t.tmax) , f.fdat );
 		push(L, R);
-		if ( targ > R + (t.tmax < -INF/2 ? 0 : t.tmax) ) {
+		if ( targ > R + (t.tmax < -ALMOST_INF ? 0 : t.tmax) ) {
 			// targ is above my range, i.e. there is no valid answer.
 			return -1;
 		}
-		if ( targ <= L + (t.tmin > INF/2 ? 0 : t.tmin) ) {
+		if ( targ <= L + (t.tmin > ALMOST_INF ? 0 : t.tmin) ) {
 			// targ is below my range.
 			return L;
 		}
         int M = (L+R)/2;
 		int result;
-		if ( !c[0] ) {c[0] = new SLSTnode(); ++nodes_allocated;}
+		if ( !c[0] ) {c[0] = new SLSTnode();}
 		dbgc("f_a_l LEFT" , targ , MP(L,R));
 		result = c[0]->first_at_least(targ, L, M);
 		dbgc("f_a_l LEFT DONE" , targ , MP(L,R) , result );
 		if ( result != -1 ) {
 			return result;
 		}
-		if ( !c[1] ) {c[1] = new SLSTnode(); ++nodes_allocated;}
+		if ( !c[1] ) {c[1] = new SLSTnode();}
 		dbgc("f_a_l RIGHT" , targ , MP(L,R));
 		result = c[1]->first_at_least(targ, M+1, R);
 		dbgc("f_a_l RIGHT DONE" , targ , MP(L,R) , result );
@@ -616,7 +617,6 @@ int main() {
     }
 
 	dbg( sizeof(SLSTnode), sizeof(SLSTnode::T), sizeof(SLSTnode::F), sizeof(SLSTnode*) );
-	dbg( nodes_allocated );
     return 0;
 }
 #pragma endregion
