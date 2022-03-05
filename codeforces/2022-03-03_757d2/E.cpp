@@ -405,8 +405,12 @@ struct SLSTnode {
 		int tmax = -INF;
 		T() {}  //! default/identity state
 		T(int min_, int max_) : tmin(min_), tmax(max_) {}
+		T& operator+=(const T& other) {
+			tmin = min(tmin, other.tmin); tmax = max(tmax, other.tmax);
+			return *this;
+		}
 		friend T operator+(const T& a, const T& b) {
-			return T(min(a.tmin, b.tmin), max(a.tmax, b.tmax));
+			T out(a); out += b; return out;
 		}  //! T+T
 		T& operator*=(const F& a) { tmin += a.fdat; tmax += a.fdat; return *this; }  //! F(T)
 	};
@@ -435,7 +439,7 @@ struct SLSTnode {
 	void pull() {
         // dbgc("pull START", L, R, MP(t.tmin, t.tmax), f.fdat);
         t = T();
-        F0R(i,2) if (c[i]) t = t + c[i]->t;
+        F0R(i,2) if (c[i]) t += c[i]->t;
         // dbgc("pull END",L,R,MP(t.tmin, t.tmax),f.fdat);
     }
 
