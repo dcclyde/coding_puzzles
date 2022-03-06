@@ -383,221 +383,73 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
-/*
-	Say T starts with DACA...
-	For first slot, we contribute:
-		(num As remaining) * (ways to arrange everything that's left except one A)
-		+ (num Bs remaining) * (ways to arrange everything except one B)
-		+ (... C ...)
-
-	If we don't have a D, we're done now.
-	Otherwise: what does removing that D do to my chunks above?
-
-	Ways to arrange =
-
-*/
-
-const int MOD = 998244353;
-
-/**
- * Description: modular arithmetic operations
- * Source:
-	* KACTL
-	* https://codeforces.com/blog/entry/63903
-	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
-	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
-	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
- * Verification:
-	* https://open.kattis.com/problems/modulararithmetic
- */
-
-// #pragma once
-
-template<int MOD, int RT> struct mint {
-	static const int mod = MOD;
-	static constexpr mint rt() { return RT; } // primitive root for FFT
-	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
-	mint():v(0) {}
-	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
-		if (v < 0) v += MOD; }
-	bool operator==(const mint& o) const {
-		return v == o.v; }
-	friend bool operator!=(const mint& a, const mint& b) {
-		return !(a == b); }
-	friend bool operator<(const mint& a, const mint& b) {
-		return a.v < b.v; }
-	friend void re(mint& a) { ll x; re(x); a = mint(x); }
-	friend str ts(mint a) { return ts(a.v); }
-
-	mint& operator+=(const mint& o) {
-		if ((v += o.v) >= MOD) v -= MOD;
-		return *this; }
-	mint& operator-=(const mint& o) {
-		if ((v -= o.v) < 0) v += MOD;
-		return *this; }
-	mint& operator*=(const mint& o) {
-		v = int((ll)v*o.v%MOD); return *this; }
-	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
-	friend mint pow(mint a, ll p) {
-		mint ans = 1; assert(p >= 0);
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
-		return ans; }
-	friend mint inv(const mint& a) { assert(a.v != 0);
-		return pow(a,MOD-2); }
-
-	mint operator-() const { return mint(-v); }
-	mint& operator++() { return *this += 1; }
-	mint& operator--() { return *this -= 1; }
-	friend mint operator+(mint a, const mint& b) { return a += b; }
-	friend mint operator-(mint a, const mint& b) { return a -= b; }
-	friend mint operator*(mint a, const mint& b) { return a *= b; }
-	friend mint operator/(mint a, const mint& b) { return a /= b; }
-};
-
-using mi = mint<MOD,5>; // 5 is primitive root for both common mods
-using vmi = V<mi>;
-using pmi = pair<mi,mi>;
-using vpmi = V<pmi>;
-
-V<vmi> scmb; // small combinations
-void genComb(int SZ) {
-	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
-	FOR(i,1,SZ) F0R(j,i+1)
-		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
-}
-
-/**
- * Description: pre-compute factorial mod inverses,
- 	* assumes $MOD$ is prime and $SZ < MOD$.
- * Time: O(SZ)
- * Source: KACTL
- * Verification: https://dmoj.ca/problem/tle17c4p5
- */
-
-vmi invs, fac, ifac;
-void genFac(int SZ) {
-	invs.rsz(SZ), fac.rsz(SZ), ifac.rsz(SZ);
-	invs[1] = fac[0] = ifac[0] = 1;
-	FOR(i,2,SZ) invs[i] = mi(-(ll)MOD/i*(int)invs[MOD%i]);
-	FOR(i,1,SZ) fac[i] = fac[i-1]*i, ifac[i] = ifac[i-1]*invs[i];
-}
-mi comb(int a, int b) {
-	if (a < b || b < 0) return 0;
-	return fac[a]*ifac[b]*ifac[a-b]; }
 
 
-/**
- * Description: 1D point update, range query where \texttt{cmb} is
- 	* any associative operation. If $N=2^p$ then \texttt{seg[1]==query(0,N-1)}.
- * Time: O(\log N)
- * Source:
-	* http://codeforces.com/blog/entry/18051
-	* KACTL
- * Verification: SPOJ Fenwick
- */
 
-tcT> struct SegTree { // cmb(ID,b) = b
-	const T ID{}; T cmb(T a, T b) { return a+b; }
-	int n; V<T> seg;
-	void init(int _n) { // upd, query also work if n = _n
-		for (n = 1; n < _n; ) n *= 2;
-		seg.assign(2*n,ID); }
-	void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
-	void upd(int p, T val) { // set val at position p
-		seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p); }
-	void sub1(int p) {
-		T val = seg[p+n];
-		val -= 1;
-		upd(p, val);
-	}
-	T query(int l, int r) {	// associative op on [l, r]
-		T ra = ID, rb = ID;
-		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
-			if (l&1) ra = cmb(ra,seg[l++]);
-			if (r&1) rb = cmb(seg[--r],rb);
-		}
-		return cmb(ra,rb);
-	}
-};
+
 
 
 void solve() {
-    ints(len_S, len_T);
-    vector<ll> S, T;
-    rv(len_S, S);
-	rv(len_T, T);
-	dbg(S);
-	dbg(T);
+    ints(N, C);
+    vector<ll> dat;
+    rv(N,dat);
+    // dbg(N, dat);
 
-	map<int, int> counts;
-	int max_in_S = 0;
-	for ( auto& x : S ) {
-		++counts[x];
-		max_in_S = max(max_in_S , (int)x);
+	remDup( dat );  // sort and remove duplicates
+	N = dat.size();
+	if ( dat[0] != 1 ) {
+		cout << "No\n";
+		return;
 	}
-	dbg(counts);
-	dbg(max_in_S);
-
-	// W = "num ways to place all remaining stuff".
-	ll N = S.size();
-	mi W = fac[ N ];
-	for ( auto& pr : counts ) {
-		W *= ifac[ pr.second ];
-	}
-	#ifdef DCCLYDE_LOCAL
-	vector<int> fac_printout_helper;
-	for ( auto& x : fac ) {
-		fac_printout_helper.push_back( (int)x );
-	}
-	dbg(fac_printout_helper);
-	#endif
-	dbg( (int)W );
-
-	// I just need prefix sums but anyway let's set up a segtree.
-	SegTree<int> st;
-	st.init( max_in_S + 1 );
-	for ( auto& pr : counts ) {
-		st.upd( pr.first , pr.second );
+	dbgc("");
+	vector<bool> present( C+1 , false );
+	for ( auto& x : dat ) {
+		present[x] = true;
 	}
 
-	mi out = 0;
-	for ( int tidx = 0 ; tidx < T.size() ; ++tidx ) {
-		el;
-		auto& t = T[tidx];
-		dbg(tidx, t, counts);
-		if ( N == 0 ) {
-			break;
+	dbgc("");
+	vector<ll> complement;
+	complement.reserve( C-N+1 );
+	{
+		int pos = 0;
+		for ( int k = 1 ; k <= C ; ++k ) {
+			while( pos < N && dat[pos] < k ) {
+				++pos;
+			}
+			if ( pos == N || dat[pos] != k ) {
+				complement.push_back( k );
+			}
 		}
-
-		// how many ways while placing some smaller element?
-		int num_smaller_elements = st.query(0, t-1);
-		mi contrib = W * num_smaller_elements;
-		contrib /= N;
-		out += contrib;
-		dbg( num_smaller_elements , (int)W , (int)contrib, (int)out );
-
-		if ( counts[t] == 0 ) {
-			dbgc("break", tidx, t, (int)out);
-			break;
-		}
-
-		// update all the helpers now that I've used up this element.
-		st.sub1( t );
-		W *= counts[ t ];
-		W /= N;
-		--counts[ t ];
-		--N;
 	}
-	// still need to give +1 if S anagrams to a prefix of T.
-	bool add_one = ( N == 0 && len_S < len_T );
+	dbg( dat );
+	dbg( complement );
 	el;
-	dbg( add_one, len_S, len_T, len_S<len_T );
-	if ( add_one ) {
-		out += 1;
+	vector<int> maxDenom( C+1 );
+	for ( auto& x : dat ) {
+		for ( auto& y : complement ) {
+			if ( x*y > C ) {
+				break;
+			}
+			maxDenom[x*y] = max(maxDenom[x*y], (int)x);
+		}
+	}
+	dbg(maxDenom);
+
+	/*
+		If I have 3 and missing 6, then I better not have 18, 19, 20.
+	*/
+	int denom_ctr = 0;
+	for ( int k = 2 ; k <= C ; ++k ) {
+		denom_ctr = max(denom_ctr, maxDenom[k]);
+		dbg(k, denom_ctr);
+		if ( denom_ctr > 0 && present[k] ) {
+			cout << "No\n";
+			return;
+		}
+		--denom_ctr;
 	}
 
-	cout << (int)out << '\n';
-	dbgc("Check |S|<|T| case.")
+	cout << "Yes\n";
 	return;
 }
 
@@ -606,15 +458,8 @@ void solve() {
 int main() {
 	setIO();
 
-	int FAC_MAX = 200'500;
-#ifdef DCCLYDE_LOCAL
-	FAC_MAX = 8;
-#endif
-
-	genFac( FAC_MAX );
-
     int T = 1;
-    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k );
         solve();
