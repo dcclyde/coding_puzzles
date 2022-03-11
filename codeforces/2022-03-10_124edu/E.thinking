@@ -1,0 +1,82 @@
+
+Graph decomposes into cycles.
+Fine to solve the problem for one cycle at a time if we want.
+
+
+After deleting some vertices from the bottom row,
+the graph is now a collection of "chunks" of even length.
+    (possible edge case if we deleted nothing from the bottom.)
+It's fine if our method only handles incrementally adding OR deleting
+    bottom vertices.
+    Then do N^2 steps and hope we have some good tricks for the top.
+
+When we start deleting from the top, the first deletion from a certain chunk costs 0.
+Subsequent deletions from same chunk cost 1 each.
+
+
+
+
+Say some chunk has top vertices [3, 8, 4, 1]. Length 6 and N = 10.
+L   R   out
+1   10  3
+1   9   3
+1   8   3
+1   7   3
+
+out = 3:
+Need to include [1, 4] OR [3, 8].
+7 + 3*3 - 3 = 13
+
+out = 2:
+[L, R] should include exactly 2/4 points.
+
+lose 0 from start: 1
+lose 1 from start: 2
+lose 2 from start: 1
+lose 3 from start: 4
+
+lose 0 from end: 3
+lose 1 from end: 4
+lose 2 from end: 1
+lose 3 from end: 2
+
+[1, 2, 1, 4, 3] are the differences. Then run forward vs backward through.
+
+out = 3: Need to lose 0 or 1 total.
+1*3 + 1*4 + 2*3 = 13
+
+Final formula for this chunk is like:
+sum_k k * (s_0 * e_k + s_1 * e_{k-1} + ... + s_k * e_0)
+
+
+Had [3, 8, 4, 1] with differences [1, 2, 1, 4, 3].
+Delete a bottom node. Now we have [3, 8, 4] and [3, 1, 4, 3].
+
+Rewrite the convolution all in terms of the differences?
+    See notebook.
+
+-------------------
+
+With all bottom vertices present:
+Each top node contributes 1 per interval containing it.
+
+With 1 bottom vertex gone:
+"middle" top nodes still contribute 1 if present.
+"endpoint" top nodes contribute 1 total if at least one is present.
+
+
+.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

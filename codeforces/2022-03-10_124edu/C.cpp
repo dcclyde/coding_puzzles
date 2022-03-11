@@ -151,7 +151,7 @@ inline namespace Input {
     tcT> typename enable_if<is_readable_v<T>,void>::type re(T& x) { cin >> x; } // default
     tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
-    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }
+    tcTU> void re(pair<T,U>& p) { re(p.f,p.s); }
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
         each(x,i) re(x); }
     tcTUU> void re(T& t, U&... u) { re(t); re(u...); } // read multiple
@@ -390,218 +390,69 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
-/*
-? This solution works. It uses a "segment tree x IntervalUnion" data structure.
-? It's clearly overkill for this problem. Good news is that it would also handle
-?     a hypothetical online version where we need to handle ins/del queries.
-*/
-
 // ! ---------------------------------------------------------------------------
 
-const int INF = 1e9;
-
-const int INPUT_COORD_MAX = 200'200;
-const int INTERNAL_COORD_MAX = INPUT_COORD_MAX * 2;
-
-template<class T, bool MERGE_ADJACENT = true>
-struct IntervalUnion {
-    set<pair<T, T>> x;
-
-    // internal helper
-    pair<T, T> merge_intervals(const pair<T,T>& a, const pair<T,T>& b) {
-        return { min(a.first, b.first) , max(a.second, b.second) };
+ll min_cost(ll v, set<ll>& S) {
+    auto it = S.lower_bound( v );
+    ll out = 1e18;
+    if ( it != S.end() ) {
+        out = min(out, abs(v - *it));
     }
-
-    void insert(pair<T, T> pr) {
-        while ( true ) {
-            auto it = x.lower_bound( pr );
-            if ( it != x.end() && it->first <= pr.second + MERGE_ADJACENT ) {
-                // found an adjacent interval that's ">=" mine.
-                pr = merge_intervals(pr, *it);
-                x.erase( it );
-                continue;
-            }
-            if ( it == x.begin() ) {
-                break;
-            }
-            --it;
-            if ( it->second >= pr.first - MERGE_ADJACENT ) {
-                pr = merge_intervals(pr, *it);
-                x.erase(it);
-                continue;
-            }
-            break;
-        }
-        x.insert( pr );
-    }
-
-    // If pr \subseteq *this, return INF.
-    // Otherwise, return a point in *this \ pr.
-    T test_contained(pair<T,T> pr) {
-        auto& [a,b] = pr;
-        auto it = query(a);
-        if ( it == x.end() ) {
-            return a;
-        }
-        if ( it->second >= b ) {
-            return INF;
-        }
-        return it->second + 1;
-    }
-    //     auto& [a,b] = pr;
-    //     auto it = x.lower_bound( MP(a,a) );
-    //     if ( it != x.end() ) {
-    //         if ( it->first == a ) {
-    //             // *it had better contain the whole interval.
-    //             if ( it->second >= b ) {
-    //                 return INF;
-    //             } else {
-    //                 return it->second + 1;
-    //             }
-    //         }
-    //     }
-    //     if ( it != x.begin() ) {
-    //         --it;
-    //         // now THIS interval needs to cover [a,b].
-    //         if ( it->second < b ) {
-    //             return max(it->second + 1, a);
-    //         } else {
-    //             return INF;
-    //         }
-    //     }
-    //     return a;
-    // }
-
-    set<pair<T,T>>::const_iterator query(T p) {
-        auto it = x.lower_bound(MP(p,p));
-        if ( it != x.end() && it->first == p ) {
-            return it;
-        }
-        if ( it == x.begin() ) {
-            return x.end();
-        }
+    if ( it != S.begin() ) {
         --it;
-        if ( it->second >= p ) {
-            return it;
-        }
-        return x.end();
+        out = min(out, abs(v - *it));
     }
-};
+    return out;
+}
 
-
-tcT> struct SegTree { // cmb(ID,b) = b
-	const T ID{};
-    // T cmb(T a, T b) { return a+b; }
-	int n; V<T> seg;
-	void init(int _n) { // upd, query also work if n = _n
-		for (n = 1; n < _n; ) n *= 2;
-		seg.assign(2*n,ID); }
-	// void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
-	void upd(int p, int val) { // set val at position p
-		seg[p += n].insert( MP(val,val) );
-        int prev = p;
-        for (p /= 2; p; p /= 2) {
-            if ( seg[prev^1].test_contained( MP(val,val) ) != INF ) {
-                break;
-            }
-            seg[p].insert(MP(val,val));
-            prev = p;
-        }
-    }
-    pii track_missing(int p, int tc) {
-        if ( p == (n+6)/2 ) {
-            dbgc("tm special", p, tc);
-        }
-        if ( p >= n ) {
-            return MP(p-n, tc);
-        }
-        int missing = seg[2*p].test_contained(MP(tc,tc));
-        if ( missing != INF ) {
-            return track_missing(2*p, tc);
-        } else {
-            return track_missing(2*p+1, tc);
-        }
-    }
-	pii query(int l, int r, pii vertical) {	// associative op on [l, r]
-		// T ra = ID, rb = ID;
-        dbgc("query", l,r,vertical);
-        if ( l < 0 ) {
-            dbgc("too far left");
-            return MP(l, vertical.first);
-        }
-        if ( r >= n ) {
-            dbgc("too far right");
-            return MP(r, vertical.first);
-        }
-		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
-			if (l&1) {
-                // ra = cmb(ra,seg[l++]);
-                int tc = seg[l].test_contained(vertical);
-                dbgc("cmb", l, seg[l].x, tc);
-                if ( tc != INF ) return track_missing(l, tc);
-                ++l;
-            }
-			if (r&1) {
-                --r;
-                int tc = seg[r].test_contained(vertical);
-                dbgc("cmb", r, seg[r].x, tc);
-                if ( tc != INF ) return track_missing(r, tc);
-                // rb = cmb(seg[--r],rb);
-            }
-		}
-        return MP(INF,INF);
-		// return cmb(ra,rb);
-	}
-};
 
 
 
 void solve() {
-    ints(N);
-    vector<pii> dat;
-    rv(N, dat);
-    dbg(N, dat); el;
-    SegTree<IntervalUnion<int>> st;
-    st.init( INTERNAL_COORD_MAX );
-    for ( auto& [a, b] : dat ) {
-        tie(a, b) = MP(a+b, a-b);
-        st.upd( a   , b   );
-        st.upd( a+1 , b   );
-        st.upd( a-1 , b   );
-        st.upd( a   , b+1 );
-        st.upd( a   , b-1 );
-    }
-    dbg(dat);
-    #ifdef DCCLYDE_LOCAL
-    for( int k = 0 ; k < st.n ; ++k ) {
-        auto& x = st.seg[k+st.n].x;
-        if ( x.size() > 0 ) {
-            dbg(k, x, st.seg[(k+st.n)/2].x);
-        }
-    }
-    el;
-    #endif
+    lls(N);
+    vector<ll> A, B;
+    rv(N, A);
+    rv(N, B);
 
-    for ( auto& [a, b] : dat ) {
-        int lo = 0;
-        int hi = 1e6;
-        while ( hi - lo > 1 ) {
-            int curr = (lo + hi) / 2;
-            el; dbgc(OUT_MARK<<"BINSEARCH IN", MP(a,b), curr);
-            pii result = st.query( a-curr, a+curr, MP(b-curr, b+curr) );
-            dbgc(OUT_MARK<<"BINSEARCH OUT", MP(a,b), curr , result);
-            if ( result.first == INF ) {
-                // fully contained.
-                lo = curr;
-            } else {
-                hi = curr;
-            }
-        }
-        pii best = st.query( a-hi, a+hi, MP(b-hi, b+hi) );
-        auto& [x, y] = best;
-        dbg(best);
-        cout << (x+y)/2 << ' ' << (x-y)/2 << '\n';
+    set<ll> AS, BS;
+    AS.insert( all(A) );
+    BS.insert( all(B) );
+
+    ll a1 = A[0];
+    ll aN = A[N-1];
+    ll b1 = B[0];
+    ll bN = B[N-1];
+
+    ll a1cost = min_cost(a1, BS);
+    ll aNcost = min_cost(aN, BS);
+    ll b1cost = min_cost(b1, AS);
+    ll bNcost = min_cost(bN, AS);
+    dbg(a1cost, aNcost, b1cost, bNcost);
+
+    ll d11 = abs(a1 - b1);
+    ll d1N = abs(a1 - bN);
+    ll dN1 = abs(aN - b1);
+    ll dNN = abs(aN - bN);
+    dbg(d11, d1N, dN1, dNN);
+
+    vector<ll> options;
+    options.push_back( a1cost + aNcost + b1cost + bNcost );
+
+    options.push_back( d11 + aNcost + bNcost );
+    options.push_back( d1N + aNcost + b1cost );
+    options.push_back( dNN + a1cost + b1cost );
+    options.push_back( dN1 + a1cost + bNcost );
+
+
+    options.push_back( d11 + dNN );
+    options.push_back( d1N + dN1 );
+
+    ll out = 1e18;
+    for ( auto& x : options ) {
+        out = min(x, out);
     }
+    dbg(options);
+    cout << out << '\n';
 
     return;
 }
@@ -612,7 +463,7 @@ int main() {
     setIO();
 
     int T = 1;
-    // std::cin >> T;  dbgc("loading num cases!!!")  // ! Comment this out for one-case problems.
+    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k );
         solve();

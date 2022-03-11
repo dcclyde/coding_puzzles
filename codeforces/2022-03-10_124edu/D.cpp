@@ -81,6 +81,7 @@ constexpr int msk2(int x) { return p2(x)-1; }
 
 ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
 ll fdiv(ll a, ll b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
+int fdiv(int a, int b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
 
 tcT> bool ckmin(T& a, const T& b) {
     return b < a ? a = b, 1 : 0; } // set a = min(a,b)
@@ -151,7 +152,7 @@ inline namespace Input {
     tcT> typename enable_if<is_readable_v<T>,void>::type re(T& x) { cin >> x; } // default
     tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
-    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }
+    tcTU> void re(pair<T,U>& p) { re(p.f,p.s); }
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
         each(x,i) re(x); }
     tcTUU> void re(T& t, U&... u) { re(t); re(u...); } // read multiple
@@ -390,22 +391,39 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
-/*
-? This solution works. It uses a "segment tree x IntervalUnion" data structure.
-? It's clearly overkill for this problem. Good news is that it would also handle
-?     a hypothetical online version where we need to handle ins/del queries.
-*/
-
 // ! ---------------------------------------------------------------------------
 
-const int INF = 1e9;
+const int INF = 2e9;
 
-const int INPUT_COORD_MAX = 200'200;
-const int INTERNAL_COORD_MAX = INPUT_COORD_MAX * 2;
+#ifdef DCCLYDE_LOCALx
+const int COORD_MAX_INPUT = 10;
+#else
+const int COORD_MAX_INPUT = 200'000;
+#endif
+const int COORD_MAX_INTERNAL = COORD_MAX_INPUT * 2 + 100;
+
+pii xform(pii& p) {
+    auto& [a, b] = p;
+    return MP(fdiv(a+b,2), a-b);
+}
+
+pii xform_inv(pii& p) {
+    if ( p.first == INF ) {
+        return p;
+    }
+    auto& [x, y] = p;
+    return MP((x+y)/2, (x-y)/2);
+}
+
+/*
+    Track a collection of intervals.
+    Example usage: codeforces/2022-02-23/E_working_on_data_structure.cpp
+*/
 
 template<class T, bool MERGE_ADJACENT = true>
 struct IntervalUnion {
     set<pair<T, T>> x;
+    set<pair<T, T>>::iterator it;  // avoid reallocating.
 
     // internal helper
     pair<T, T> merge_intervals(const pair<T,T>& a, const pair<T,T>& b) {
@@ -414,7 +432,7 @@ struct IntervalUnion {
 
     void insert(pair<T, T> pr) {
         while ( true ) {
-            auto it = x.lower_bound( pr );
+            it = x.lower_bound( pr );
             if ( it != x.end() && it->first <= pr.second + MERGE_ADJACENT ) {
                 // found an adjacent interval that's ">=" mine.
                 pr = merge_intervals(pr, *it);
@@ -435,45 +453,39 @@ struct IntervalUnion {
         x.insert( pr );
     }
 
-    // If pr \subseteq *this, return INF.
-    // Otherwise, return a point in *this \ pr.
+    /*
+        Return a value that's in pr but not in the data structure,
+        or INF if pr is fully contained.
+    */
     T test_contained(pair<T,T> pr) {
-        auto& [a,b] = pr;
-        auto it = query(a);
-        if ( it == x.end() ) {
+        auto& [a, b] = pr;
+        it = x.lower_bound( MP(a,a) );
+        // case where there's an interval starting at a
+        // dbg(a, b, it==x.end(), it==x.begin());
+        if ( it != x.end() ) {
+            // dbgc("lower_bound", *it);
+            if ( it->first == a ) {
+                if ( it->second >= b ) {
+                    return INF;
+                } else {
+                    return it->second + 1;
+                }
+            }
+        }
+        // no interval starting at a.
+        // previous interval had better cover [a, b].
+        if ( it == x.begin() ) {
             return a;
         }
+        --it;
         if ( it->second >= b ) {
             return INF;
         }
         return it->second + 1;
     }
-    //     auto& [a,b] = pr;
-    //     auto it = x.lower_bound( MP(a,a) );
-    //     if ( it != x.end() ) {
-    //         if ( it->first == a ) {
-    //             // *it had better contain the whole interval.
-    //             if ( it->second >= b ) {
-    //                 return INF;
-    //             } else {
-    //                 return it->second + 1;
-    //             }
-    //         }
-    //     }
-    //     if ( it != x.begin() ) {
-    //         --it;
-    //         // now THIS interval needs to cover [a,b].
-    //         if ( it->second < b ) {
-    //             return max(it->second + 1, a);
-    //         } else {
-    //             return INF;
-    //         }
-    //     }
-    //     return a;
-    // }
 
     set<pair<T,T>>::const_iterator query(T p) {
-        auto it = x.lower_bound(MP(p,p));
+        it = x.lower_bound(MP(p,p));
         if ( it != x.end() && it->first == p ) {
             return it;
         }
@@ -489,6 +501,17 @@ struct IntervalUnion {
 };
 
 
+
+/**
+ * Description: 1D point update, range query where \texttt{cmb} is
+ 	* any associative operation. If $N=2^p$ then \texttt{seg[1]==query(0,N-1)}.
+ * Time: O(\log N)
+ * Source:
+	* http://codeforces.com/blog/entry/18051
+	* KACTL
+ * Verification: SPOJ Fenwick
+ */
+
 tcT> struct SegTree { // cmb(ID,b) = b
 	const T ID{};
     // T cmb(T a, T b) { return a+b; }
@@ -496,111 +519,152 @@ tcT> struct SegTree { // cmb(ID,b) = b
 	void init(int _n) { // upd, query also work if n = _n
 		for (n = 1; n < _n; ) n *= 2;
 		seg.assign(2*n,ID); }
-	// void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
+	void pull(int p, int val) {
+        // seg[p] = cmb(seg[2*p],seg[2*p+1]);
+        // only add this if BOTH children have it.
+        seg[p].insert(MP(val,val));
+        dbgc("PULL", p, val, seg[p].x);
+    }
 	void upd(int p, int val) { // set val at position p
-		seg[p += n].insert( MP(val,val) );
-        int prev = p;
+		seg[p += n].insert(MP(val,val));
+        dbgc("UPD ", p, val, seg[p].x);
+        int prev_p = p;
         for (p /= 2; p; p /= 2) {
-            if ( seg[prev^1].test_contained( MP(val,val) ) != INF ) {
+            // if the adjacent child doesn't contain val, we're done here.
+            if ( seg[prev_p ^ 1].test_contained(MP(val,val)) != INF ) {
                 break;
             }
-            seg[p].insert(MP(val,val));
-            prev = p;
+            pull(p, val);
+            prev_p = p;
         }
     }
-    pii track_missing(int p, int tc) {
-        if ( p == (n+6)/2 ) {
-            dbgc("tm special", p, tc);
-        }
+
+    pii find_missing(int p, int tc) {
+        // check children until we find one that's missing tc.
+        dbgc("fm", p, tc, seg[p].x);
         if ( p >= n ) {
-            return MP(p-n, tc);
+            return MP(p - n, tc);
         }
-        int missing = seg[2*p].test_contained(MP(tc,tc));
-        if ( missing != INF ) {
-            return track_missing(2*p, tc);
+        int tcL = seg[2*p].test_contained( MP(tc,tc) );
+        dbgc("fm calls tc", tc, 2*p, seg[2*p].x, tcL);
+        if ( tcL != INF ) {
+            return find_missing( 2*p , tc );
         } else {
-            return track_missing(2*p+1, tc);
+            return find_missing( 2*p+1 , tc );
         }
     }
-	pii query(int l, int r, pii vertical) {	// associative op on [l, r]
+
+    /*
+        T/F: Is vert a subset of the intersection from l to r?
+        If yes, return (INF, INF).
+        If no, return a point that's not included.
+    */
+	pii query(int l, int r, pair<int,int> vert) {	// associative op on [l, r]
 		// T ra = ID, rb = ID;
-        dbgc("query", l,r,vertical);
+        dbgc("query", n, l, r, vert);
         if ( l < 0 ) {
-            dbgc("too far left");
-            return MP(l, vertical.first);
+            return MP(l, vert.first);
         }
         if ( r >= n ) {
-            dbgc("too far right");
-            return MP(r, vertical.first);
+            return MP(r, vert.first);
         }
+        dbg();
 		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+            dbg(l, r);
 			if (l&1) {
+                dbg(seg[l].x);
                 // ra = cmb(ra,seg[l++]);
-                int tc = seg[l].test_contained(vertical);
-                dbgc("cmb", l, seg[l].x, tc);
-                if ( tc != INF ) return track_missing(l, tc);
+                int tc = seg[l].test_contained( vert );
+                if ( tc != INF ) {
+                    // found something missing.
+                    return find_missing( l , tc );
+                }
                 ++l;
             }
 			if (r&1) {
-                --r;
-                int tc = seg[r].test_contained(vertical);
-                dbgc("cmb", r, seg[r].x, tc);
-                if ( tc != INF ) return track_missing(r, tc);
+                dbg(seg[r].x);
                 // rb = cmb(seg[--r],rb);
+                --r;
+                int tc = seg[r].test_contained( vert );
+                if ( tc != INF ) {
+                    return find_missing( r , tc );
+                }
             }
 		}
-        return MP(INF,INF);
-		// return cmb(ra,rb);
+		return MP(INF, INF);
 	}
 };
 
 
 
+
 void solve() {
-    ints(N);
-    vector<pii> dat;
-    rv(N, dat);
-    dbg(N, dat); el;
+    lls(N);
+    vector<pii> dat( N );
     SegTree<IntervalUnion<int>> st;
-    st.init( INTERNAL_COORD_MAX );
-    for ( auto& [a, b] : dat ) {
+    st.init( COORD_MAX_INTERNAL );
+    FOR(k,0,N) {
+        auto& [a, b] = dat[k];
+        cin >> a >> b;
         tie(a, b) = MP(a+b, a-b);
-        st.upd( a   , b   );
-        st.upd( a+1 , b   );
-        st.upd( a-1 , b   );
-        st.upd( a   , b+1 );
-        st.upd( a   , b-1 );
+        dbg(a, b);
+        st.upd( a   , b   ); el;
+        st.upd( a+1 , b   ); el;
+        st.upd( a-1 , b   ); el;
+        st.upd( a   , b+1 ); el;
+        st.upd( a   , b-1 ); el;
+
+        // #ifdef DCCLYDE_LOCAL
+        // int dout = st.seg[23].test_contained(MP(-3,-3));
+        // if ( dout == INF ) {
+        //     dbg(k, dat[k], dout, st.seg[21].x);
+        //     exit(1);
+        // }
+        // #endif
     }
-    dbg(dat);
-    #ifdef DCCLYDE_LOCAL
-    for( int k = 0 ; k < st.n ; ++k ) {
-        auto& x = st.seg[k+st.n].x;
-        if ( x.size() > 0 ) {
-            dbg(k, x, st.seg[(k+st.n)/2].x);
+    dbg(N, dat); el;
+    for ( int k = 0 ; k < st.n ; ++k ) {
+        if ( st.seg[k+st.n].x.size() > 0 ) {
+            dbg(k, st.seg[k+st.n].x);
         }
     }
     el;
-    #endif
 
-    for ( auto& [a, b] : dat ) {
-        int lo = 0;
-        int hi = 1e6;
+    /*
+        Describe a 13-point square around (5, 3) as:
+        [6, 10] x [0, 4].
+        radius = r, center = (a, b)
+        [a+b-r, a+b+r] x [
+    */
+
+    for ( auto& xx : dat ) {
+        auto& [a, b] = xx;
+        int lo = 0;  // definitely contained
+        int hi = 500;  // definitely not contained. sqrt of num points.
+
         while ( hi - lo > 1 ) {
-            int curr = (lo + hi) / 2;
-            el; dbgc(OUT_MARK<<"BINSEARCH IN", MP(a,b), curr);
-            pii result = st.query( a-curr, a+curr, MP(b-curr, b+curr) );
-            dbgc(OUT_MARK<<"BINSEARCH OUT", MP(a,b), curr , result);
-            if ( result.first == INF ) {
-                // fully contained.
-                lo = curr;
+            int Q = (lo + hi) / 2;
+            el; dbgc(OUT_MARK<<"BINSEARCH", xx, Q);
+            /*
+                Need to describe box of radius Q around (a, b).
+            */
+            pii response = st.query(a-Q, a+Q, MP(b-Q, b+Q));
+            dbgc(OUT_MARK<<"st response", Q , xx, MP(a-Q,a+Q), MP(b-Q,b+Q), response, xform_inv(response));
+            if ( response.first == INF ) {
+                // this box is contained.
+                lo = Q;
             } else {
-                hi = curr;
+                hi = Q;
             }
         }
-        pii best = st.query( a-hi, a+hi, MP(b-hi, b+hi) );
-        auto& [x, y] = best;
-        dbg(best);
-        cout << (x+y)/2 << ' ' << (x-y)/2 << '\n';
+        el;
+        int Q = hi;
+        pii final_response = st.query(a-Q, a+Q, MP(b-Q, b+Q));
+        auto& [x, y] = final_response;
+        int aaa = (x+y) / 2;
+        int bbb = (x-y) / 2;
+        cout << aaa << ' ' << bbb << '\n';
+        // exit(1);
     }
 
     return;
@@ -612,7 +676,7 @@ int main() {
     setIO();
 
     int T = 1;
-    // std::cin >> T;  dbgc("loading num cases!!!")  // ! Comment this out for one-case problems.
+    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k );
         solve();
