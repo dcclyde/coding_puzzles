@@ -5,4 +5,4 @@
 tmp-gdb-cmd-args.txt
 
 library_algorithms/benq
-projecteuler/**
+/projecteuler

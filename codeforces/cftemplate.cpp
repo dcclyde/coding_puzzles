@@ -422,8 +422,8 @@ int main() {
 
     int T = 1;
     std::cin >> T;  dbgc("loading num cases!!!")  // ! Comment this out for one-case problems.
-    for ( int k = 1 ; k <= T ; ++k ) {
-        el; dbgc("CASE" , k );
+    for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
+        el; dbgc("CASE" , CASE );
         solve();
     }
 
