@@ -45,8 +45,8 @@ using vpd = V<pd>;
 #define ins insert
 #define pb push_back
 #define eb emplace_back
-// #define ft front()
-// #define bk back()
+#define ft front()
+#define bk back()
 
 //// #define lb lower_bound
 //// #define ub upper_bound
@@ -210,7 +210,7 @@ inline namespace ToString {
         if (lev == 0 || !sz(v)) return {ts(v)};
         vs res;
         for (const auto& t: v) {
-            if (sz(res)) res.back() += ",";
+            if (sz(res)) res.bk += ",";
             vs tmp = ts_lev<lev-1>(t);
             res.ins(end(res),all(tmp));
         }
@@ -218,7 +218,7 @@ inline namespace ToString {
             str bef = " "; if (i == 0) bef = "{";
             res[i] = bef+res[i];
         }
-        res.back() += "}";
+        res.bk += "}";
         return res;
     }
 }
@@ -392,18 +392,65 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+/**
+ * Description: 1D point update, range query where \texttt{cmb} is
+ 	* any associative operation. If $N=2^p$ then \texttt{seg[1]==query(0,N-1)}.
+ * Time: O(\log N)
+ * Source:
+	* http://codeforces.com/blog/entry/18051
+	* KACTL
+ * Verification: SPOJ Fenwick
+ */
 
-bool f(int a) {
-	dbg(a);
-	return false;
-}
+
+tcT> struct SegTree { // cmb(ID,b) = b
+	const T ID{};
+    T cmb(T a, T b) {
+        auto& [ar, ap, as] = a;
+        auto& [br, bp, bs] = b;
+        T out;
+        auto& [cr, cp, cs] = out;
+
+
+        return out;
+    }
+	int n; V<T> seg;
+	void init(int _n) { // upd, query also work if n = _n
+		for (n = 1; n < _n; ) n *= 2;
+		seg.assign(2*n,ID); }
+	void pull(int p) { seg[p] = cmb(seg[2*p],seg[2*p+1]); }
+	void upd(int p, T val) { // set val at position p
+		seg[p += n] = val; for (p /= 2; p; p /= 2) pull(p); }
+	T query(int l, int r) {	// associative op on [l, r]
+		T ra = ID, rb = ID;
+		for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+			if (l&1) ra = cmb(ra,seg[l++]);
+			if (r&1) rb = cmb(seg[--r],rb);
+		}
+		return cmb(ra,rb);
+	}
+};
+
+
 
 
 
 void solve() {
+    lls(N, Q);
+    string dat; cin >> dat;
 
-	int ft = lstTrue(0, 20, [&](int x) {return f(x);});
-	dbg(ft);
+    SegTree<tuple<int,int,int>> st;
+    st.init( N );
+    FOR( k , 0 , N ) {
+        if ( dat[k] == 'R' ) {
+            st.upd( k , MT(1,0,0) );
+        } else if ( dat[k] == 'P' ) {
+            st.upd( k , MT(0,1,0) );
+        } else if ( dat[k] == 'S' ) {
+            st.upd( k , MT(0,0,1) );
+        }
+    }
+
 
 
     return;
