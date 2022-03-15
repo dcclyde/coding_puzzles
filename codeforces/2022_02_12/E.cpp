@@ -547,8 +547,9 @@ void solve() {
                         break;
                     }
                     out_local += posA;
-                    if ( aidx == bidx && posA > posB ) {
-                        out_local -= 1;  // Don't count (x, x) as a pair.
+                    if ( aidx == bidx ) {
+                        // undo counting same pairs twice.
+                        out_local -= min(posB+1, posA);
                     }
                 }
                 dbgc("LxL", MP(nA,vA), MP(nB,vB), out_local);
@@ -686,6 +687,12 @@ void solve() {
 #pragma region
 int main() {
 	setIO();
+
+    // artificially force an error so I can practice backtracing.
+    vector<int> asdf( 3 );
+    for ( int k = 0 ; k < 10 ; k += 2 ) {
+        asdf[k] = 13;
+    }
 
     int T = 1;
     std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
