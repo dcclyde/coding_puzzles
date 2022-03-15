@@ -383,10 +383,72 @@ void debug_out(Head H, Tail... T) {
 
 #pragma endregion
 
-ll MOD = 998244353;
+const int MOD = 998244353;
 
 
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
 
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+vmi invs, fac, ifac;
+void genFac(int SZ) {
+	invs.rsz(SZ), fac.rsz(SZ), ifac.rsz(SZ);
+	invs[1] = fac[0] = ifac[0] = 1;
+	FOR(i,2,SZ) invs[i] = mi(-(ll)MOD/i*(int)invs[MOD%i]);
+	FOR(i,1,SZ) fac[i] = fac[i-1]*i, ifac[i] = ifac[i-1]*invs[i];
+}
+mi comb(int a, int b) {
+	if (a < b || b < 0) return 0;
+	return fac[a]*ifac[b]*ifac[a-b]; }
 
 
 void solve() {
@@ -406,11 +468,66 @@ void solve() {
 		Alternate strategy:
 		W and B will each get a subset of the rows and subset of the cols.
 		Yeah ok this seems better.
+
+		Num ways to put B rooks into rB x cB grid is just a binomial coeff.
+			? Actually not really... need to count ways to FULLY use
+			? that many rows and cols.
 	*/
 
+	// dp[color][r][c] = num ways of fitting #COLOR rooks into r x c grid, fully using all rows and cols.
+	vector<vector<mi>> dp[ 2 ];
+	int num_per_color[2] = {W, B};
+	dp[0].assign( R+1 , vector<mi>( C+1 , 0 ) );
+	dp[1].assign( R+1 , vector<mi>( C+1 , 0 ) );
 
+	FOR( color , 0 , 2 ) {
+		int num_rooks = num_per_color[ color ];
+		FOR( r , 1 , R+1 ) {
+			// handle c=1 case separately.
+			if ( r == 1 ) {
+				if ( num_rooks == 1 ) {
+ 					dp[color][1][1] = 1;
+				}
+			} else {
+				dp[color][r][1] = comb(r-2, num_rooks-2);
+			}
+			FOR( c , 2 , C+1 ) {
+				/*
+					dp[r][c] = (total ways to put rooks into rxc) - sum(
+						(c choose k) * (ways to use exactly rxk)
+					)
+				*/
+				auto& curr = dp[color][r][c];
+				curr = comb(r*c, num_rooks);
+				for ( int k = 1 ; k <= c-1 ; ++k ) {
+					curr -= comb(c, k) * dp[color][r][k];
+				}
+				dbg(color, r, c, (int)curr);
+			}
+		}
+		el;
+	}
+	el;
 
-
+	mi out = 0;
+	for ( int rW = 0 ; rW <= R ; ++rW ) {
+		for ( int rB = 0 ; rW + rB <= R ; ++rB ) {
+			for ( int cW = 0 ; cW <= C ; ++cW ) {
+				for ( int cB = 0 ; cW + cB <= C ; ++cB ) {
+					mi local = 1;
+					local *= comb( R , rW );
+					local *= comb( R-rW , rB );
+					local *= comb( C , cW );
+					local *= comb( C-cW , cB );
+					local *= dp[0][rW][cW];
+					local *= dp[1][rB][cB];
+					out += local;
+					dbg(rW, cW, rB, cB, (int)dp[0][rW][cW], (int)dp[1][rB][cB], (int)local);
+				}
+			}
+		}
+	}
+	cout << (int)out << '\n';
 
 	return;
 }
@@ -420,8 +537,10 @@ void solve() {
 int main() {
 	setIO();
 
+	genFac( 50*50 + 10 );
+
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
+    // std::cin >> T;  dbgc("loading num cases!!!")  // comment this out for one-case problems.
     for ( int k = 1 ; k <= T ; ++k ) {
         el; dbgc("CASE" , k );
         solve();

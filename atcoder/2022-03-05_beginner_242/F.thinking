@@ -1,0 +1,17 @@
+
+I want num ways to put B rooks into R x C grid while "fully using the grid".
+Feels like DP.
+
+F = ways fully using the grid
+G = ways total
+
+G( R , C , B ) = bin( R*C , B )
+
+If I know all the Fs for c, what can I say about c+1?
+
+F(R, c, b) * G(R-c', c+c', b') gets added onto F(R,
+
+F(r, c, b) * G(
+
+
+.

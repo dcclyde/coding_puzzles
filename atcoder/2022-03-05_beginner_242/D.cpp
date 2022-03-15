@@ -418,7 +418,6 @@ void solve() {
 			source_char_idx = target_idx / per_char;
 			subidx = target_idx % per_char;
 			dbg(per_char, source_char_idx, subidx);
-			return;
 		}
 
 		ll source_char = dat[source_char_idx] - 'A';
