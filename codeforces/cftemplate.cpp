@@ -92,6 +92,11 @@ tcT> bool ckmin(T& a, const T& b) {
 tcT> bool ckmax(T& a, const T& b) {
     return a < b ? a = b, 1 : 0; } // set a = max(a,b)
 
+int maxi(int a, int b) {return max((int)a, (int)b);}
+int mini(int a, int b) {return min((int)a, (int)b);}
+int maxll(ll a, ll b) {return max((ll)a, (ll)b);}
+int minll(ll a, ll b) {return min((ll)a, (ll)b);}
+
 tcTU> T fstTrue(T lo, T hi, U f) {
     ++hi; assert(lo <= hi); // assuming f is increasing
     while (lo < hi) { // find first index such that f is true
@@ -238,6 +243,9 @@ inline namespace Output {
     // print w/ spaces, end with newline
     void ps() { cout << "\n"; }
     template<class ...T> void ps(const T&... t) { pr_sep(cout," ",t...); ps(); }
+
+    template<class T>
+    void pv(T& dat) {for(auto& x : dat) cout<<x<<' '; cout<<'\n';}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
