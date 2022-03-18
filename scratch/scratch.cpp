@@ -43,10 +43,10 @@ using vpd = V<pd>;
 #define sor(x) sort(all(x))
 #define rsz resize
 #define ins insert
-#define pb push_back
-#define eb emplace_back
-// #define ft front()
-// #define bk back()
+//// #define pb push_back
+//// #define eb emplace_back
+//// #define ft front()
+//// #define bk back()
 
 //// #define lb lower_bound
 //// #define ub upper_bound
@@ -62,18 +62,23 @@ tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
+#define foreach(a,x) each(a,x)
+
 
 //// const int MOD = 1e9+7; // 998244353;  // I can add this myself.
 const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
 //// const int dx[4]{1,0,-1,0}, dy[4]{0,1,0,-1}; // for every grid problem!!
+vector<pii> stepsOrthogonal = {{1,0},{0,1},{-1,0},{0,-1}};
+vector<pii> steps8dirs = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
 mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
 
 // bitwise ops
 // also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
-constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set
+constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
+constexpr ll pct(ll x) { return __builtin_popcountll(x); }
 constexpr int bits(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
     return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
 constexpr int p2(int x) { return 1<<x; }
@@ -161,7 +166,7 @@ inline namespace Input {
     tcTUU> void rv(size_t N, V<T>& t, U&... u);
     template<class...U> void rv(size_t, size_t N2, U&... u);
     tcTUU> void rv(size_t N, V<T>& t, U&... u) {
-        t.rsz(N); re(t);
+        t.resize(N); re(t);
         rv(N,u...); }
     template<class...U> void rv(size_t, size_t N2, U&... u) {
         rv(N2,u...); }
@@ -173,6 +178,7 @@ inline namespace Input {
     #define int1(...) ints(__VA_ARGS__); decrement(__VA_ARGS__);
     #define lls(...) ll __VA_ARGS__; re(__VA_ARGS__);
     #define ll1(...) lls(__VA_ARGS__); decrement(__VA_ARGS__);
+    #define strings(...) string __VA_ARGS__; re(__VA_ARGS__);
 }
 
 inline namespace ToString {
@@ -212,7 +218,7 @@ inline namespace ToString {
         for (const auto& t: v) {
             if (sz(res)) res.back() += ",";
             vs tmp = ts_lev<lev-1>(t);
-            res.ins(end(res),all(tmp));
+            res.insert(end(res),all(tmp));
         }
         F0R(i,sz(res)) {
             str bef = " "; if (i == 0) bef = "{";
@@ -235,7 +241,8 @@ inline namespace Output {
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
-    #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
+    // #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
+    db TIME() {return (db)(clock()-beg)/CLOCKS_PER_SEC;}
 }
 
 inline namespace FileIO {
@@ -393,17 +400,14 @@ void debug_out(Head H, Tail... T) {
 // ! ---------------------------------------------------------------------------
 
 
-bool f(int a) {
-	dbg(a);
-	return false;
-}
+
 
 
 
 void solve() {
+    vector<int> dat = {1, 8, 4};
+    ps(dat);
 
-	int ft = lstTrue(0, 20, [&](int x) {return f(x);});
-	dbg(ft);
 
 
     return;
@@ -416,8 +420,8 @@ int main() {
 
     int T = 1;
     // std::cin >> T;  dbgc("loading num cases!!!")  // ! Comment this out for one-case problems.
-    for ( int k = 1 ; k <= T ; ++k ) {
-        el; dbgc("CASE" , k );
+    for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
+        el; dbgc("CASE" , CASE );
         solve();
     }
 
