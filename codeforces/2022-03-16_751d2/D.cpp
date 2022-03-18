@@ -455,6 +455,21 @@ struct IntervalUnion {
         return x.end();
     }
 
+    // If pr \subseteq *this, return INF.
+    // Otherwise, return a point in *this \ pr.
+    T test_contained(pair<T,T> pr) {
+        auto& [a,b] = pr;
+        auto it = query(a);
+        if ( it == x.end() ) {
+            return a;
+        }
+        if ( it->second >= b ) {
+            return INF;
+        }
+        return it->second + 1;
+    }
+
+    // What parts of the query interval are missing from the data structure?
     vector<pair<T,T>> missing_sections(pair<T,T> pr) {
         auto& [a, b] = pr;
         vector<pair<T,T>> out;
