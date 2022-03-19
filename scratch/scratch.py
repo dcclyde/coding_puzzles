@@ -24,46 +24,24 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgBase(*args, **kwargs):
         color_helper = kwargs.pop('color', OUT_CYAN)
         print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >20} {OUT_BOLD}: {color_helper}", end='', file=sys.stderr)
+        kwargs['end']=f"{OUT_RESET}\n"
         print(*args, file=sys.stderr, **kwargs)
-        print(f"{OUT_RESET}", file=sys.stderr, end='')
 
-    def dbg(*args, **kwargs):
-        kwargs['color'] = OUT_CYAN
-        dbgBase(*args, **kwargs)
-
+    def dbg(*args, **kwargs): dbgBase(color=OUT_CYAN, *args, **kwargs)
     dbgB = dbg
-
-    def dbgG(*args, **kwargs):
-        kwargs['color'] = OUT_GREEN
-        dbgBase(*args, **kwargs)
-
-    def dbgP(*args, **kwargs):
-        kwargs['color'] = OUT_PURPLE
-        dbgBase(*args, **kwargs)
-
-    def dbgY(*args, **kwargs):
-        kwargs['color'] = OUT_YELLOW
-        dbgBase(*args, **kwargs)
-
-    def dbgBackground(*args, **kwargs):
-        kwargs['color'] = OUT_BACKGROUND
-        dbgBase(*args, **kwargs)
-
-    def el(n=1):
-        print('\n'*n, file=sys.stderr, end='')
+    def dbgG(*args, **kwargs): dbgBase(color=OUT_GREEN, *args, **kwargs)
+    def dbgP(*args, **kwargs): dbgBase(color=OUT_PURPLE, *args, **kwargs)
+    def dbgY(*args, **kwargs): dbgBase(color=OUT_YELLOW, *args, **kwargs)
+    def dbgBackground(*args, **kwargs): dbgBase(color=OUT_BACKGROUND, *args, **kwargs)
+    def el(n=1): print('\n'*n, file=sys.stderr, end='')
 else:
-    def dbg(*args, **kwargs):
-        pass
-    def dbgB(*args, **kwargs):
-        pass
-    def dbgG(*args, **kwargs):
-        pass
-    def dbgP(*args, **kwargs):
-        pass
-    def dbgY(*args, **kwargs):
-        pass
-    def el(n=1):
-        pass
+    def dbg(*args, **kwargs): pass
+    def dbgB(*args, **kwargs): pass
+    def dbgG(*args, **kwargs): pass
+    def dbgP(*args, **kwargs): pass
+    def dbgY(*args, **kwargs): pass
+    def dbgBackground(*args, **kwargs): pass
+    def el(n=1): pass
 #endregion
 #region  FastIO
 from io import BytesIO, IOBase
@@ -140,7 +118,13 @@ def lm():
 # ! Read the sample cases before writing code!
 
 
-def solve():
+
+
+
+
+
+
+def solve(testID):
     N = nn()
     dat = lm()
 
@@ -151,25 +135,9 @@ def solve():
     return
 
 
-dbg("This is just me demoing dbg, obviously not part of the template.")
-dbgP("Use dbg just like print, but it prints with fancy format and writes to cerr and also won't print at all unless PYTHON_CONTEST_HELPER is defined, see comment about PYTHON_CONTEST_HELPER above.")
-dbgBackground("Most python objects get passed by reference so you could call dbg(hugeList) and leave that call in when submitting and it should be no problem.")
-dbgY("Don't call dbg([x for x in range(10**15)]) though. And if you have calls that construct a big object then you do need to comment those before submitting.")
-dbgG("el() writes one empty line just for spcaing purposes. el(n) writes n empty lines. Again safe to submit with these left in.")
-el()
-dbg("The FastIO part is an experiment, copy-pasting from someone on codeforces. You should find a problem with a lot of input/output and experiment whether commenting out that whole section helps vs hurts your runtime (or correctness??)")
-el()
-X = 14
-dat = [x**3 - 6 for x in range(2,9)]
-dbgB(X, dat)
-dbgG('abc')
-el(3)
-dbgP('12', {1, 3})
-el(2)
-dbgY([1,534,23,2], [{1, 'b'}, 31])
-exit()
-
 T = 1
 T = nn()  # ! Comment this out for single-case problems!
 for testID in range(1, T+1):
-    solve()
+    el()
+    dbgBackground(f"Case {testID}")
+    solve(testID)
