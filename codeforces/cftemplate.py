@@ -24,46 +24,25 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgBase(*args, **kwargs):
         color_helper = kwargs.pop('color', OUT_CYAN)
         print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >20} {OUT_BOLD}: {color_helper}", end='', file=sys.stderr)
+        end_maybe = kwargs.get('end', '\n')
+        kwargs['end']=f"{OUT_RESET}{end_maybe}"
         print(*args, file=sys.stderr, **kwargs)
-        print(f"{OUT_RESET}", file=sys.stderr, end='')
 
-    def dbg(*args, **kwargs):
-        kwargs['color'] = OUT_CYAN
-        dbgBase(*args, **kwargs)
-
+    def dbg(*args, **kwargs): dbgBase(color=OUT_CYAN, *args, **kwargs)
     dbgB = dbg
-
-    def dbgG(*args, **kwargs):
-        kwargs['color'] = OUT_GREEN
-        dbgBase(*args, **kwargs)
-
-    def dbgP(*args, **kwargs):
-        kwargs['color'] = OUT_PURPLE
-        dbgBase(*args, **kwargs)
-
-    def dbgY(*args, **kwargs):
-        kwargs['color'] = OUT_YELLOW
-        dbgBase(*args, **kwargs)
-
-    def dbgBackground(*args, **kwargs):
-        kwargs['color'] = OUT_BACKGROUND
-        dbgBase(*args, **kwargs)
-
-    def el(n=1):
-        print('\n'*n, file=sys.stderr, end='')
+    def dbgG(*args, **kwargs): dbgBase(color=OUT_GREEN, *args, **kwargs)
+    def dbgP(*args, **kwargs): dbgBase(color=OUT_PURPLE, *args, **kwargs)
+    def dbgY(*args, **kwargs): dbgBase(color=OUT_YELLOW, *args, **kwargs)
+    def dbgBackground(*args, **kwargs): dbgBase(color=OUT_BACKGROUND, *args, **kwargs)
+    def el(n=1): print('\n'*n, file=sys.stderr, end='')
 else:
-    def dbg(*args, **kwargs):
-        pass
-    def dbgB(*args, **kwargs):
-        pass
-    def dbgG(*args, **kwargs):
-        pass
-    def dbgP(*args, **kwargs):
-        pass
-    def dbgY(*args, **kwargs):
-        pass
-    def el(n=1):
-        pass
+    def dbg(*args, **kwargs): pass
+    def dbgB(*args, **kwargs): pass
+    def dbgG(*args, **kwargs): pass
+    def dbgP(*args, **kwargs): pass
+    def dbgY(*args, **kwargs): pass
+    def dbgBackground(*args, **kwargs): pass
+    def el(n=1): pass
 #endregion
 #region  FastIO
 from io import BytesIO, IOBase
@@ -140,7 +119,13 @@ def lm():
 # ! Read the sample cases before writing code!
 
 
-def solve():
+
+
+
+
+
+
+def solve(testID):
     N = nn()
     dat = lm()
 
@@ -154,4 +139,6 @@ def solve():
 T = 1
 T = nn()  # ! Comment this out for single-case problems!
 for testID in range(1, T+1):
-    solve()
+    el()
+    dbgBackground(f"Case {testID}")
+    solve(testID)
