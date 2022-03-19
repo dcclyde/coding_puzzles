@@ -8,7 +8,7 @@ import os
 
 # sys.setrecursionlimit(10**5)  # This uses something like 128 MB RAM. I guess only play with this if I expect recursion depth problems.
 
-#region set up dbg commands
+#region  set up dbg commands
 # set up debug stuff.
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
 if os.environ.get("PYTHON_CONTEST_HELPER"):
@@ -128,6 +128,7 @@ def lm():
 def solve(testID):
     N = nn()
     dat = lm()
+    dbg(N, dat)
 
 
 
@@ -137,7 +138,7 @@ def solve(testID):
 
 
 T = 1
-T = nn()  # ! Comment this out for single-case problems!
+dbgBackground("Loading num cases!!!!!"); T = nn()  # ! Comment this out for single-case problems!
 for testID in range(1, T+1):
     el()
     dbgBackground(f"Case {testID}")

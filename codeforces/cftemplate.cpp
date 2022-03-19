@@ -445,9 +445,9 @@ int main() {
     setIO();
 
     int T = 1;
-    std::cin >> T;  dbgc("loading num cases!!!")  // ! Comment this out for one-case problems.
+    dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
-        el; dbgc("CASE" , CASE );
+        el; dbgcBold("CASE" , CASE );
         solve();
     }
 
