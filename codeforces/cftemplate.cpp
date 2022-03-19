@@ -373,34 +373,50 @@ void debug_out(Head H, Tail... T) {
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
-#define OUT_MARK        setw(24)<<"\033[0;30;41m"
+#define OUT_MARK        "\033[0;30;41m"
+#define OUT_YELLOW      "\033[33;1m"
+#define OUT_PURPLE      "\033[35;1m"
 
 
+#define dbgc(...) ;
+#define dbg(...) ;
+#define el ;
+#define dbgcBold(...) ;
+#define dbgY(...) ;
+#define dbgcY(...) ;
+#define dbgP(...) ;
+#define dbgcP(...) ;
 #ifdef DCCLYDE_LOCAL
+    #undef el
     #define el std::cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
-    #define dbgcbase(A, ...) std::cerr << OUT_RED \
-        << std::right << setw(20) << A \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
+        << std::right << setw(20) << C \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
-        << OUT_GREEN << "[ " << #__VA_ARGS__ << " ]" \
+        << A << "[ " << #__VA_ARGS__ << " ]" \
         << OUT_BOLD << " :    " << OUT_RESET \
-        << OUT_CYAN, debug_out(__VA_ARGS__); \
+        << B, debug_out(__VA_ARGS__); \
         std::cerr << OUT_RESET;
-    #define dbgbase(...) dbgc("", __VA_ARGS__)
-    // #define dbg(...) ;
-    // #define dbgc(...) ;
-    #define dbg(...) dbgbase(__VA_ARGS__)
-    #define dbgc(...) dbgcbase(__VA_ARGS__)
-    // useful as a second distinct "log level"
-    #define dbg2(...) dbgbase(__VA_ARGS__)
-    #define dbgc2(...) dbgcbase(__VA_ARGS__)
-#else
-    #define dbgc(...) ;
-    #define dbg(...) ;
-    #define dbg2(...) ;
-    #define dbgc2(...) ;
-    #define el ;
+
+    #undef dbg
+    #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
+    #undef dbgc
+    #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
+
+    #undef dbgcBold
+    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
+
+    #undef dbgY
+    #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
+    #undef dbgcY
+    #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
+
+    #undef dbgP
+    #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
+    #undef dbgcP
+    #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
+
 #endif
 
 #pragma endregion
