@@ -1,0 +1,14 @@
+
+If 1 bit and  S is odd, zero.
+If 2 bit is
+
+
+1 bit kills odd S.
+2 bit kills if S is 2, 3 mod 4.
+4 bit kills if S is 4, 5, 6, 7 mod 8.
+
+Basically just: S and M can't share any bits?
+
+
+
+.
