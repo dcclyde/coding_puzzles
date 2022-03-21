@@ -254,16 +254,15 @@ inline namespace Output {
 }
 
 inline namespace FileIO {
-    void setIn(str s)  { if ( !freopen(s.c_str(),"r",stdin) ) assert(false); }
-    void setOut(str s) { if ( freopen(s.c_str(),"w",stdout) ) assert(false); }
+    void setIn(str s)  { freopen(s.c_str(),"r",stdin); }
+    void setOut(str s) { freopen(s.c_str(),"w",stdout); }
     void setIO(str s = "") {
         cin.tie(0)->sync_with_stdio(0); // unsync C / C++ I/O streams
         cout.tie(0);
         cin.exceptions(cin.failbit);
         // throws exception when do smth illegal
         // ex. try to read letter into int
-
-        // if (sz(s)) setIn(s+".in"), setOut(s+".out"); // for old USACO
+        if (sz(s)) setIn(s+".in"), setOut(s+".out"); // for old USACO
     }
 }
 
@@ -421,133 +420,47 @@ void debug_out(Head H, Tail... T) {
 #endif
 
 #pragma endregion
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 
 // ! ---------------------------------------------------------------------------
 
-struct custom_hash {
-    static uint64_t splitmix64(uint64_t x) {
-        // http://xorshift.di.unimi.it/splitmix64.c
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
 
-    size_t operator()(uint64_t x) const {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
-// #define umap(A,B) unordered_map<A,B,custom_hash>
-#define umap(A,B) gp_hash_table<A,B,custom_hash>
-// #define umap(A,B) unordered_map<A,B>
-// #define umap(A,B) map<A,B>
-
-ll s1b1, s1b2, s1b3, s1b4;
-int solve_one_block(auto& dat, int l, int r) {
-    umap(int,int) slope_to_count;
-    int best = 0;
-    ++s1b1;
-    FOR(a, l, r) {
-        slope_to_count.clear();
-        ++s1b2;
-        FOR(b, a+1, r) {
-            ++s1b3;
-            int dy = dat[b] - dat[a];
-            int dx = b - a;
-            // dbgc("s1b", MP(l,r), MP(a,b), dx, dy);
-            if ( dy % dx != 0 ) {
-                continue;
-            }
-            int& ctr = slope_to_count[dy/dx];
-            ++ctr;
-            ckmax(best, ctr);
-            ++s1b4;
-            // dbg(slope_to_count);
-        }
-    }
-    // the above counts points on the line EXCEPT the base point.
-    best += 1;
-    // dbgc("s1b END", MP(l,r), best);
-    return best;
-}
-
-ll s1s1, s1s2;
-int ctr = 0;
-int solve_one_slope(auto& dat, int slope) {
-    umap(int,int) height_to_count;
-    int best = 0;
-    ++s1s1;
-    FOR(k, 0, dat.size()) {
-        int curr = dat[k] - slope * k;
-        int& ctr = height_to_count[curr];
-        ++ctr;
-        ckmax(best, ctr);
-        ++s1s2;
-    }
-    // dbgc("s1s END", slope, best);
-    return best;
-}
-
-/*
-    blocks: 2 * B^2/2 * N/B = 2 B N
-    single slopes: (2N / B) * 2 * N = 4 N^2 / B
-    so I guess I want 2bn = 4n^2/b, or b^2 = 2n, or b = sqrt(2*n).
-*/
-
-vector<int> test_prefix = {21999, 34856, 6167, 52762, 34905};
 
 void solve() {
-    ints(N);
+    lls(N);
     vector<ll> dat;
     rv(N, dat);
-    // dbg(N, dat);
+    dbg(N, dat);
 
-    // for ( int B : {400, 450, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000, 5000} ) {
-    // int B = 2000;  // works
-    int B = 3000;  // works
-        s1b1 = s1b2 = s1b3 = s1b4 = 0;
-        s1s1 = s1s2 = 0;
-    auto start_time = TIME();
-    // // const int N_MAX = 100'000;
-    // // int B = 450;  // slightly more than sqrt of 2*N_MAX
-    // int B = 1000;
-    // // specifically chose B so that cutoffs are ~ same
-
-    int max_uncovered_slope = 2*N / B + 10;
-    dbg(N, B, 2*B*B*N/B, 4*N*N/B);
-    int best = 0;
-    for ( int start = 0 ; start < N ; start += B/2 ) {
-        int curr = solve_one_block(dat, start, min(start + B, N));
-        ckmax(best, curr);
+    ll S = 0;
+    map<ll, int> ctrs;
+    for ( auto& x : dat ) {
+        S += x;
+        ++ctrs[x];
     }
-    dbgc("blocks done", TIME());
-    auto blocks_time = TIME() - start_time;
-    // if ( special ) {
-    //     return ps(TIME());
-    // }
 
-    for ( int slope = -max_uncovered_slope ; slope <= max_uncovered_slope ; ++slope ) {
-        int curr = solve_one_slope(dat, slope);
-        ckmax(best, curr);
+    priority_queue<ll> pq;
+    pq.push( S );
+
+    while ( !ctrs.empty() ) {
+        ll curr = pq.top();
+        ll highest_needed = ctrs.rbegin()->first;
+        if ( curr < highest_needed ) {
+            return ps("NO");
+        }
+        pq.pop();
+        if ( ctrs.count( curr ) != 0 ) {
+            --ctrs[curr];
+            if ( ctrs[curr] == 0 ) {
+                ctrs.erase( curr );
+            }
+            continue;
+        }
+        ll lo = curr / 2;
+        ll hi = curr - lo;
+        pq.push(lo);
+        pq.push(hi);
     }
-    auto slopes_time = TIME() - start_time - blocks_time;
-
-
-    int out = N - best;
-    ps(out);
-    // ps(B);
-    // cout.precision(3);
-    // cout << fixed << blocks_time << scientific << " " << (db)s1b1 << " "
-    //     << (db)s1b2 << " " << (db)s1b3 << " " << (db)s1b4 << endl;
-    // cout << fixed << slopes_time << scientific << " " << (db)s1s1 << " " << (db)s1s2 << endl;
-
-    dbgc("done", TIME());
-    // }
+    ps("YES");
     return;
 }
 
@@ -557,7 +470,7 @@ int main() {
     setIO();
 
     int T = 1;
-    // dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+    dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
         el; dbgcBold("CASE" , CASE );
         solve();

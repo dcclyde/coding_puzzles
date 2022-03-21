@@ -254,16 +254,15 @@ inline namespace Output {
 }
 
 inline namespace FileIO {
-    void setIn(str s)  { if ( !freopen(s.c_str(),"r",stdin) ) assert(false); }
-    void setOut(str s) { if ( freopen(s.c_str(),"w",stdout) ) assert(false); }
+    void setIn(str s)  { freopen(s.c_str(),"r",stdin); }
+    void setOut(str s) { freopen(s.c_str(),"w",stdout); }
     void setIO(str s = "") {
         cin.tie(0)->sync_with_stdio(0); // unsync C / C++ I/O streams
         cout.tie(0);
         cin.exceptions(cin.failbit);
         // throws exception when do smth illegal
         // ex. try to read letter into int
-
-        // if (sz(s)) setIn(s+".in"), setOut(s+".out"); // for old USACO
+        if (sz(s)) setIn(s+".in"), setOut(s+".out"); // for old USACO
     }
 }
 
@@ -421,133 +420,194 @@ void debug_out(Head H, Tail... T) {
 #endif
 
 #pragma endregion
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 
 // ! ---------------------------------------------------------------------------
 
-struct custom_hash {
-    static uint64_t splitmix64(uint64_t x) {
-        // http://xorshift.di.unimi.it/splitmix64.c
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
+constexpr int MOD = 998'244'353;
 
-    size_t operator()(uint64_t x) const {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+#pragma region  // mint
+/**
+ * Description: modular arithmetic operations
+ * Source:
+	* KACTL
+	* https://codeforces.com/blog/entry/63903
+	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
+	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
+	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
+ * Verification:
+	* https://open.kattis.com/problems/modulararithmetic
+ */
+
+
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
+
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
 
-// #define umap(A,B) unordered_map<A,B,custom_hash>
-#define umap(A,B) gp_hash_table<A,B,custom_hash>
-// #define umap(A,B) unordered_map<A,B>
-// #define umap(A,B) map<A,B>
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
 
-ll s1b1, s1b2, s1b3, s1b4;
-int solve_one_block(auto& dat, int l, int r) {
-    umap(int,int) slope_to_count;
-    int best = 0;
-    ++s1b1;
-    FOR(a, l, r) {
-        slope_to_count.clear();
-        ++s1b2;
-        FOR(b, a+1, r) {
-            ++s1b3;
-            int dy = dat[b] - dat[a];
-            int dx = b - a;
-            // dbgc("s1b", MP(l,r), MP(a,b), dx, dy);
-            if ( dy % dx != 0 ) {
-                continue;
-            }
-            int& ctr = slope_to_count[dy/dx];
-            ++ctr;
-            ckmax(best, ctr);
-            ++s1b4;
-            // dbg(slope_to_count);
-        }
-    }
-    // the above counts points on the line EXCEPT the base point.
-    best += 1;
-    // dbgc("s1b END", MP(l,r), best);
-    return best;
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
 }
 
-ll s1s1, s1s2;
-int ctr = 0;
-int solve_one_slope(auto& dat, int slope) {
-    umap(int,int) height_to_count;
-    int best = 0;
-    ++s1s1;
-    FOR(k, 0, dat.size()) {
-        int curr = dat[k] - slope * k;
-        int& ctr = height_to_count[curr];
-        ++ctr;
-        ckmax(best, ctr);
-        ++s1s2;
-    }
-    // dbgc("s1s END", slope, best);
-    return best;
+template <int MOD, int RT>
+string to_string(mint<MOD, RT> modint) {
+    return to_string((int)modint);
+}
+#pragma endregion
+
+using ul = uint64_t;
+ul modMul(ul a, ul b, const ul mod) {
+	ll ret = a*b-mod*(ul)((db)a*b/mod);
+	return ret+((ret<0)-(ret>=(ll)mod))*mod; }
+ul modPow(ul a, ul b, const ul mod) {
+	if (b == 0) return 1;
+	ul res = modPow(a,b/2,mod); res = modMul(res,res,mod);
+	return b&1 ? modMul(res,a,mod) : res;
 }
 
-/*
-    blocks: 2 * B^2/2 * N/B = 2 B N
-    single slopes: (2N / B) * 2 * N = 4 N^2 / B
-    so I guess I want 2bn = 4n^2/b, or b^2 = 2n, or b = sqrt(2*n).
-*/
 
-vector<int> test_prefix = {21999, 34856, 6167, 52762, 34905};
+bool prime(ul n) { // not ll!
+	if (n < 2 || n % 6 % 4 != 1) return n-2 < 2;
+	ul A[] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022},
+	    s = __builtin_ctzll(n-1), d = n>>s;
+	each(a,A) {   // ^ count trailing zeroes
+		ul p = modPow(a,d,n), i = s;
+		while (p != 1 && p != n-1 && a%n && i--) p = modMul(p,p,n);
+		if (p != n-1 && i != s) return 0;
+	}
+	return 1;
+}
+
+ul pollard(ul n) { // return some nontrivial factor of n
+	auto f = [n](ul x) { return modMul(x, x, n) + 1; };
+	ul x = 0, y = 0, t = 30, prd = 2, i = 1, q;
+	while (t++ % 40 || gcd(prd, n) == 1) { /// speedup: don't take gcd every it
+		if (x == y) x = ++i, y = f(x);
+		if ((q = modMul(prd, max(x,y)-min(x,y), n))) prd = q;
+		x = f(x), y = f(f(y));
+	}
+	return gcd(prd, n);
+}
+void factor_rec(ul n, map<ul,int>& cnt, int c) {
+    dbgc("fr", n, c, cnt);
+	if (n == 1) return;
+	if (prime(n)) { cnt[n] += c; dbgc("add n",n,cnt); return; }
+	ul u = pollard(n);
+	factor_rec(u,cnt,c), factor_rec(n/u,cnt,c);
+}
+
+
+
+
 
 void solve() {
-    ints(N);
-    vector<ll> dat;
-    rv(N, dat);
-    // dbg(N, dat);
-
-    // for ( int B : {400, 450, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000, 5000} ) {
-    // int B = 2000;  // works
-    int B = 3000;  // works
-        s1b1 = s1b2 = s1b3 = s1b4 = 0;
-        s1s1 = s1s2 = 0;
-    auto start_time = TIME();
-    // // const int N_MAX = 100'000;
-    // // int B = 450;  // slightly more than sqrt of 2*N_MAX
-    // int B = 1000;
-    // // specifically chose B so that cutoffs are ~ same
-
-    int max_uncovered_slope = 2*N / B + 10;
-    dbg(N, B, 2*B*B*N/B, 4*N*N/B);
-    int best = 0;
-    for ( int start = 0 ; start < N ; start += B/2 ) {
-        int curr = solve_one_block(dat, start, min(start + B, N));
-        ckmax(best, curr);
+    lls(N);
+    vector<vector<tuple<int, int, int>>> G( N );
+    rep(N-1) {
+        int1(a, b);
+        ints(wa, wb);
+        G[a].emplace_back(b, wb, wa);
+        G[b].emplace_back(a, wa, wb);
     }
-    dbgc("blocks done", TIME());
-    auto blocks_time = TIME() - start_time;
-    // if ( special ) {
-    //     return ps(TIME());
-    // }
+    dbg(N, G); el;
+    vector<mi> weight( N , 0 );
+    vector<bool> seen( N , false );
+    deque<tuple<int,int,int>> todo;  // node, edge num, edge denom
 
-    for ( int slope = -max_uncovered_slope ; slope <= max_uncovered_slope ; ++slope ) {
-        int curr = solve_one_slope(dat, slope);
-        ckmax(best, curr);
+    todo.emplace_back(0, 1, 1);
+    weight[0] = 1;
+    seen[0] = true;
+
+    map<ul,int> max_negative_powers;
+    map<ul,int> curr_powers;
+
+    function<void(int,int,int)> Dfs = [&](int curr, int num, int denom) {
+        map<ul,int> local_powers;
+        dbg(curr, num, denom);
+        factor_rec(num  , local_powers,  1);
+        dbgP(local_powers);
+        factor_rec(denom, local_powers, -1);
+        for ( auto& [p, pow] : local_powers ) {
+            curr_powers[p] += pow;
+            ckmax(max_negative_powers[p], -curr_powers[p]);
+        }
+        dbgP(local_powers);
+        dbgY(max_negative_powers);
+        el;
+
+        for ( auto& [proposed, pnum, pdenom] : G[curr] ) {
+            if ( seen[proposed] ) {
+                continue;
+            }
+            seen[proposed] = true;
+            weight[proposed] = (weight[curr] * pnum) / pdenom;
+            Dfs(proposed, pnum, pdenom);
+        }
+
+        for ( auto& [p, pow] : local_powers ) {
+            curr_powers[p] -= pow;
+        }
+    };
+
+    Dfs(0, 1, 1);
+
+    mi lcd = 1;
+    for ( auto& [p, power] : max_negative_powers ) {
+        lcd *= pow(mi((int)p), power);
     }
-    auto slopes_time = TIME() - start_time - blocks_time;
 
-
-    int out = N - best;
+    mi out = 0;
+    for ( auto& x : weight ) {
+        mi contribution = lcd * x;
+        dbg((int)contribution);
+        out += x * lcd;
+    }
     ps(out);
-    // ps(B);
-    // cout.precision(3);
-    // cout << fixed << blocks_time << scientific << " " << (db)s1b1 << " "
-    //     << (db)s1b2 << " " << (db)s1b3 << " " << (db)s1b4 << endl;
-    // cout << fixed << slopes_time << scientific << " " << (db)s1s1 << " " << (db)s1s2 << endl;
 
-    dbgc("done", TIME());
-    // }
+
     return;
 }
 
@@ -557,7 +617,7 @@ int main() {
     setIO();
 
     int T = 1;
-    // dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+    dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
         el; dbgcBold("CASE" , CASE );
         solve();
