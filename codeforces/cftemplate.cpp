@@ -53,6 +53,38 @@ using vpd = V<pd>;
 tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
+
+// Safe hash maps. See https://codeforces.com/blog/entry/62393
+struct custom_hash {
+    static uint64_t splitmix64(uint64_t x) {
+        // http://xorshift.di.unimi.it/splitmix64.c
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const {
+        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
+    template<class T, class U>
+    size_t operator()(pair<T,U> x) const {
+        uint64_t a = (*this)(x.first);
+        uint64_t b = (*this)(x.second);
+        return a + 3*b;
+    }
+};
+
+template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
+// template<class A, class B> using umap = unordered_map<A,B,custom_hash>;  // slower?
+// template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
+// template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
+
+#define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
+#define unordered_set DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_SET
+
+
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
@@ -254,8 +286,8 @@ inline namespace Output {
 }
 
 inline namespace FileIO {
-    void setIn(str s)  { freopen(s.c_str(),"r",stdin); }
-    void setOut(str s) { freopen(s.c_str(),"w",stdout); }
+    void setIn(str s)  { if ( !freopen(s.c_str(),"r",stdin) ) assert(false); }
+    void setOut(str s) { if ( freopen(s.c_str(),"w",stdout) ) assert(false); }
     void setIO(str s = "") {
         cin.tie(0)->sync_with_stdio(0); // unsync C / C++ I/O streams
         cout.tie(0);
