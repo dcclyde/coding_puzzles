@@ -8,5 +8,10 @@ def demo():
     dbgY(print_details_helper(x.items()))
     dbgP(print_tsv_helper(y))
     dbgG("abbreviations work too", pdh(y))
+    if local_run:
+        print(
+            "Use `local_run` boolean like this to run a more complicated debug function"
+            " that will be totally skipped if the code executes on a different machine."
+        )
 
 demo()

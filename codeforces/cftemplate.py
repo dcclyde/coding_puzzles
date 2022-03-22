@@ -31,6 +31,7 @@ pth = print_tsv_helper
 #region  set up dbg commands
 # set up debug stuff.
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
+
 local_run = False
 if os.environ.get("PYTHON_CONTEST_HELPER"):
     local_run = True
