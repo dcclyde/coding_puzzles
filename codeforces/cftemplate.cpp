@@ -1,6 +1,9 @@
 #pragma region
 #include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
 using namespace std;
+using namespace __gnu_pbds;
 
 using ll = long long;
 using db = long double; // or double, if TL is tight
@@ -418,9 +421,9 @@ void debug_out(Head H, Tail... T) {
 #define dbgcY(...) ;
 #define dbgP(...) ;
 #define dbgcP(...) ;
+#define dbg_only(...) ;
+#define local_run (false)
 #ifdef DCCLYDE_LOCAL
-    #undef el
-    #define el std::cerr << '\n';  // in my head I say "error line"
     // dbgc = "debug with comment"
     #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
         << std::right << setw(20) << C \
@@ -431,13 +434,13 @@ void debug_out(Head H, Tail... T) {
         << B, debug_out(__VA_ARGS__); \
         std::cerr << OUT_RESET;
 
+    #undef dbgcBold
+    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
+
     #undef dbg
     #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
     #undef dbgc
     #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
-
-    #undef dbgcBold
-    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
 
     #undef dbgY
     #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
@@ -449,6 +452,14 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
+    #undef dbg_only
+    #define dbg_only(...) __VA_ARGS__;
+
+    #undef el
+    #define el std::cerr << '\n';  // in my head I say "error line"
+
+    #undef local_run
+    #define local_run (true)
 #endif
 
 #pragma endregion
