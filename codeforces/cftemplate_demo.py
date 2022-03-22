@@ -1,0 +1,12 @@
+from cftemplate import *
+
+def demo():
+    a = 'abcde'
+    x = {'q': 14, 'apple': -3, 'monkey': 40}
+    y = [[1, 5, 3, 2], [3, 6, 4, 2], [8, 9, 9, 5]]
+    dbg(a, x, y)
+    dbgY(print_details_helper(x.items()))
+    dbgP(print_tsv_helper(y))
+    dbgG("abbreviations work too", pdh(y))
+
+demo()

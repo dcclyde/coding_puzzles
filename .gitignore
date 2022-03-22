@@ -2,6 +2,7 @@
 *.prog
 *.out
 *.o
+__pycache__
 tmp-gdb-cmd-args.txt
 
 library_algorithms/benq

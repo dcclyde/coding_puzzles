@@ -8,10 +8,32 @@ import os
 
 # sys.setrecursionlimit(10**5)  # This uses something like 128 MB RAM. I guess only play with this if I expect recursion depth problems.
 
+# provides more detailed listing of complicated objects
+# call like dbg(print_details_helper)
+def print_details_helper(q):
+    out = []
+    for k, x in enumerate(q):
+        out.append(f"\n\t{k}\t{x}")
+    return ''.join(out)
+
+pdh = print_details_helper  # alternate shorter name
+
+# good if we want to see spacing, or to copy-paste into GSheets
+def print_tsv_helper(q):
+    out = []
+    for row in q:
+        out.append('\t'.join(str(x) for x in row))
+    return ''.join('\n\t' + x for x in out)
+
+pth = print_tsv_helper
+
+
 #region  set up dbg commands
 # set up debug stuff.
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
+local_run = False
 if os.environ.get("PYTHON_CONTEST_HELPER"):
+    local_run = True
     OUT_RED_BOLD = "\033[31;1m"
     OUT_GREEN = "\033[32m"
     OUT_RESET = "\033[0m"
@@ -137,9 +159,10 @@ def solve(testID):
     return
 
 
-T = 1
-dbgBackground("Loading num cases!!!!!"); T = nn()  # ! Comment this out for single-case problems!
-for testID in range(1, T+1):
-    el()
-    dbgBackground(f"Case {testID}")
-    solve(testID)
+if __name__ == '__main__':
+    T = 1
+    dbgBackground("Loading num cases!!!!!"); T = nn()  # ! Comment this out for single-case problems!
+    for testID in range(1, T+1):
+        el()
+        dbgBackground(f"Case {testID}")
+        solve(testID)
