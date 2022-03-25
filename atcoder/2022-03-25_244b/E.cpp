@@ -395,6 +395,38 @@ string to_string(tuple<A, B, C, D, E> p) {
     return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
 }
 
+// helpers for debugging complicated objects
+template<class T>
+string print_details_helper(T& q) {
+    string out = "\n";
+    int ctr = 0;
+    for ( auto& x : q ) {
+        out += to_string(ctr) + "\t" + to_string(x) + "\n";
+        ++ctr;
+    }
+    return out;
+}
+#define pdh print_details_helper
+
+template<class T>
+string print_tsv_helper(T& q) {
+    string out = "\n";
+    for ( auto& x : q ) {
+        bool first = true;
+        for ( auto& v : x ) {
+            if ( !first ) {
+                out += '\t';
+            }
+            out += to_string(v);
+            first = false;
+        }
+        out += '\n';
+    }
+    return out;
+}
+#define pth print_tsv_helper
+
+
 void debug_out() { std::cerr << endl; }
 
 template <typename Head, typename... Tail>
@@ -407,15 +439,15 @@ void debug_out(Head H, Tail... T) {
 #define BOLD_MAYBE     ";1"  // YES bold
 
 #define OUT_RESET       "\033[0m"
-#define OUT_BOLD        "\033[" << BOLD_MAYBE << "m"
+#define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
 #define OUT_MARK        "\033[0;30;41m"
-#define OUT_YELLOW      "\033[33;1m"
-#define OUT_PURPLE      "\033[35;1m"
+#define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
+#define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
 
 
 #define dbgc(...) ;
@@ -426,11 +458,13 @@ void debug_out(Head H, Tail... T) {
 #define dbgcY(...) ;
 #define dbgP(...) ;
 #define dbgcP(...) ;
+#define dbgR(...) ;
+#define dbgcR(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
@@ -457,6 +491,11 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -471,25 +510,109 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+const int MOD = 998244353;
+/**
+ * Description: modular arithmetic operations
+ * Source:
+	* KACTL
+	* https://codeforces.com/blog/entry/63903
+	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
+	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
+	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
+ * Verification:
+	* https://open.kattis.com/problems/modulararithmetic
+ */
 
+// #pragma once
+
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
+
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+template <int MOD, int RT>
+string to_string(mint<MOD, RT> modint) {
+    return to_string((int)modint);
+}
 
 
 
 
 void solve() {
-    int x = 14; int y = 87;
-    tie(y, x) = MT(x, y);
-    dbg(x, y);
-    array<int,5> q;
-    q[3] = 15;
-    dbg(q);
-    auto& [a,b,c,d,e] = q;
-    dbg(a,b,c,d,e);
+    lls(num_verts, num_edges, desired_length);
+    int1(vstart, vend, veven);
+    V<V<int>> G(num_verts);
+    rep(num_edges) {
+        int1(a, b);
+        G[a].push_back(b);
+        G[b].push_back(a);
+    }
+    dbgY(num_verts, num_edges);
+    dbgY(pdh(G)); el;
 
+    V<V<V<mi>>> dp(desired_length+1, V<V<mi>>(num_verts, {0,0}));
+    dp[0][vstart][0] = 1;
 
-
-
-
+    FOR(n, 1, desired_length+1) {
+        FOR(curr, 0, num_verts) {
+            FOR(parity, 0, 2) {
+                // sum over ways to get here in n steps with the suggested parity.
+                for ( auto& o : G[curr] ) {  // "other"
+                    dp[n][curr][parity] += dp[n-1][o][parity ^ (curr==veven)];
+                }
+            }
+        }
+    }
+    int out = (int)dp[desired_length][vend][0];
+    ps(out);
     return;
 }
 

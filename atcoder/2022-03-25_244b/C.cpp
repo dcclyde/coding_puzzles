@@ -395,6 +395,38 @@ string to_string(tuple<A, B, C, D, E> p) {
     return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
 }
 
+// helpers for debugging complicated objects
+template<class T>
+string print_details_helper(T& q) {
+    string out = "\n";
+    int ctr = 0;
+    for ( auto& x : q ) {
+        out += to_string(ctr) + "\t" + to_string(x) + "\n";
+        ++ctr;
+    }
+    return out;
+}
+#define pdh print_details_helper
+
+template<class T>
+string print_tsv_helper(T& q) {
+    string out = "\n";
+    for ( auto& x : q ) {
+        bool first = true;
+        for ( auto& v : x ) {
+            if ( !first ) {
+                out += '\t';
+            }
+            out += to_string(v);
+            first = false;
+        }
+        out += '\n';
+    }
+    return out;
+}
+#define pth print_tsv_helper
+
+
 void debug_out() { std::cerr << endl; }
 
 template <typename Head, typename... Tail>
@@ -407,15 +439,15 @@ void debug_out(Head H, Tail... T) {
 #define BOLD_MAYBE     ";1"  // YES bold
 
 #define OUT_RESET       "\033[0m"
-#define OUT_BOLD        "\033[" << BOLD_MAYBE << "m"
+#define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
 #define OUT_MARK        "\033[0;30;41m"
-#define OUT_YELLOW      "\033[33;1m"
-#define OUT_PURPLE      "\033[35;1m"
+#define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
+#define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
 
 
 #define dbgc(...) ;
@@ -426,11 +458,13 @@ void debug_out(Head H, Tail... T) {
 #define dbgcY(...) ;
 #define dbgP(...) ;
 #define dbgcP(...) ;
+#define dbgR(...) ;
+#define dbgcR(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
@@ -457,6 +491,11 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -477,18 +516,20 @@ void debug_out(Head H, Tail... T) {
 
 
 void solve() {
-    int x = 14; int y = 87;
-    tie(y, x) = MT(x, y);
-    dbg(x, y);
-    array<int,5> q;
-    q[3] = 15;
-    dbg(q);
-    auto& [a,b,c,d,e] = q;
-    dbg(a,b,c,d,e);
+    lls(N);
+    set<int> todo;
+    FOR(n, 1, 2*N+2) {
+        todo.insert(n);
+    }
 
-
-
-
+    rep(N+1) {
+        int x = *todo.begin();
+        ps(x);
+        cout << flush;
+        todo.erase(x);
+        ints(y);
+        todo.erase(y);
+    }
 
     return;
 }

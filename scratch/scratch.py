@@ -8,10 +8,25 @@ import os
 
 # sys.setrecursionlimit(10**5)  # This uses something like 128 MB RAM. I guess only play with this if I expect recursion depth problems.
 
-#region set up dbg commands
+def print_details_helper(q):
+    out = []
+    for k, x in enumerate(q):
+        out.append(f"\n\t{k}\t{x}")
+    return ''.join(out)
+
+def print_tsv_helper(q):
+    out = []
+    for row in q:
+        out.append('\t'.join(str(x) for x in row))
+    return ''.join('\n' + x for x in out)
+
+
+#region  set up dbg commands
 # set up debug stuff.
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
+local_run = False
 if os.environ.get("PYTHON_CONTEST_HELPER"):
+    local_run = True
     OUT_RED_BOLD = "\033[31;1m"
     OUT_GREEN = "\033[32m"
     OUT_RESET = "\033[0m"
@@ -24,7 +39,8 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgBase(*args, **kwargs):
         color_helper = kwargs.pop('color', OUT_CYAN)
         print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >20} {OUT_BOLD}: {color_helper}", end='', file=sys.stderr)
-        kwargs['end']=f"{OUT_RESET}\n"
+        end_maybe = kwargs.get('end', '\n')
+        kwargs['end']=f"{OUT_RESET}{end_maybe}"
         print(*args, file=sys.stderr, **kwargs)
 
     def dbg(*args, **kwargs): dbgBase(color=OUT_CYAN, *args, **kwargs)
@@ -117,7 +133,14 @@ def lm():
 
 # ! Read the sample cases before writing code!
 
-
+def demo():
+    a = 'abcde'
+    x = {'q': 14, 'apple': -3, 'monkey': 40}
+    y = [[1, 5, 3, 2], [3, 6, 4, 2], [8, 9, 9, 5]]
+    dbg(a, x, y)
+    dbgY(print_details_helper(x.items()))
+    dbg(print_tsv_helper(y))
+    exit()
 
 
 
@@ -127,7 +150,7 @@ def lm():
 def solve(testID):
     N = nn()
     dat = lm()
-
+    dbg(N, dat)
 
 
 
@@ -135,9 +158,11 @@ def solve(testID):
     return
 
 
-T = 1
-T = nn()  # ! Comment this out for single-case problems!
-for testID in range(1, T+1):
-    el()
-    dbgBackground(f"Case {testID}")
-    solve(testID)
+demo()
+if __name__ == '__main__':
+    T = 1
+    dbgBackground("Loading num cases!!!!!"); T = nn()  # ! Comment this out for single-case problems!
+    for testID in range(1, T+1):
+        el()
+        dbgBackground(f"Case {testID}")
+        solve(testID)

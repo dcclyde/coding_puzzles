@@ -197,6 +197,10 @@ inline namespace Input {
     tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
     tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }
+    template<class A,class B,class C> void re(tuple<A,B,C>& t) {auto& [a,b,c]=t; re(a,b,c);}
+    template<class A,class B,class C, class D> void re(tuple<A,B,C,D>& t) {auto& [a,b,c,d]=t; re(a,b,c,d);}
+    template<class A,class B,class C, class D, class E> void re(tuple<A,B,C>& t) {auto& [a,b,c,d,e]=t; re(a,b,c,d,e);}
+    template<class A,class B,class C, class D, class E, class F> void re(tuple<A,B,C>& t) {auto& [a,b,c,d,e,f]=t; re(a,b,c,d,e,f);}
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
         each(x,i) re(x); }
     tcTUU> void re(T& t, U&... u) { re(t); re(u...); } // read multiple
@@ -216,6 +220,7 @@ inline namespace Input {
     tcTUU> void decrement(T& t, U&... u) { --t; decrement(u...); }
     #define ints(...) int __VA_ARGS__; re(__VA_ARGS__);
     #define int1(...) ints(__VA_ARGS__); decrement(__VA_ARGS__);
+    #define chars(...) char __VA_ARGS__; re(__VA_ARGS__);
     #define lls(...) ll __VA_ARGS__; re(__VA_ARGS__);
     #define ll1(...) lls(__VA_ARGS__); decrement(__VA_ARGS__);
     #define strings(...) string __VA_ARGS__; re(__VA_ARGS__);
@@ -390,6 +395,38 @@ string to_string(tuple<A, B, C, D, E> p) {
     return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
 }
 
+// helpers for debugging complicated objects
+template<class T>
+string print_details_helper(T& q) {
+    string out = "\n";
+    int ctr = 0;
+    for ( auto& x : q ) {
+        out += to_string(ctr) + "\t" + to_string(x) + "\n";
+        ++ctr;
+    }
+    return out;
+}
+#define pdh print_details_helper
+
+template<class T>
+string print_tsv_helper(T& q) {
+    string out = "\n";
+    for ( auto& x : q ) {
+        bool first = true;
+        for ( auto& v : x ) {
+            if ( !first ) {
+                out += '\t';
+            }
+            out += to_string(v);
+            first = false;
+        }
+        out += '\n';
+    }
+    return out;
+}
+#define pth print_tsv_helper
+
+
 void debug_out() { std::cerr << endl; }
 
 template <typename Head, typename... Tail>
@@ -402,15 +439,15 @@ void debug_out(Head H, Tail... T) {
 #define BOLD_MAYBE     ";1"  // YES bold
 
 #define OUT_RESET       "\033[0m"
-#define OUT_BOLD        "\033[" << BOLD_MAYBE << "m"
+#define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
 #define OUT_MARK        "\033[0;30;41m"
-#define OUT_YELLOW      "\033[33;1m"
-#define OUT_PURPLE      "\033[35;1m"
+#define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
+#define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
 
 
 #define dbgc(...) ;
@@ -421,11 +458,13 @@ void debug_out(Head H, Tail... T) {
 #define dbgcY(...) ;
 #define dbgP(...) ;
 #define dbgcP(...) ;
+#define dbgR(...) ;
+#define dbgcR(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
@@ -452,6 +491,11 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -475,13 +519,15 @@ void solve() {
     lls(N);
     vector<ll> dat;
     rv(N, dat);
-    dbg(N, dat);
+    dbgY(N, dat);
 
 
 
     return;
 }
 
+// ! Check bounds even if I have a solution - are they letting through simpler versions?
+// ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 // ! Read the sample cases before writing code!
 #pragma region
 int main() {
