@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-cf_dir="$(dirname $(realpath "$0"))"
+template_dir="$(dirname $(realpath "$0"))"
 
 if [ $# -ne 1 ]
 then
@@ -9,10 +9,12 @@ then
 fi
 
 mkdir -p "$1"
+cp "$template_dir/gen.py" "$1/"
+cp "$template_dir/compare.sh" "$1/"
 for PROBLEM in A B C D E F G H
 do
-    cp "$cf_dir/cftemplate.py"  "$1/$PROBLEM.py"
-    cp "$cf_dir/cftemplate.cpp" "$1/$PROBLEM.cpp"
+    cp "$template_dir/template.py"  "$1/$PROBLEM.py"
+    cp "$template_dir/template.cpp" "$1/$PROBLEM.cpp"
     touch "$1/$PROBLEM.in"
     touch "$1/$PROBLEM.thinking"
 done

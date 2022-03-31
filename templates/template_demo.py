@@ -1,4 +1,4 @@
-from cftemplate import *
+from template import *
 
 def demo():
     a = 'abcde'

@@ -1,0 +1,11 @@
+
+Template should be slightly different per contest website.
+
+* Codeforces: as is.
+* Atcoder: should default to assuming T=1 (one test case per file)
+* Code Jam: should default to printing "Case #{testID}: " at the start of each case.
+
+I don't want to maintain 3 versions of template.cpp, so for now I just do these by hand
+after running setup_contest and before the round starts.
+Could be nice to set up "patch" files somehow, so that I can have 3 different .cpp files
+that automatically get updated if I modify the base.

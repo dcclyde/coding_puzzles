@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-cf_dir="$(dirname $(realpath "$0"))"
+template_dir="$(dirname $(realpath "$0"))"
 
 if [ $# -ne 2 ]
 then
@@ -8,7 +8,7 @@ then
     exit
 fi
 
-source_file="$cf_dir/cftemplate.$1"
+source_file="$template_dir/template.$1"
 # echo "source_file = $source_file"
 if [ ! -s "$source_file" ]
 then

@@ -1,28 +1,28 @@
 #! /usr/bin/bash
 
-template_base="/home/dcclyde/puzzles/code/codeforces/cftemplate"
 for file in ./*
 do
     if [ "$file" = "./*" ]
     then
+        echo "Don't run this script from the template directory."
         break
     fi
 
     # delete empty files (e.g. *.in)
     if [ ! -s "$file" ]
     then
-        echo "Deleting empty file: $file"
+        echo "Delete $file (empty)"
         rm "$file"
         continue
     fi
 
     # delete files that are unchanged from the template.
-    for template_suffix in ".cpp" ".py"
+    for template_file in /home/dcclyde/puzzles/code/templates/*
     do
-        if cmp "$file" "$template_base$template_suffix" &>/dev/null \
-            && [ "$file" != "./cftemplate$template_suffix" ]
+        if cmp "$file" "$template_file" &> /dev/null \
+            && [ "$(realpath $file)" != "$(realpath $template_file)" ]
         then
-            echo "Deleting copy of template: $file"
+            echo "Delete $file     (copy of template)"
             rm "$file"
         fi
     done
