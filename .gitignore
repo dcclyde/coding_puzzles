@@ -2,6 +2,7 @@
 *.prog
 *.out
 *.o
+*.in
 __pycache__
 tmp-gdb-cmd-args.txt
 
