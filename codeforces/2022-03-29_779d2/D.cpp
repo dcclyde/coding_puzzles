@@ -515,6 +515,49 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+/**
+ * Description: insert int, query max xor with some int in the trie
+ * Time: O(MXBIT)
+ * Source: CF Algorithms Gym
+ * Verification: January Easy 2018 - Shubham and Subarray Xor
+ */
+const int INF = 2e9;
+
+template<int MXBIT> struct Trie {
+    V<array<int,2>> nex; V<int> val; int num = 0; // num is last node in trie
+    Trie() {val.assign(1, 0);}
+	void ins(ll x, int a = 1) { // insert or delete
+		int cur = 0; val[cur] += a;
+		R0F(i,MXBIT) {
+            while (cur >= nex.size()) { nex.emplace_back(); }
+			int t = (x>>i)&1;
+			if (!nex[cur][t]) nex[cur][t] = ++num;
+            cur = nex[cur][t];
+            while (cur >= val.size()) {val.emplace_back();}
+			val[cur] += a;
+		}
+	}
+	ll max_xor(ll x) { // compute max xor
+		if (!val[0]) return -INF; // no elements in trie
+		int cur = 0;
+		R0F(i,MXBIT) {
+			int t = ((x>>i)&1)^1;
+			if (!nex[cur][t] || !val[nex[cur][t]]) t ^= 1;
+			cur = nex[cur][t]; if (t) x ^= 1LL<<i;
+		}
+		return x;
+	}
+	ll min_xor(ll x) { // compute max xor
+		if (!val[0]) return INF; // no elements in trie
+		int cur = 0;
+		R0F(i,MXBIT) {
+			int t = ((x>>i)&1);
+			if (!nex[cur][t] || !val[nex[cur][t]]) t ^= 1;
+			cur = nex[cur][t]; if (t) x ^= 1LL<<i;
+		}
+		return x;
+	}
+};
 
 
 
@@ -527,50 +570,23 @@ void solve() {
     rv(N, dat);
     dbgY(L, R, N, dat);
 
-    const int MAX_BITS = 16;
-    V<int> cpb_orig(MAX_BITS+1);
-    V<int> cpb_dat(MAX_BITS+1);
-    FOR(k, L, R+1) {
-        FOR(b, 0, MAX_BITS+1) {
-            if ( (k>>b) & 1 ) {
-                ++cpb_orig[b];
-            }
+    const int MAX_BITS = 17;
+    const int MAX_N = (1<<MAX_BITS);
+    Trie<17> tr;
+    dbg(sizeof(tr));
+    for ( auto& a : dat ) {
+        tr.ins(a);
+    }
+    for ( auto& a : dat ) {
+        int x = a ^ L;
+        int big = tr.max_xor(x);
+        int little = tr.min_xor(x);
+        if ( big == R && little == L ) {
+            return ps(x);
         }
     }
-    for ( auto& x : dat ) {
-        FOR(b, 0, MAX_BITS+1) {
-            if ( (x>>b) & 1 ) {
-                ++cpb_dat[b];
-            }
-        }
-    }
-    dbg(cpb_orig);
-    dbg(cpb_dat);
+    assert(false);
 
-    int out = 0;
-    V<int> unsure;
-    FOR(b, 0, MAX_BITS+1) {
-        if ( cpb_orig[b] != cpb_dat[b] ) {
-            out |= (1<<b);
-        } else if ( cpb_orig[b] != N - cpb_dat[b] ) {
-            // pass
-        } else {
-            unsure.push_back(b);
-        }
-    }
-    dbg(unsure);
-
-    V<int> todo;
-    for ( auto& b : unsure ) {
-        int lx = L ^ (1<<b);
-        int rx = R ^ (1<<b);
-        if ( lx >= L && lx <= R && rx >= L && rx <= R ) {
-            // maybe this bit really just doesn't matter?
-        }
-    }
-
-
-    ps(out);
 
     return;
 }
