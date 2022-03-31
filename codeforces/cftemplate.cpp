@@ -84,6 +84,11 @@ template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
 // template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
 // template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
 
+template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
+// template<class A> using uset = unordered_set<A, custom_hash>;
+// template<class A> using uset = set<A>;
+// template<class A> using uset = unordered_set<A>;
+
 #define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
 #define unordered_set DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_SET
 
