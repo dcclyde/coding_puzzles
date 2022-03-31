@@ -56,6 +56,8 @@ using vpd = V<pd>;
 tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
+int hash_ctr = 0;
+int pairhash_ctr = 0;
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
@@ -69,13 +71,15 @@ struct custom_hash {
 
     size_t operator()(uint64_t x) const {
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        ++hash_ctr;
         return splitmix64(x + FIXED_RANDOM);
     }
     template<class T, class U>
     size_t operator()(pair<T,U> x) const {
+        ++pairhash_ctr;
         uint64_t a = (*this)(x.first);
         uint64_t b = (*this)(x.second);
-        return a + 3*b;
+        return a + 31*b;
     }
 };
 
@@ -83,6 +87,11 @@ template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
 // template<class A, class B> using umap = unordered_map<A,B,custom_hash>;  // slower?
 // template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
 // template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
+
+template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
+// template<class A> using uset = unordered_set<A, custom_hash>;
+// template<class A> using uset = set<A>;
+// template<class A> using uset = unordered_set<A>;
 
 #define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
 #define unordered_set DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_SET
@@ -395,6 +404,38 @@ string to_string(tuple<A, B, C, D, E> p) {
     return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
 }
 
+// helpers for debugging complicated objects
+template<class T>
+string print_details_helper(T& q) {
+    string out = "\n";
+    int ctr = 0;
+    for ( auto& x : q ) {
+        out += to_string(ctr) + "\t" + to_string(x) + "\n";
+        ++ctr;
+    }
+    return out;
+}
+#define pdh print_details_helper
+
+template<class T>
+string print_tsv_helper(T& q) {
+    string out = "\n";
+    for ( auto& x : q ) {
+        bool first = true;
+        for ( auto& v : x ) {
+            if ( !first ) {
+                out += '\t';
+            }
+            out += to_string(v);
+            first = false;
+        }
+        out += '\n';
+    }
+    return out;
+}
+#define pth print_tsv_helper
+
+
 void debug_out() { std::cerr << endl; }
 
 template <typename Head, typename... Tail>
@@ -407,15 +448,15 @@ void debug_out(Head H, Tail... T) {
 #define BOLD_MAYBE     ";1"  // YES bold
 
 #define OUT_RESET       "\033[0m"
-#define OUT_BOLD        "\033[" << BOLD_MAYBE << "m"
+#define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
 #define OUT_MARK        "\033[0;30;41m"
-#define OUT_YELLOW      "\033[33;1m"
-#define OUT_PURPLE      "\033[35;1m"
+#define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
+#define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
 
 
 #define dbgc(...) ;
@@ -426,11 +467,13 @@ void debug_out(Head H, Tail... T) {
 #define dbgcY(...) ;
 #define dbgP(...) ;
 #define dbgcP(...) ;
+#define dbgR(...) ;
+#define dbgcR(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_RED \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
@@ -457,6 +500,11 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -471,24 +519,80 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+ll INF = 2e9;
 
-
+void learn() {
+    dbg(sizeof(long double));
+    dbg(LDBL_EPSILON);
+    int N = 160;
+    auto t0 = TIME();
+    V<pii> dat;
+    rv(N, dat);
+    uset<pii> seen;
+    // umap<pii, int> seen;
+    // uset<int> seen;
+    for ( auto& [a, b] : dat ) {
+        seen.insert(MP(a,b));
+        // seen.insert(a);
+        // seen.insert(b);
+        // seen[MP(a,b)] = 14;
+        // dbg(seen.size(), pairhash_ctr, hash_ctr);
+    }
+    dbg(seen.size(), TIME() - t0, seen);
+    exit(0);
+    return;
+}
 
 
 
 void solve() {
-    int x = 14; int y = 87;
-    tie(y, x) = MT(x, y);
-    dbg(x, y);
-    array<int,5> q;
-    q[3] = 15;
-    dbg(q);
-    auto& [a,b,c,d,e] = q;
-    dbg(a,b,c,d,e);
+    lls(num_verts, num_edges);
+    V<V<int>> G(num_verts);
+    rep(num_edges) {
+        int1(a, b);
+        G[a].push_back(b);
+        G[b].push_back(a);
+    }
+    dbgY(num_verts, num_edges)
+    dbgY(pdh(G)); el;
 
+    /*
+        Make a new graph G2.
+        Nodes = (mask, vertex in G)
+    */
+    V<int> dp((1<<num_verts), INF);
+    dp[0] = 0;
+    using t3 = tuple<int,int,int>;
+    uset<pii> seen;
 
-
-
+    deque<t3> todo;
+    FOR(v, 0, num_verts) {
+        todo.emplace_back(0, v, 0);
+    }
+    while ( !todo.empty() ) {
+        auto curr = todo.front();
+        auto& [mask, v, cost] = curr;
+        todo.pop_front();
+        for ( auto& o : G[v] ) {
+            int new_mask = mask ^ (1<<o);
+            pii prop = {new_mask, o};
+            if ( seen.find(prop) != seen.end() ) {
+                continue;
+            }
+            seen.insert(prop);
+            ckmin(dp[new_mask], cost + 1);
+            todo.emplace_back(new_mask, o, cost+1);
+            dbgP(MT(bitset<5>(mask), v, cost), MT(bitset<5>(new_mask), o, cost+1));
+        }
+    }
+    ll out = 0;
+    for ( auto& x : dp ) {
+        out += x;
+    }
+    FOR(k, 0, dp.size()) {
+        dbg(k, bitset<5>(k), dp[k]);
+    }
+    ps(out);
 
     return;
 }
@@ -499,6 +603,7 @@ void solve() {
 #pragma region
 int main() {
     setIO();
+    learn();
 
     int T = 1;
     // dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
