@@ -75,7 +75,7 @@ struct custom_hash {
     size_t operator()(pair<T,U> x) const {
         uint64_t a = (*this)(x.first);
         uint64_t b = (*this)(x.second);
-        return a + 3*b;
+        return a + 31*b;
     }
 };
 
@@ -84,9 +84,9 @@ template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
 // template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
 // template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
 
-// template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
+template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // template<class A> using uset = unordered_set<A, custom_hash>;
-template<class A> using uset = set<A>;
+// template<class A> using uset = set<A>;
 // template<class A> using uset = unordered_set<A>;
 
 #define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
@@ -540,14 +540,15 @@ void solve() {
     dp[0] = 0;
     using t3 = tuple<int,int,int>;
     uset<pii> seen;
+
     deque<t3> todo;
     FOR(v, 0, num_verts) {
         todo.emplace_back(0, v, 0);
     }
     while ( !todo.empty() ) {
-        auto curr = todo.back();
+        auto curr = todo.front();
         auto& [mask, v, cost] = curr;
-        todo.pop_back();
+        todo.pop_front();
         for ( auto& o : G[v] ) {
             int new_mask = mask ^ (1<<o);
             pii prop = {new_mask, o};
@@ -557,12 +558,17 @@ void solve() {
             seen.insert(prop);
             ckmin(dp[new_mask], cost + 1);
             todo.emplace_back(new_mask, o, cost+1);
+            dbgP(MT(bitset<5>(mask), v, cost), MT(bitset<5>(new_mask), o, cost+1));
         }
     }
     ll out = 0;
     for ( auto& x : dp ) {
         out += x;
     }
+    FOR(k, 0, dp.size()) {
+        dbg(k, bitset<5>(k), dp[k]);
+    }
+    dbg(seen.size(), seen);
     ps(out);
 
     return;
