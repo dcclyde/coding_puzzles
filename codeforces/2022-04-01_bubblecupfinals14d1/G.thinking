@@ -1,0 +1,11 @@
+
+Think about the situation when we arrive at the non-colinear point.
+From here, we'll go to nearest endpoint of remaining points, then other endpoint.
+If both original endpoints remain, our work so far has been useless.
+    For this case: Try walking directly from start to NCP.
+
+otherwise go to at least one original endpoint, then NCP, then finish.
+
+
+
+.
