@@ -111,6 +111,7 @@ const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
 //// const int dx[4]{1,0,-1,0}, dy[4]{0,1,0,-1}; // for every grid problem!!
 vector<pii> stepsOrthogonal = {{1,0},{0,1},{-1,0},{0,-1}};
+vector<pii> stepsDiagonal = {{1,1},{1,-1},{-1,-1},{-1,1}};
 vector<pii> steps8dirs = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
 mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
@@ -134,8 +135,8 @@ tcT> bool ckmax(T& a, const T& b) {
 
 int maxi(int a, int b) {return max((int)a, (int)b);}
 int mini(int a, int b) {return min((int)a, (int)b);}
-int maxll(ll a, ll b) {return max((ll)a, (ll)b);}
-int minll(ll a, ll b) {return min((ll)a, (ll)b);}
+ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
+ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
 
 tcTU> T fstTrue(T lo, T hi, U f) {
     ++hi; assert(lo <= hi); // assuming f is increasing
@@ -219,6 +220,11 @@ inline namespace Input {
         rv(N,u...); }
     template<class...U> void rv(size_t, size_t N2, U&... u) {
         rv(N2,u...); }
+    void rv1(size_t) {}
+    tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
+        t.resize(N); re(t); for(auto& x : t) --x;
+        rv(N,u...); }
+
 
     // dumb shortcuts to read in ints
     void decrement() {} // subtract one from each
@@ -283,19 +289,27 @@ inline namespace Output {
     template<class T> void pr_sep(ostream& os, str, const T& t) { os << ts(t); }
     template<class T, class... U> void pr_sep(ostream& os, str sep, const T& t, const U&... u) {
         pr_sep(os,sep,t); os << sep; pr_sep(os,sep,u...); }
+    template<class T> void pr_sep1(ostream& os, str, const T& t) { os << ts(t); }
+    template<class T, class... U> void pr_sep1(ostream& os, str sep, const T& t, const U&... u) {
+        pr_sep1(os,sep,t); os << sep; pr_sep1(os,sep,u...); }
     // print w/ no spaces
     template<class ...T> void pr(const T&... t) { pr_sep(cout,"",t...); }
     // print w/ spaces, end with newline
     void ps() { cout << "\n"; }
     template<class ...T> void ps(const T&... t) { pr_sep(cout," ",t...); ps(); }
+    void ps1() { cout << "\n"; }
+    template<class ...T> void ps1(const T&... t) { pr_sep1(cout," ",t...); ps1(); }
 
     template<class T>
-    void pv(T& dat) {for(auto& x : dat) cout<<x<<' '; cout<<'\n';}
+    void pv(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << ' ' << x;} cout<<'\n';}
+    template<class T>
+    void pv1(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << ' ' << x+1;} cout<<'\n';}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
     // #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
     db TIME() {return (db)(clock()-beg)/CLOCKS_PER_SEC;}
+
 }
 
 inline namespace FileIO {
@@ -511,6 +525,12 @@ void debug_out(Head H, Tail... T) {
     #define local_run (true)
 #endif
 
+
+#define yes return ps("YES");
+#define no return ps("NO");
+
+// const int MOD = 1000000007;
+
 #pragma endregion
 
 // ! ---------------------------------------------------------------------------
@@ -542,8 +562,13 @@ int main() {
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
         el; dbgcBold("CASE" , CASE );
+#ifndef DCCLYDE_BRUTEFORCE
         solve();
+#else
+        brute();
+#endif
     }
+    dbg(TIME());
 
     return 0;
 }
