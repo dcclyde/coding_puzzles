@@ -31,10 +31,13 @@ tcT, size_t SZ> using AR = array<T,SZ>;
 using vi = V<int>;
 using vb = V<bool>;
 using vl = V<ll>;
+using vll = V<ll>;
 using vd = V<db>;
 using vs = V<str>;
 using vpi = V<pi>;
+using vpii = V<pi>;
 using vpl = V<pl>;
+using vpll = V<pll>;
 using vpd = V<pd>;
 
 // vectors
@@ -46,15 +49,16 @@ using vpd = V<pd>;
 #define sor(x) sort(all(x))
 #define rsz resize
 #define ins insert
-//// #define pb push_back
-//// #define eb emplace_back
+#define pb push_back
+#define eb emplace_back
+#define emp emplace
 //// #define ft front()
 //// #define bk back()
 
 //// #define lb lower_bound
 //// #define ub upper_bound
-tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
-tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
+//// tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
+//// tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
@@ -96,17 +100,33 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FOR(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
 #define foreach(a,x) each(a,x)
 
+#pragma region  // rangeint
+V<int> rangeint(int start, int end, int inc=1) {
+    V<int> out;
+    if (inc > 0) {
+        for(int curr = start; curr < end; curr += inc) {
+            out.push_back(curr);
+        }
+        return out;
+    } else {
+        for(int curr = start; curr > end; curr += inc) {
+            out.push_back(curr);
+        }
+        return out;
+    }
+}
+#pragma endregion
 
 //// const int MOD = 1e9+7; // 998244353;  // I can add this myself.
-const int MX = 2e5+5;
+// const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
 //// const int dx[4]{1,0,-1,0}, dy[4]{0,1,0,-1}; // for every grid problem!!
@@ -114,6 +134,12 @@ vector<pii> stepsOrthogonal = {{1,0},{0,1},{-1,0},{0,-1}};
 vector<pii> stepsDiagonal = {{1,1},{1,-1},{-1,-1},{-1,1}};
 vector<pii> steps8dirs = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
 mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
+#pragma region  // rng examples
+// std::uniform_real_distribution<db> rand_dbl(0, 1);  // [L, R)
+// db ard = unif_db(rng);
+// std::uniform_int_distribution<int> rand_int(1, 2);  // inclusive
+// int ri = rand_int(rng);
+#pragma endregion
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
 
 // bitwise ops
@@ -301,9 +327,9 @@ inline namespace Output {
     template<class ...T> void ps1(const T&... t) { pr_sep1(cout," ",t...); ps1(); }
 
     template<class T>
-    void pv(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << ' ' << x;} cout<<'\n';}
+    void pv(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x;} cout<<'\n';}
     template<class T>
-    void pv1(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << ' ' << x+1;} cout<<'\n';}
+    void pv1(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x+1;} cout<<'\n';}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
