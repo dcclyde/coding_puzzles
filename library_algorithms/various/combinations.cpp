@@ -1,5 +1,5 @@
-
 #pragma region  // next_combination
+// SEO combs comb itertools.comb
 template <typename Iterator>
 bool next_combination(const Iterator first, Iterator k, const Iterator last)
 {
