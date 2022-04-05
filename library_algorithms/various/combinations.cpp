@@ -51,22 +51,22 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 #pragma endregion
 
 #pragma region  // N ints summing to S
-// // get all combinations of N nonnegative ints summing to S.
+// // get all combinations of combN nonnegative ints summing to combS.
 // // that's (N+S-1) choose (S-1).
-// int N = 7;
-// int S = 3;
-// V<int> ch = rangeint(0, N+S-1);
-// V<int> nums(N);
+// int combN = 7;
+// int combS = 3;
+// V<int> ch = rangeint(0, combN+combS-1);
+// V<int> nums(combN);
 // int combs_ctr = 0;
 // do {
-//     nums[0] = ch[0]; nums[N-1] = N+S-2 - ch[N-2];
-//     FOR(k,1,N-1) {
+//     nums[0] = ch[0]; nums[combN-1] = combN+combS-2 - ch[combN-2];
+//     FOR(k,1,combN-1) {
 //         nums[k] = ch[k] - ch[k-1] - 1;
 //     }
 //     ++combs_ctr;
 //     dbg(combs_ctr, nums);
 //     // ! Do something with nums here.
-// } while (next_combination(ch.begin(), ch.begin() + N-1, ch.end()));
+// } while (next_combination(ch.begin(), ch.begin() + (combN-1), ch.end()));
 #pragma endregion
 
 #pragma endregion
