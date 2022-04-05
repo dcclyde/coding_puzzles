@@ -446,7 +446,8 @@ string print_details_helper(T& q) {
     string out = "\n";
     int ctr = 0;
     for ( auto& x : q ) {
-        out += to_string(ctr) + "\t" + to_string(x) + "\n";
+        out.push_back('\t');
+        out += to_string(ctr) + ":\t" + to_string(x) + "\n";
         ++ctr;
     }
     return out;
@@ -472,12 +473,18 @@ string print_tsv_helper(T& q) {
 #define pth print_tsv_helper
 
 
-void debug_out() { std::cerr << endl; }
+void debug_out() {}
 
 template <typename Head, typename... Tail>
 void debug_out(Head H, Tail... T) {
-    std::cerr << to_string(H) << "   ";
-    debug_out(T...);
+    // mostly no difference unless there's a background color.
+    // std::cerr << to_string(H) << "   ";
+    // debug_out(T...);
+    std::cerr << ' ' << to_string(H) << ' ';
+    if (sizeof...(T)) {
+        std::cerr << " ";
+        debug_out(T...);
+    }
 }
 
 // #define BOLD_MAYBE ""    // NOT bold
@@ -491,7 +498,7 @@ void debug_out(Head H, Tail... T) {
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
 #define OUT_WHITE       "\033[97" << "m"
-#define OUT_MARK        "\033[0;30;41m"
+#define OUT_MARK        "\033[0;30;41;1m"
 #define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
 #define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
 
@@ -514,15 +521,16 @@ void debug_out(Head H, Tail... T) {
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << B \
-        << std::right << setw(20) << C \
+    #define dbgcbase(A, B, C, ...) std::cout << std::flush; \
+        std::cerr << OUT_BOLD << B \
+        << std::right << setw(20) << C << ' ' \
         << OUT_RESET << OUT_BOLD << OUT_RED \
-        << std::right << setw(8) << __LINE__        \
+        << std::right << setw(7) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << A << "[ " << #__VA_ARGS__ << " ]" \
-        << OUT_BOLD << " :    " << OUT_RESET \
+        << OUT_BOLD << " :   " << OUT_RESET \
         << B, debug_out(__VA_ARGS__); \
-        std::cerr << OUT_RESET;
+        std::cerr << OUT_RESET << std::endl;
 
     #undef dbgcBold
     #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)

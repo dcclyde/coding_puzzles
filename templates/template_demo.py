@@ -7,11 +7,24 @@ def demo():
     dbg(a, x, y)
     dbgY(print_details_helper(x.items()))
     dbgP(print_tsv_helper(y))
-    dbgG("abbreviations work too", pdh(y))
+    dbgG("abbreviations pdh and pth work too", pdh(y))
     if local_run:
         print(
             "Use `local_run` boolean like this to run a more complicated debug function"
             " that will be totally skipped if the code executes on a different machine."
         )
+    el()
+    dbgc("any comment", "use dbgc, etc to put first arg on the left as a marker.")
+    dbgcP("diff color", x, y, "color variants work too. dbgcP, dbgcR, dbgcG, etc.")
+
+    print("demo all the different colors:")
+    dbg("dbg, aka dbgC (for cyan)")
+    dbgG("dbgG")
+    dbgP("dbgP")
+    dbgY("dbgY")
+    dbgR("dbgR")
+    dbgB("dbgB")
+    dbgW("dbgW")
+    dbgBackground("dbgBackground")
 
 demo()

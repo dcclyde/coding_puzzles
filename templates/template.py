@@ -57,8 +57,8 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def print_details_helper(q):
         out = []
         for k, x in enumerate(q):
-            out.append(f"\n\t{k}\t{x}")
-        return ''.join(out)
+            out.append(f"\n\t{k}:\t{x}")
+        return ''.join(out) + '\n'
 
     pdh = print_details_helper  # alternate shorter name
 
@@ -67,7 +67,7 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
         out = []
         for row in q:
             out.append('\t'.join(str(x) for x in row))
-        return ''.join('\n\t' + x for x in out)
+        return ''.join('\n\t' + x for x in out) + '\n'
 
     pth = print_tsv_helper
 
@@ -75,32 +75,75 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     OUT_GREEN = "\033[32m"
     OUT_RESET = "\033[0m"
     OUT_BOLD = "\033[;1m"
+    OUT_RED = "\033[31m"
+    OUT_WHITE = "\033[97m"
+    OUT_BLUE = "\033[34;1m"
     OUT_CYAN = "\033[36;1m"
     OUT_PURPLE = "\033[35;1m"
     OUT_YELLOW = "\033[33;1m"
     OUT_BACKGROUND = "\033[41;30;1m"
 
+    # helper function so your error printouts won't show up above an earlier stdout line.
+    def flush_stdout():
+        print('', flush=True, end='')
+
     def dbgBase(*args, **kwargs):
+        flush_stdout()
         color_helper = kwargs.pop('color', OUT_CYAN)
-        print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >20} {OUT_BOLD}: {color_helper}", end='', file=sys.stderr)
+        if kwargs.get('comment_first', False):
+            print(f'{OUT_BOLD}{color_helper}{args[0]: >11} {OUT_RESET}', end='', file=sys.stderr)
+            args = tuple(args[1:])
+        else:
+            print(f"{'': >12}", end='', file=sys.stderr)
+        if 'comment_first' in kwargs:
+            del kwargs['comment_first']
+        print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >7} {OUT_BOLD}: {OUT_RESET}{color_helper}", end='', file=sys.stderr)
         end_maybe = kwargs.get('end', '\n')
         kwargs['end']=f"{OUT_RESET}{end_maybe}"
+        if 'sep' not in kwargs:
+            kwargs['sep'] = ' '*4
         print(*args, file=sys.stderr, **kwargs)
 
+    # Can always comment out some of these lines to disable those logs.
+    # e.g. if you make lots of messy printouts while finding bug #1 but now it's fixed but you still want SOME printouts.
     def dbg(*args, **kwargs): dbgBase(color=OUT_CYAN, *args, **kwargs)
-    dbgB = dbg
+    dbgC = dbg
     def dbgG(*args, **kwargs): dbgBase(color=OUT_GREEN, *args, **kwargs)
     def dbgP(*args, **kwargs): dbgBase(color=OUT_PURPLE, *args, **kwargs)
     def dbgY(*args, **kwargs): dbgBase(color=OUT_YELLOW, *args, **kwargs)
+    def dbgR(*args, **kwargs): dbgBase(color=OUT_RED, *args, **kwargs)
+    def dbgB(*args, **kwargs): dbgBase(color=OUT_BLUE, *args, **kwargs)
+    def dbgW(*args, **kwargs): dbgBase(color=OUT_WHITE, *args, **kwargs)
     def dbgBackground(*args, **kwargs): dbgBase(color=OUT_BACKGROUND, *args, **kwargs)
-    def el(n=1): print('\n'*n, file=sys.stderr, end='')
+    def el(n=1): flush_stdout(); print('\n'*n, file=sys.stderr, end='')
+    def dbgc(*args, **kwargs): dbgBase(comment_first=True, color=OUT_CYAN, *args, **kwargs)
+    dbgcC = dbgc
+    def dbgcG(*args, **kwargs): dbgBase(comment_first=True, color=OUT_GREEN, *args, **kwargs)
+    def dbgcP(*args, **kwargs): dbgBase(comment_first=True, color=OUT_PURPLE, *args, **kwargs)
+    def dbgcY(*args, **kwargs): dbgBase(comment_first=True, color=OUT_YELLOW, *args, **kwargs)
+    def dbgcR(*args, **kwargs): dbgBase(comment_first=True, color=OUT_RED, *args, **kwargs)
+    def dbgcB(*args, **kwargs): dbgBase(comment_first=True, color=OUT_BLUE, *args, **kwargs)
+    def dbgcW(*args, **kwargs): dbgBase(comment_first=True, color=OUT_WHITE, *args, **kwargs)
+    def dbgcBackground(*args, **kwargs): dbgBase(comment_first=True, color=OUT_BACKGROUND, *args, **kwargs)
 else:
     def dbg(*args, **kwargs): pass
-    def dbgB(*args, **kwargs): pass
+    def dbgC(*args, **kwargs): pass
     def dbgG(*args, **kwargs): pass
     def dbgP(*args, **kwargs): pass
     def dbgY(*args, **kwargs): pass
+    def dbgR(*args, **kwargs): pass
+    def dbgB(*args, **kwargs): pass
+    def dbgW(*args, **kwargs): pass
     def dbgBackground(*args, **kwargs): pass
+    def dbgc(*args, **kwargs): pass
+    def dbgcC(*args, **kwargs): pass
+    def dbgcG(*args, **kwargs): pass
+    def dbgcP(*args, **kwargs): pass
+    def dbgcY(*args, **kwargs): pass
+    def dbgcR(*args, **kwargs): pass
+    def dbgcB(*args, **kwargs): pass
+    def dbgcW(*args, **kwargs): pass
+    def dbgcBackground(*args, **kwargs): pass
     def el(n=1): pass
     def print_details_helper(*args, **kwargs): pass
     def print_tsv_helper(*args, **kwargs): pass
