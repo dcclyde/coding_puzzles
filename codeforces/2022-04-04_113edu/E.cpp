@@ -75,6 +75,11 @@ struct custom_hash {
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    template<class T>
+    size_t operator()(T x) const {
+        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64((uint64_t)int(x) + FIXED_RANDOM);
+    }
     template<class T, class U>
     size_t operator()(pair<T,U> x) const {
         uint64_t a = (*this)(x.first);
@@ -485,12 +490,11 @@ void debug_out(Head H, Tail... T) {
 
 #define OUT_RESET       "\033[0m"
 #define OUT_BOLD        "\033[;1m"
-#define OUT_RED         "\033[31" << "m"
+#define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
-#define OUT_WHITE       "\033[97" << "m"
 #define OUT_MARK        "\033[0;30;41m"
 #define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
 #define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
@@ -506,17 +510,12 @@ void debug_out(Head H, Tail... T) {
 #define dbgcP(...) ;
 #define dbgR(...) ;
 #define dbgcR(...) ;
-#define dbgB(...) ;
-#define dbgcB(...) ;
-#define dbgW(...) ;
-#define dbgcW(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << B \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
-        << OUT_RESET << OUT_BOLD << OUT_RED \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << A << "[ " << #__VA_ARGS__ << " ]" \
@@ -525,7 +524,7 @@ void debug_out(Head H, Tail... T) {
         std::cerr << OUT_RESET;
 
     #undef dbgcBold
-    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
+    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
 
     #undef dbg
     #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
@@ -547,16 +546,6 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcR
     #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
-    #undef dbgB
-    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
-    #undef dbgcB
-    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
-
-    #undef dbgW
-    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
-    #undef dbgcW
-    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
-
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -567,10 +556,9 @@ void debug_out(Head H, Tail... T) {
     #define local_run (true)
 #endif
 
-#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
 
-#define yes ps("YES");
-#define no ps("NO");
+#define yes return ps("YES");
+#define no return ps("NO");
 
 // const int MOD = 1000000007;
 
@@ -578,18 +566,276 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+const int MOD = 998244353;
+#pragma region  // mint
+/**
+ * Description: modular arithmetic operations
+ * Source:
+	* KACTL
+	* https://codeforces.com/blog/entry/63903
+	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
+	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
+	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
+ * Verification:
+	* https://open.kattis.com/problems/modulararithmetic
+ */
 
+#ifndef BENQ_MODINT
+#define BENQ_MODINT
 
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
 
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+template <int MOD, int RT>
+string to_string(mint<MOD, RT> modint) {
+    return to_string((int)modint);
+}
+
+#endif
+#pragma endregion  // mint
 
 
 void solve() {
-    lls(N);
-    vector<ll> dat;
-    rv(N, dat);
-    dbgR(N, dat);
+    lls(K, Ain, target_hash_in);
+    mi A = Ain;
+    mi target_hash = target_hash_in;
 
+#ifdef DCCLYDE_LOCAL
+    int CUTOFF_K = K-1;
+#else
+    int CUTOFF_K = 4;
+#endif
+    if (K <= CUTOFF_K) {
+        // just simulate all possible tournaments.
+        int num_players = (1<<K);
+        int BITS = num_players - 1;
+        V<int> out(num_players);
+        FOR(mask, 0, (1<<BITS)) {
+            V<int> curr = rangeint(1, num_players+1);
+            V<int> wip;
+            mi hash = 0;
+            int bidx = 0;
+            FOR(round, 0, K) {
+                int placement = (1<<(K-round-1)) + 1;
+                // dbgR(K, num_players, round, placement);
+                FOR(k, 0, curr.size()/2) {
+                    int winner = curr[2*k];
+                    int loser = curr[2*k+1];
+                    if ((mask>>bidx) & 1) {
+                        swap(winner, loser);
+                    }
+                    // dbgP(mask, bidx, (mask>>bidx), winner, loser)
+                    ++bidx;
+                    wip.push_back(winner);
+                    hash += loser * pow(A, placement);
+                    out[loser-1] = placement;
+                }
 
+                swap(curr, wip);
+                wip.clear();
+            }
+            int champ = curr[0];
+            hash += champ * A;  // winner places 1st
+            out[champ-1] = 1;
+            dbg(mask, out);
+            if ( hash == target_hash ) {
+                return pv(out);
+            }
+        }
+        return ps(-1);
+    }
+
+    // K is one past the cutoff.
+    // simulate all possible subtournaments for 1st half vs 2nd half.
+    int num_players_total = (1<<K);
+    V<umap<int, int>> champ_to_hash_to_mask(num_players_total);
+    auto& chm = champ_to_hash_to_mask;  // nickname
+    FOR(half, 0, 2) {
+        int num_players = num_players_total / 2;
+        int offset = half * num_players;
+        int BITS = num_players - 1;
+        int Kinner = K-1;
+        // V<int> out(num_players);
+        FOR(mask, 0, (1<<BITS)) {
+            V<int> curr = rangeint(offset+1, offset+num_players+1);
+            V<int> wip;
+            mi hash = 0;
+            int bidx = 0;
+            FOR(round, 0, Kinner) {
+                int placement = (1<<(K-round-1)) + 1;
+                // dbgR(Kinner, num_players, round, placement);
+                FOR(k, 0, curr.size()/2) {
+                    int winner = curr[2*k];
+                    int loser = curr[2*k+1];
+                    if ((mask>>bidx) & 1) {
+                        std::swap(winner, loser);
+                    }
+                    // dbgP(mask, bidx, (mask>>bidx), winner, loser)
+                    ++bidx;
+                    wip.push_back(winner);
+                    hash += loser * pow(A, placement);
+                    // out[loser-1] = placement;
+                }
+
+                std::swap(curr, wip);
+                wip.clear();
+            }
+            int champ = curr[0];
+            // hash += champ * A;  // winner places "1st"
+            // out[champ-1] = 1;
+            // dbg(mask, hash);
+            chm[champ-1][(int)hash] = mask;
+        }
+    }
+    dbg(pdh(chm));
+
+    // int good_champ_top = -1;
+    // int good_champ_bot = -1;
+    int good_mask_top = -1;
+    int good_mask_bot = -1;
+    bool top_wins;
+    FOR(champ_top, 0, num_players_total / 2) {
+        for(auto& [hash_top_int, mask_top] : chm[champ_top]) {
+            mi hash_top = hash_top_int;
+            FOR(champ_bottom, num_players_total/2, num_players_total) {
+                /*
+                    case 1: assume I win the finals.
+                    That means the final hash will be
+                        my_hash + other_hash + other_winner*A
+                */
+                mi hash_needed_top_wins = target_hash - hash_top - mi(champ_top+1)*A - mi(champ_bottom+1)*A*A;
+                mi hash_needed_bot_wins = target_hash - hash_top - mi(champ_top+1)*A*A - mi(champ_bottom+1)*A;
+                dbg(champ_top, champ_bottom, hash_top);
+                dbg(target_hash, hash_top, mi(champ_top+1)*A);
+                dbg(hash_needed_top_wins, hash_needed_bot_wins, chm[champ_bottom]);
+                el;
+                if ( chm[champ_bottom].find((int)hash_needed_top_wins) != chm[champ_bottom].end() ) {
+                    // found a solution.
+                    // good_champ_top = champ_top;
+                    // good_champ_bot = champ_bottom;
+                    good_mask_top = mask_top;
+                    good_mask_bot = chm[champ_bottom][(int)hash_needed_top_wins];
+                    top_wins = true;
+                    break;
+                }
+                if ( chm[champ_bottom].find((int)hash_needed_bot_wins) != chm[champ_bottom].end() ) {
+                    // found a solution.
+                    // good_champ_top = champ_top;
+                    // good_champ_bot = champ_bottom;
+                    good_mask_top = mask_top;
+                    good_mask_bot = chm[champ_bottom][(int)hash_needed_bot_wins];
+                    top_wins = false;
+                    break;
+                }
+            }
+            if (good_mask_top >= 0) {
+                break;
+            }
+        }
+        if (good_mask_top >= 0) {
+            break;
+        }
+    }
+
+    if (good_mask_top == -1) {
+        return ps(-1);
+    }
+
+    // ok now reconstruct everything.
+    V<int> out(num_players_total);
+    V<int> masks = {good_mask_top, good_mask_bot};
+    FOR(half, 0, 2) {
+        int num_players = num_players_total / 2;
+        int offset = half * num_players;
+        // int BITS = num_players - 1;
+        int Kinner = K-1;
+        int mask = masks[half];
+
+        {
+            V<int> curr = rangeint(offset+1, offset+num_players+1);
+            V<int> wip;
+            mi hash = 0;
+            int bidx = 0;
+            FOR(round, 0, Kinner) {
+                int placement = (1<<(K-round-1)) + 1;
+                dbgR(Kinner, num_players, round, placement);
+                FOR(k, 0, curr.size()/2) {
+                    int winner = curr[2*k];
+                    int loser = curr[2*k+1];
+                    if ((mask>>bidx) & 1) {
+                        std::swap(winner, loser);
+                    }
+                    // dbgP(mask, bidx, (mask>>bidx), winner, loser)
+                    ++bidx;
+                    wip.push_back(winner);
+                    hash += loser * pow(A, placement);
+                    out[loser-1] = placement;
+                }
+
+                std::swap(curr, wip);
+                wip.clear();
+            }
+            int champ = curr[0];
+            hash += champ * A;  // winner places "1st"
+            if ((top_wins && half == 0) || (!top_wins && half == 1)) {
+                out[champ-1] = 1;
+            } else {
+                out[champ-1] = 2;
+            }
+            // dbg(mask, hash);
+        }
+    }
+    pv(out);
 
     return;
 }
@@ -602,7 +848,7 @@ int main() {
     setIO();
 
     int T = 1;
-    dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+    // dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
         el; dbgcBold("CASE" , CASE );
 #ifndef DCCLYDE_BRUTEFORCE
@@ -611,7 +857,7 @@ int main() {
         brute();
 #endif
     }
-    dbgR(TIME());
+    dbg(TIME());
 
     return 0;
 }

@@ -485,12 +485,11 @@ void debug_out(Head H, Tail... T) {
 
 #define OUT_RESET       "\033[0m"
 #define OUT_BOLD        "\033[;1m"
-#define OUT_RED         "\033[31" << "m"
+#define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
-#define OUT_WHITE       "\033[97" << "m"
 #define OUT_MARK        "\033[0;30;41m"
 #define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
 #define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
@@ -506,17 +505,12 @@ void debug_out(Head H, Tail... T) {
 #define dbgcP(...) ;
 #define dbgR(...) ;
 #define dbgcR(...) ;
-#define dbgB(...) ;
-#define dbgcB(...) ;
-#define dbgW(...) ;
-#define dbgcW(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << B \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
-        << OUT_RESET << OUT_BOLD << OUT_RED \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << A << "[ " << #__VA_ARGS__ << " ]" \
@@ -525,7 +519,7 @@ void debug_out(Head H, Tail... T) {
         std::cerr << OUT_RESET;
 
     #undef dbgcBold
-    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
+    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
 
     #undef dbg
     #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
@@ -547,16 +541,6 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcR
     #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
-    #undef dbgB
-    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
-    #undef dbgcB
-    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
-
-    #undef dbgW
-    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
-    #undef dbgcW
-    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
-
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -567,7 +551,6 @@ void debug_out(Head H, Tail... T) {
     #define local_run (true)
 #endif
 
-#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
 
 #define yes ps("YES");
 #define no ps("NO");
@@ -585,11 +568,37 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     lls(N);
-    vector<ll> dat;
-    rv(N, dat);
-    dbgR(N, dat);
+    strings(dat);
+    dbgY(N, dat);
 
-
+    V<int> wants_win;
+    FOR(k, 0, N) {
+        if ( dat[k] == '2') {
+            wants_win.push_back(k);
+        }
+    }
+    if (wants_win.size() == 1 || wants_win.size() == 2 ) {
+        return no;
+    }
+    yes;
+    V<string> out(N, string(N, '='));
+    FOR(k, 0, N) {
+        out[k][k] = 'X';
+    }
+    if (!wants_win.empty()) {
+        wants_win.push_back(wants_win.front());
+    }
+    dbg(wants_win);
+    FOR(k, 0, int(wants_win.size()) - 1) {
+        dbg(k);
+        int a = wants_win[k];
+        int b = wants_win[k+1];
+        out[a][b] = '+';
+        out[b][a] = '-';
+    }
+    FOR(k, 0, N) {
+        ps(out[k]);
+    }
 
     return;
 }
@@ -611,7 +620,7 @@ int main() {
         brute();
 #endif
     }
-    dbgR(TIME());
+    dbg(TIME());
 
     return 0;
 }

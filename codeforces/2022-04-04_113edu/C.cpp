@@ -485,12 +485,11 @@ void debug_out(Head H, Tail... T) {
 
 #define OUT_RESET       "\033[0m"
 #define OUT_BOLD        "\033[;1m"
-#define OUT_RED         "\033[31" << "m"
+#define OUT_RED         "\033[31" << BOLD_MAYBE << "m"
 #define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" << "m"
 #define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
-#define OUT_WHITE       "\033[97" << "m"
 #define OUT_MARK        "\033[0;30;41m"
 #define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
 #define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
@@ -506,17 +505,12 @@ void debug_out(Head H, Tail... T) {
 #define dbgcP(...) ;
 #define dbgR(...) ;
 #define dbgcR(...) ;
-#define dbgB(...) ;
-#define dbgcB(...) ;
-#define dbgW(...) ;
-#define dbgcW(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << B \
+    #define dbgcbase(A, B, C, ...) std::cerr << OUT_BOLD << OUT_RED \
         << std::right << setw(20) << C \
-        << OUT_RESET << OUT_BOLD << OUT_RED \
         << std::right << setw(8) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
         << A << "[ " << #__VA_ARGS__ << " ]" \
@@ -525,7 +519,7 @@ void debug_out(Head H, Tail... T) {
         std::cerr << OUT_RESET;
 
     #undef dbgcBold
-    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
+    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_CYAN, OUT_MARK<<__VA_ARGS__)
 
     #undef dbg
     #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
@@ -547,16 +541,6 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcR
     #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
-    #undef dbgB
-    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
-    #undef dbgcB
-    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
-
-    #undef dbgW
-    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
-    #undef dbgcW
-    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
-
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
 
@@ -567,10 +551,9 @@ void debug_out(Head H, Tail... T) {
     #define local_run (true)
 #endif
 
-#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
 
-#define yes ps("YES");
-#define no ps("NO");
+#define yes return ps("YES");
+#define no return ps("NO");
 
 // const int MOD = 1000000007;
 
@@ -578,18 +561,166 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+void brute() {
+    dbgcBold("brute");
+    lls(N);
+    vector<ll> dat;
+    rv(N, dat);
+    dbgY(N, dat);
 
+    auto ph = rangeint(0, N);
+    int out = 0;
+    do {
+        V<int> local(N);
+        int sum = 0;
+        FOR(k, 0, N) {
+            local[k] = dat[ph[k]];
+            sum += dat[k];
+        }
+        auto bak = local;
+        int last = N-1;
+        int curr = 0;
+        while ( curr != last && sum > 0 ) {
+            if ( local[curr] > 0 ) {
+                --local[curr];
+                --sum;
+                last = curr;
+            }
+            ++curr; curr %= N;
+        }
+        if ( sum == 0 ) {
+            dbg(bak);
+            ++out;
+        }
 
+    } while (next_permutation(all(ph)));
+    ps(out);
+    return;
+}
 
+const int MOD = 998'244'353;
+
+#pragma region  // mint
+/**
+ * Description: modular arithmetic operations
+ * Source:
+	* KACTL
+	* https://codeforces.com/blog/entry/63903
+	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
+	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
+	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
+ * Verification:
+	* https://open.kattis.com/problems/modulararithmetic
+ */
+
+#ifndef BENQ_MODINT
+#define BENQ_MODINT
+
+template<int MOD, int RT> struct mint {
+	static const int mod = MOD;
+	static constexpr mint rt() { return RT; } // primitive root for FFT
+	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
+	mint():v(0) {}
+	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
+		if (v < 0) v += MOD; }
+	bool operator==(const mint& o) const {
+		return v == o.v; }
+	friend bool operator!=(const mint& a, const mint& b) {
+		return !(a == b); }
+	friend bool operator<(const mint& a, const mint& b) {
+		return a.v < b.v; }
+	friend void re(mint& a) { ll x; re(x); a = mint(x); }
+	friend str ts(mint a) { return ts(a.v); }
+
+	mint& operator+=(const mint& o) {
+		if ((v += o.v) >= MOD) v -= MOD;
+		return *this; }
+	mint& operator-=(const mint& o) {
+		if ((v -= o.v) < 0) v += MOD;
+		return *this; }
+	mint& operator*=(const mint& o) {
+		v = int((ll)v*o.v%MOD); return *this; }
+	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
+	friend mint pow(mint a, ll p) {
+		mint ans = 1; assert(p >= 0);
+		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		return ans; }
+	friend mint inv(const mint& a) { assert(a.v != 0);
+		return pow(a,MOD-2); }
+
+	mint operator-() const { return mint(-v); }
+	mint& operator++() { return *this += 1; }
+	mint& operator--() { return *this -= 1; }
+	friend mint operator+(mint a, const mint& b) { return a += b; }
+	friend mint operator-(mint a, const mint& b) { return a -= b; }
+	friend mint operator*(mint a, const mint& b) { return a *= b; }
+	friend mint operator/(mint a, const mint& b) { return a /= b; }
+};
+
+using mi = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = V<mi>;
+using pmi = pair<mi,mi>;
+using vpmi = V<pmi>;
+
+V<vmi> scmb; // small combinations
+void genComb(int SZ) {
+	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
+	FOR(i,1,SZ) F0R(j,i+1)
+		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+}
+
+template <int MOD, int RT>
+string to_string(mint<MOD, RT> modint) {
+    return to_string((int)modint);
+}
+
+#endif
+#pragma endregion  // mint
+
+/**
+ * Description: pre-compute factorial mod inverses,
+ 	* assumes $MOD$ is prime and $SZ < MOD$.
+ * Time: O(SZ)
+ * Source: KACTL
+ * Verification: https://dmoj.ca/problem/tle17c4p5
+ */
+
+vmi invs, fac, ifac;
+void genFac(int SZ) {
+	invs.rsz(SZ), fac.rsz(SZ), ifac.rsz(SZ);
+	invs[1] = fac[0] = ifac[0] = 1;
+	FOR(i,2,SZ) invs[i] = mi(-(ll)MOD/i*(int)invs[MOD%i]);
+	FOR(i,1,SZ) fac[i] = fac[i-1]*i, ifac[i] = ifac[i-1]*invs[i];
+}
+mi comb(int a, int b) {
+	if (a < b || b < 0) return 0;
+	return fac[a]*ifac[b]*ifac[a-b]; }
 
 
 void solve() {
     lls(N);
     vector<ll> dat;
     rv(N, dat);
-    dbgR(N, dat);
+    dbgY(N, dat);
 
+    sort(all(dat));
+    if ( dat[N-1] == dat[N-2] ) {
+        return ps(fac[N]);
+    }
+    if ( dat[N-2] + 1 != dat[N-1] ) {
+        return ps(0);
+    }
+    int pos = N-2;
+    while ( pos > 0 && dat[pos-1] == dat[N-2] ) {
+        --pos;
+    }
+    int K = N-2 - pos + 1;
+    dbg(K);
 
+    mi out = fac[N];
+    out *= K;
+    out /= (K+1);
+    ps(out);
 
     return;
 }
@@ -600,6 +731,7 @@ void solve() {
 #pragma region
 int main() {
     setIO();
+    genFac(200'200);
 
     int T = 1;
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
@@ -611,7 +743,7 @@ int main() {
         brute();
 #endif
     }
-    dbgR(TIME());
+    dbg(TIME());
 
     return 0;
 }
