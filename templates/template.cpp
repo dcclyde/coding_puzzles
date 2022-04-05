@@ -569,7 +569,7 @@ void debug_out(Head H, Tail... T) {
     #define dbg_only(...) __VA_ARGS__;
 
     #undef el
-    #define el std::cerr << '\n';  // in my head I say "error line"
+    #define el std::cerr << std::flush; std::cerr << '\n';  // in my head I say "error line"
 
     #undef local_run
     #define local_run (true)

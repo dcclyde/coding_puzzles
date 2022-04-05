@@ -102,12 +102,12 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
         kwargs['end']=f"{OUT_RESET}{end_maybe}"
         if 'sep' not in kwargs:
             kwargs['sep'] = ' '*4
+        kwargs['flush'] = True
         print(*args, file=sys.stderr, **kwargs)
 
     # Can always comment out some of these lines to disable those logs.
     # e.g. if you make lots of messy printouts while finding bug #1 but now it's fixed but you still want SOME printouts.
     def dbg(*args, **kwargs): dbgBase(color=OUT_CYAN, *args, **kwargs)
-    dbgC = dbg
     def dbgG(*args, **kwargs): dbgBase(color=OUT_GREEN, *args, **kwargs)
     def dbgP(*args, **kwargs): dbgBase(color=OUT_PURPLE, *args, **kwargs)
     def dbgY(*args, **kwargs): dbgBase(color=OUT_YELLOW, *args, **kwargs)
@@ -115,9 +115,8 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgB(*args, **kwargs): dbgBase(color=OUT_BLUE, *args, **kwargs)
     def dbgW(*args, **kwargs): dbgBase(color=OUT_WHITE, *args, **kwargs)
     def dbgBackground(*args, **kwargs): dbgBase(color=OUT_BACKGROUND, *args, **kwargs)
-    def el(n=1): flush_stdout(); print('\n'*n, file=sys.stderr, end='')
+    def el(n=1): flush_stdout(); print('\n'*n, file=sys.stderr, end='', flush=True)
     def dbgc(*args, **kwargs): dbgBase(comment_first=True, color=OUT_CYAN, *args, **kwargs)
-    dbgcC = dbgc
     def dbgcG(*args, **kwargs): dbgBase(comment_first=True, color=OUT_GREEN, *args, **kwargs)
     def dbgcP(*args, **kwargs): dbgBase(comment_first=True, color=OUT_PURPLE, *args, **kwargs)
     def dbgcY(*args, **kwargs): dbgBase(comment_first=True, color=OUT_YELLOW, *args, **kwargs)
@@ -127,7 +126,6 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgcBackground(*args, **kwargs): dbgBase(comment_first=True, color=OUT_BACKGROUND, *args, **kwargs)
 else:
     def dbg(*args, **kwargs): pass
-    def dbgC(*args, **kwargs): pass
     def dbgG(*args, **kwargs): pass
     def dbgP(*args, **kwargs): pass
     def dbgY(*args, **kwargs): pass
@@ -136,7 +134,6 @@ else:
     def dbgW(*args, **kwargs): pass
     def dbgBackground(*args, **kwargs): pass
     def dbgc(*args, **kwargs): pass
-    def dbgcC(*args, **kwargs): pass
     def dbgcG(*args, **kwargs): pass
     def dbgcP(*args, **kwargs): pass
     def dbgcY(*args, **kwargs): pass

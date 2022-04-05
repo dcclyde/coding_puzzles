@@ -14,11 +14,11 @@ def demo():
             " that will be totally skipped if the code executes on a different machine."
         )
     el()
-    dbgc("any comment", "use dbgc, etc to put first arg on the left as a marker.")
+    dbgc("any comment", a, "Use dbgc to put first arg on the left as a marker.")
     dbgcP("diff color", x, y, "color variants work too. dbgcP, dbgcR, dbgcG, etc.")
 
     print("demo all the different colors:")
-    dbg("dbg, aka dbgC (for cyan)")
+    dbg("dbg")
     dbgG("dbgG")
     dbgP("dbgP")
     dbgY("dbgY")
