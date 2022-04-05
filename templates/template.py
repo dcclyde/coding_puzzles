@@ -1,40 +1,76 @@
-
+#region defines
 import copy
-from collections import defaultdict
+from collections import defaultdict as dd
 from collections import deque
 import math
 import sys
 import os
+#endregion
+#region  @bootstrap for recursive functions
+# # TLDR:
+# # Python's recursion limit is 1000. Increasing the limit often causes MLE.
+# # Instead, use this decorator. See https://codeforces.com/blog/entry/80158?#comment-662204.
+# # Usage instructions:
+# #   1) Put @bootstrap 1 line before the recursive function.
+# #   2) Replace "return" with "yield"
+# #   3) You also need to wrap your recursive calls like (yield myfunction(x)).
+# #          (applies even if the function doesn't return anything!)
+# # Example (original version):
+# def f(n):
+#     if n <= 0: yield 1
+#     return f(n-1) + f(n-2)
+#
+# # Example (fixed):
+# @bootstrap
+# def f(n):
+#     if n <= 0: return 1
+#     yield (yield f(n-1)) + (yield f(n-2))
 
-# sys.setrecursionlimit(10**5)  # This uses something like 128 MB RAM. I guess only play with this if I expect recursion depth problems.
-
-# provides more detailed listing of complicated objects
-# call like dbg(print_details_helper)
-def print_details_helper(q):
-    out = []
-    for k, x in enumerate(q):
-        out.append(f"\n\t{k}\t{x}")
-    return ''.join(out)
-
-pdh = print_details_helper  # alternate shorter name
-
-# good if we want to see spacing, or to copy-paste into GSheets
-def print_tsv_helper(q):
-    out = []
-    for row in q:
-        out.append('\t'.join(str(x) for x in row))
-    return ''.join('\n\t' + x for x in out)
-
-pth = print_tsv_helper
-
-
-#region  set up dbg commands
-# set up debug stuff.
+from types import GeneratorType
+def bootstrap(f, stack=[]):
+    def wrappedfunc(*args, **kwargs):
+        if stack:
+            return f(*args, **kwargs)
+        else:
+            to = f(*args, **kwargs)
+            while True:
+                if type(to) is GeneratorType:
+                    stack.append(to)
+                    to = next(to)
+                else:
+                    stack.pop()
+                    if not stack:
+                        break
+                    to = stack[-1].send(to)
+            return to
+    return wrappedfunc
+#endregion
+#region  dbg commands
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
 
 local_run = False
 if os.environ.get("PYTHON_CONTEST_HELPER"):
     local_run = True
+
+    # call like dbg(print_details_helper(stuff))
+    # provides more detailed listing of complicated objects
+    def print_details_helper(q):
+        out = []
+        for k, x in enumerate(q):
+            out.append(f"\n\t{k}\t{x}")
+        return ''.join(out)
+
+    pdh = print_details_helper  # alternate shorter name
+
+    # good if we want to see spacing, or to copy-paste into GSheets
+    def print_tsv_helper(q):
+        out = []
+        for row in q:
+            out.append('\t'.join(str(x) for x in row))
+        return ''.join('\n\t' + x for x in out)
+
+    pth = print_tsv_helper
+
     OUT_RED_BOLD = "\033[31;1m"
     OUT_GREEN = "\033[32m"
     OUT_RESET = "\033[0m"
@@ -66,6 +102,10 @@ else:
     def dbgY(*args, **kwargs): pass
     def dbgBackground(*args, **kwargs): pass
     def el(n=1): pass
+    def print_details_helper(*args, **kwargs): pass
+    def print_tsv_helper(*args, **kwargs): pass
+    def pdh(*args, **kwargs): pass
+    def pth(*args, **kwargs): pass
 #endregion
 #region  FastIO
 from io import BytesIO, IOBase
@@ -120,7 +160,7 @@ class IOWrapper(IOBase):
 sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
 #endregion
-
+#region  input helpers
 def nn():
     return int(input())
 
@@ -130,10 +170,9 @@ def li():
 def lm():
     return list(map(int, input().split()))
 
-
 # To print while flushing output for interactive problems:
 # print(x, flush=True)
-
+#endregion
 
 #########################################################################
 # Problem specific code usually goes below this line.
