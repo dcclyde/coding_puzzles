@@ -15,16 +15,26 @@ import os
 # #   2) Replace "return" with "yield"
 # #   3) You also need to wrap your recursive calls like (yield myfunction(x)).
 # #          (applies even if the function doesn't return anything!)
+#            (only do this for recursive calls within the recursive function though!)
 # # Example (original version):
 # def f(n):
 #     if n <= 0: yield 1
 #     return f(n-1) + f(n-2)
+#
+# print(f(5))
 #
 # # Example (fixed):
 # @bootstrap
 # def f(n):
 #     if n <= 0: return 1
 #     yield (yield f(n-1)) + (yield f(n-2))
+#
+# print(f(5))  # don't add `yield` to the call from outside!
+#
+# Extended example:
+#     Before: https://pastebin.com/inwciZgh
+#     After: https://pastebin.com/fKksXXLj
+#     Try submitting at: https://codingcompetitions.withgoogle.com/codejam/round/0000000000876ff1/0000000000a45ef7
 
 from types import GeneratorType
 def bootstrap(f, stack=[]):
