@@ -1,6 +1,7 @@
 from template import *
 
-def demo():
+def demo_debug_printouts():
+    el()
     a = 'abcde'
     x = {'q': 14, 'apple': -3, 'monkey': 40}
     y = [[1, 5, 3, 2], [3, 6, 4, 2], [8, 9, 9, 5]]
@@ -26,5 +27,6 @@ def demo():
     dbgB("dbgB")
     dbgW("dbgW")
     dbgBackground("dbgBackground")
+    el()
 
-demo()
+demo_debug_printouts()

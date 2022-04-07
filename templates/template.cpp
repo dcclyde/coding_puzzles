@@ -100,9 +100,11 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FOR(i,a,b) for (ll i = (a); i < (b); ++i)
+#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (ll i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
@@ -154,10 +156,10 @@ constexpr int msk2(int x) { return p2(x)-1; }
 ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
 ll fdiv(ll a, ll b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
 
-tcT> bool ckmin(T& a, const T& b) {
-    return b < a ? a = b, 1 : 0; } // set a = min(a,b)
-tcT> bool ckmax(T& a, const T& b) {
-    return a < b ? a = b, 1 : 0; } // set a = max(a,b)
+tcTU> bool ckmin(T& a, const U& b) {
+    return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
+tcTU> bool ckmax(T& a, const U& b) {
+    return a < (T)b ? a = (T)b, 1 : 0; } // set a = max(a,b)
 
 int maxi(int a, int b) {return max((int)a, (int)b);}
 int mini(int a, int b) {return min((int)a, (int)b);}

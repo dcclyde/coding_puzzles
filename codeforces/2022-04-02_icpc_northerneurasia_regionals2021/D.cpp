@@ -37,7 +37,7 @@ using vs = V<str>;
 using vpi = V<pi>;
 using vpii = V<pi>;
 using vpl = V<pl>;
-using vpll = V<pl>;
+using vpll = V<pll>;
 using vpd = V<pd>;
 
 // vectors
@@ -100,17 +100,35 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FOR(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
 #define foreach(a,x) each(a,x)
 
+#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {exit(1);}}
+
+#pragma region  // rangeint
+V<int> rangeint(int start, int end, int inc=1) {
+    V<int> out;
+    if (inc > 0) {
+        for(int curr = start; curr < end; curr += inc) {
+            out.push_back(curr);
+        }
+        return out;
+    } else {
+        for(int curr = start; curr > end; curr += inc) {
+            out.push_back(curr);
+        }
+        return out;
+    }
+}
+#pragma endregion
 
 //// const int MOD = 1e9+7; // 998244353;  // I can add this myself.
-const int MX = 2e5+5;
+// const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
 //// const int dx[4]{1,0,-1,0}, dy[4]{0,1,0,-1}; // for every grid problem!!
@@ -545,132 +563,190 @@ void debug_out(Head H, Tail... T) {
 
 // ! ---------------------------------------------------------------------------
 
+#pragma region  // next_combination
+// SEO combs comb itertools.comb
+template <typename Iterator>
+bool next_combination(const Iterator first, Iterator k, const Iterator last)
+{
+   /* Credits: Mark Nelson http://marknelson.us */
+   if ((first == last) || (first == k) || (last == k))
+      return false;
+   Iterator i1 = first;
+   Iterator i2 = last;
+   ++i1;
+   if (last == i1)
+      return false;
+   i1 = last;
+   --i1;
+   i1 = k;
+   --i2;
+   while (first != i1)
+   {
+      if (*--i1 < *i2)
+      {
+         Iterator j = k;
+         while (!(*i1 < *j)) ++j;
+         std::iter_swap(i1,j);
+         ++i1;
+         ++j;
+         i2 = k;
+         std::rotate(i1,j,last);
+         while (last != j)
+         {
+            ++j;
+            ++i2;
+         }
+         std::rotate(k,i2,last);
+         return true;
+      }
+   }
+   std::rotate(first,k,last);
+   return false;
+}
+
+#pragma region  // example
+
+// std::string s = "abcde";
+// int comb_size = 2;
+// do {
+//     std::cout << std::string(s.begin(),s.begin() + i) << std::endl;
+// }
+// while(next_combination(s.begin(),s.begin() + i,s.end()));
+
+#pragma endregion
+
+#pragma region  // N ints summing to S
+// // get all combinations of N nonnegative ints summing to S.
+// // that's (N+S-1) choose (S-1).
+// int N = 7;
+// int S = 3;
+// V<int> ch = rangeint(0, N+S-1);
+// V<int> nums(N);
+// int combs_ctr = 0;
+// do {
+//     nums[0] = ch[0]; nums[N-1] = N+S-2 - ch[N-2];
+//     FOR(k,1,N-1) {
+//         nums[k] = ch[k] - ch[k-1] - 1;
+//     }
+//     ++combs_ctr;
+//     dbg(combs_ctr, nums);
+//     // ! Do something with nums here.
+// } while (next_combination(ch.begin(), ch.begin() + N-1, ch.end()));
+#pragma endregion
+
+#pragma endregion
 
 
 
 
 
 void solve() {
-    ints(N, D);
+    lls(N, TARGET);
     vector<ll> dat;
     rv(N, dat);
-    dbgY(N, dat);
+    dbgR(N, dat);
 
-    // try all setups where we omit up to 6 items.
-    V<V<int>> per_digit(10);
+    V<V<ll>> per_digit(10);
     for(auto& x : dat) {
         per_digit[x%10].push_back(x);
     }
-
-    if ( D == 0 ) {
-        // multiply everything together.
-        int dprod = 1;
-        for(auto& x : dat) {
-            dprod *= x;
-            dprod %= 10;
-        }
-        if ( dprod == 0 ) {
-            ps(N);
-            pv(dat);
-            return;
-        } else {
-            return ps(-1);
+    if ( TARGET != 0 ) {
+        N -= per_digit[0].size();
+        per_digit[0].clear();
+    }
+    if ( TARGET % 2 == 1 ) {
+        FOR(d, 0, 10) {
+            if ( d%2 == 0 ) {
+                N -= per_digit[d].size();
+                per_digit[d].clear();
+            }
         }
     }
-
-    dbg(pdh(per_digit));
-    N -= per_digit[0].size();
-    per_digit[0].clear();  // * Never use 0s unless that's the target.
-    if ( D % 2 == 1 ) {
-        for(int k = 2 ; k <= 8 ; k += 2 ) {
-            N -= per_digit[k].size();
-            per_digit[k].clear();
-        }
-    }
-    FOR(k, 0, 10) {
-        sort(all(per_digit[k]));
-    }
-    dbg(N);
-    dbgP(pdh(per_digit));
-
-    V<V<int>> suffix_products(10);
     FOR(d, 0, 10) {
-        auto& sp = suffix_products[d];
-        sp.resize(per_digit[d].size() + 1);
-        sp.back() = 1;
-        for(int k = sp.size() - 2; k >= 0 ; --k) {
-            sp[k] = sp[k+1] * d;
-            sp[k] %= 10;
-        }
+        sort(all(per_digit[d]));
     }
-    dbg(pdh(suffix_products));
+    dbgP(N, pdh(per_digit));
 
-    const ll INF = 2e18;
-    ll best_prod = INF;
-    V<int> best_omitted;
-    int MAX_OMITTED = min(6, N-1);
-    dbg(MAX_OMITTED);
-    FOR(num_omitted, 0, MAX_OMITTED + 1) {
-        // find all ways to omit this many.
-        V<bool> comb_helper(10 + num_omitted - 1, false);
-        FOR(k, 0, 9) {
-            comb_helper[comb_helper.size()-1-k] = true;
+    // build suffix products, storing last digit only.
+    V<V<int>> suffix_products(10);
+    auto& sp = suffix_products;
+    FOR(d, 0, 10) {
+        sp[d].assign(per_digit[d].size() + 1, 1);
+        dbg(d, sp[d]);
+        for(int k = per_digit[d].size() - 1; k >= 0 ; --k) {
+            dbg(d, k, sp[d][k+1], sp[d][k]);
+            sp[d][k] = sp[d][k+1] * d;
+            sp[d][k] %= 10;
         }
-        V<int> omit_counts(10);
-        V<int> true_indices;
-        do {
-            true_indices.clear();
-            true_indices.push_back(-1);
-            FOR(k, 0, comb_helper.size()) {
-                if (comb_helper[k]) {
-                    true_indices.push_back(k);
-                }
-            }
-            true_indices.push_back(comb_helper.size());
-            FOR(k, 0, 10) {
-                omit_counts[k] = true_indices[k+1] - true_indices[k] - 1;
-            }
-            // dbg(comb_helper);
-            // dbg(true_indices);
-            // dbg(omit_counts);
-            // el;
+        dbgY(d, sp[d]);
+    }
 
-            ll prod = 1;
-            ll last_digit_prod = 1;
+
+    // try omitting up to 6 items total.
+
+    // get all combinations of N nonnegative ints summing to S.
+    ll INF = 2e18;
+    ll best_omitted_product = INF;
+    V<int> best_nums;
+    FOR(num_omitted, 0, 7) {
+        if (num_omitted >= N) {
+            break;
+        }
+        int S = num_omitted;
+        // that's (N+S-1) choose (S-1).
+        int num_ints = 10;
+        V<int> ch = rangeint(0, num_ints + S - 1);
+        dbg(num_ints, S, ch);
+        V<int> nums(num_ints);
+        int combs_ctr = 0;
+        do {
+            nums[0] = ch[0]; nums[num_ints-1] = num_ints+S-2 - ch[num_ints-2];
+            FOR(k,1,num_ints-1) {
+                nums[k] = ch[k] - ch[k-1] - 1;
+            }
+            ++combs_ctr;
+            dbg(combs_ctr, nums);
+
+            // timebomb(100);
+            ll curr_omitted_product = 1;
+            int curr_product_digit = 1;
             FOR(d, 0, 10) {
-                if ( per_digit[d].size() < omit_counts[d] ) {
-                    prod = INF;
+                if (nums[d] > per_digit[d].size()) {
+                    dbgc("omitted too many", d, nums[d], per_digit[d]);
+                    curr_omitted_product = INF + 1;
                     break;
                 }
-                // multiply together appropriate count of small items.
-                FOR(k, 0, omit_counts[d]) {
-                    prod *= per_digit[d][k];
+                FOR(k, 0, nums[d]) {
+                    curr_omitted_product *= per_digit[d][k];
                 }
-                last_digit_prod *= suffix_products[d][omit_counts[d]];
-                last_digit_prod %= 10;
+                curr_product_digit *= sp[d][nums[d]];
+                // dbgP(d, k, nums[k], nums, sp[d][nums[k]], sp[d], curr_product_digit);
+                curr_product_digit %= 10;
             }
-            if ( last_digit_prod != D ) {
+            dbg(curr_omitted_product, curr_product_digit);
+            if (curr_product_digit != TARGET) {
                 continue;
             }
-            if ( ckmin(best_prod, prod) ) {
-                dbgc("update")
-                dbg(prod, omit_counts);
-                best_omitted = omit_counts;
+            if (ckmin(best_omitted_product, curr_omitted_product)) {
+                best_nums = nums;
+                dbgcP("update", best_omitted_product, best_nums);
             }
-        } while (next_permutation(all(comb_helper)));
+        } while (next_combination(ch.begin(), ch.begin() + (num_ints-1), ch.end()));
     }
-    if ( best_prod == INF ) {
+    if (best_omitted_product == INF) {
         return ps(-1);
     }
     V<int> out;
     FOR(d, 0, 10) {
-        FOR(k, best_omitted[d], per_digit[d].size()) {
+        FOR(k, best_nums[d], per_digit[d].size()) {
             out.push_back(per_digit[d][k]);
         }
     }
     sort(all(out));
     ps(out.size());
     pv(out);
+
+
     return;
 }
 
