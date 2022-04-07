@@ -1,10 +1,11 @@
 #! /usr/bin/bash
-
 set -e
 
-g++ --std=c++2a G.cpp -o a.out \
+PROBLEM="E"
+
+g++ --std=c++2a "$PROBLEM".cpp -o a.out \
     -DDCCLYDE_LOCAL
-g++ --std=c++2a -DDCCLYDE_BRUTEFORCE G.cpp -o b.out \
+g++ --std=c++2a -DDCCLYDE_BRUTEFORCE "$PROBLEM".cpp -o b.out \
     -DDCCLYDE_LOCAL
 
 for((k = 1; k < 100000 ; ++k)); do

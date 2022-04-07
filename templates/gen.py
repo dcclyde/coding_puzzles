@@ -1,35 +1,98 @@
-import random
+#region  load template's helpers
+import sys
+sys.path.append("/home/dcclyde/puzzles/code/templates")
+from template import *
+#endregion
+#region  output
+def ps(*args, **kwargs):
+    if hasattr(args[0], '__iter__'):
+        print(' '.join(str(x) for x in args[0]), **kwargs)
+    else:
+        print(' '.join(str(x) for x in args), **kwargs)
 
-MAX_A = 0
-MAX_SLOPE = 0
-MAX_X = 5
-NUM_POINTS = 4
+def pv(q): ps(*q)
+def ps1(*args, **kwargs): alocal = tuple(tuple(x+1 for x in q) for q in args); ps(*alocal, **kwargs)
+def pv1(q): ps1(*q)
+def pvn(q):
+    for x in q: ps(x)
+def pvn1(q):
+    for x in q: ps1(x)
+#endregion
+#region  randomness helpers
+import random
+#region  ints, lists
+def ri(q):
+    if isinstance(q, int):
+        q = (q,q)
+    return random.randint(q[0], q[1])
+
+def rv(q, n):
+    N = ri(n)
+    return [ri(q) for _ in range(N)]
+#endregion
+#region  rgraph
+def rgraph(nr, er):
+    N = ri(nr)
+    E = ri(er)
+    E = min(E, N*(N-1)//2)
+    edge_options = [(a, b) for a in range(N) for b in range(a+1, N)]
+    edges = random.sample(edge_options, E)
+
+    print(N, E)
+    pvn1(edges)
+    return
+#endregion
+#region  rtree
+#region  DSU (for tree)
+class DSU:
+    def __init__(self, _N):
+        self.N = _N
+        self.e = [-1] * self.N
+    def get(self, x):
+        if self.e[x] < 0:
+            return x
+        self.e[x] = self.e[self.e[x]]
+        return self.e[x]
+    def sameSet(self, a,b): return self.get(a) == self.get(b)
+    def size(self, x): return -self.e[self.get(x)]
+    def unite(self, x, y):
+        x = self.get(x); y = self.get(y)
+        if (x == y): return False
+        if (self.e[x] > self.e[y]): x,y = y,x
+        self.e[x] += self.e[y]
+        self.e[y] = x
+        return True
+#endregion
+
+def rtree(nr):
+    N = ri(nr)
+    dsu = DSU(N)
+    edges = []
+    for _ in range(N-1):
+        while True:
+            a, b = rv((0,N-1), 2)
+            if dsu.unite(a, b):
+                break
+        edges.append((a,b))
+    print(N)
+    pvn1(edges)
+    return
+#endregion
+#endregion
+
+N_RANGE = (2, 8)
+V_RANGE = (1, 8)
+S_RANGE = (1, 50)
 
 def gen_test():
-    N = random.randint(3, NUM_POINTS)
-    # pick N-1 colinear points.
-    a = random.randint(0, MAX_A)
-    b = random.randint(-MAX_SLOPE, MAX_SLOPE)
-    dat = []
-    for _ in range(N-1):
-        x = random.randint(-MAX_X, MAX_X)
-        y = a*x + b
-        dat.append((x, y))
+#     rtree(N_RANGE)
+#     rgraph(N_RANGE, S_RANGE)
+#     rv(N_RANGE, LR_RANGE)
+    N = ri(N_RANGE)
+    dat = [rv(V_RANGE) for _ in range(N)]
+    ps(1)
+    ps(N)
+    pvn(dat)
 
-    # pick one non-colinear point.
-    x = 0
-    y = b
-    while a*x + b == y:
-        x = random.randint(-MAX_X, MAX_X)
-        y = random.randint(-MAX_X, MAX_X)
-    dat.append((x, y))
-    random.shuffle(dat)
-
-    K = random.randint(1, N)
-
-    print(N, K)
-    for q in dat:
-        print(q[0], q[1])
-
-
+# ! If it passes small random tests then the problem is likely overflow.
 gen_test()

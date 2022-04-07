@@ -166,18 +166,18 @@ int mini(int a, int b) {return min((int)a, (int)b);}
 ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
 ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
 
-tcTU> T fstTrue(T lo, T hi, U f) {
+tcT> ll fstTrue(ll lo, ll hi, T f) {
     ++hi; assert(lo <= hi); // assuming f is increasing
     while (lo < hi) { // find first index such that f is true
-        T mid = lo+(hi-lo)/2;
+        ll mid = lo+(hi-lo)/2;
         f(mid) ? hi = mid : lo = mid+1;
     }
     return lo;
 }
-tcTU> T lstTrue(T lo, T hi, U f) {
+tcT> ll lstTrue(ll lo, ll hi, T f) {
     --lo; assert(lo <= hi); // assuming f is decreasing
     while (lo < hi) { // find first index such that f is true
-        T mid = lo+(hi-lo+1)/2;
+        ll mid = lo+(hi-lo+1)/2;
         f(mid) ? lo = mid : hi = mid-1;
     }
     return lo;
@@ -317,7 +317,7 @@ inline namespace Output {
     template<class T> void pr_sep(ostream& os, str, const T& t) { os << ts(t); }
     template<class T, class... U> void pr_sep(ostream& os, str sep, const T& t, const U&... u) {
         pr_sep(os,sep,t); os << sep; pr_sep(os,sep,u...); }
-    template<class T> void pr_sep1(ostream& os, str, const T& t) { os << ts(t); }
+    template<class T> void pr_sep1(ostream& os, str, const T& t) { os << ts(t+1); }
     template<class T, class... U> void pr_sep1(ostream& os, str sep, const T& t, const U&... u) {
         pr_sep1(os,sep,t); os << sep; pr_sep1(os,sep,u...); }
     // print w/ no spaces
@@ -327,17 +327,25 @@ inline namespace Output {
     template<class ...T> void ps(const T&... t) { pr_sep(cout," ",t...); ps(); }
     void ps1() { cout << "\n"; }
     template<class ...T> void ps1(const T&... t) { pr_sep1(cout," ",t...); ps1(); }
+    void pso() {}
+    template<class ...T> void pso(const T&... t) { pr_sep(cout," ",t...); pso(); }
+    void pso1() {}
+    template<class ...T> void pso1(const T&... t) { pr_sep1(cout," ",t...); pso1(); }
 
     template<class T>
-    void pv(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x;} cout<<'\n';}
+    void pv(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x;} cout<<'\n';}
     template<class T>
-    void pv1(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x+1;} cout<<'\n';}
+    void pv1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x+1;} cout<<'\n';}
+    template<class T>
+    void pvn(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x;} cout<<'\n';}
+    template<class T>
+    void pvn1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x+1;} cout<<'\n';}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
     // #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
     db TIME() {return (db)(clock()-beg)/CLOCKS_PER_SEC;}
-
+    void flush() {std::cout << std::flush;}
 }
 
 inline namespace FileIO {

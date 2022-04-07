@@ -1,4 +1,4 @@
-#region defines
+#region imports
 import copy
 from collections import defaultdict as dd
 from collections import deque
@@ -107,11 +107,11 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
             print(f"{'': >12}", end='', file=sys.stderr)
         if 'comment_first' in kwargs:
             del kwargs['comment_first']
-        print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >7} {OUT_BOLD}: {OUT_RESET}{color_helper}", end='', file=sys.stderr)
+        print(f"{OUT_RED_BOLD}{sys._getframe().f_back.f_back.f_lineno: >7} {OUT_BOLD}:  {OUT_RESET}{color_helper}", end='', file=sys.stderr)
         end_maybe = kwargs.get('end', '\n')
         kwargs['end']=f"{OUT_RESET}{end_maybe}"
         if 'sep' not in kwargs:
-            kwargs['sep'] = ' '*4
+            kwargs['sep'] = ' '*3
         kwargs['flush'] = True
         print(*args, file=sys.stderr, **kwargs)
 

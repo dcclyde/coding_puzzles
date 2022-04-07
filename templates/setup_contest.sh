@@ -11,6 +11,7 @@ fi
 mkdir -p "$1"
 cp "$template_dir/gen.py" "$1/"
 cp "$template_dir/compare.sh" "$1/"
+cp "$template_dir/compare.py" "$1/"
 for PROBLEM in A B C D E F G H
 do
     cp "$template_dir/template.py"  "$1/$PROBLEM.py"
