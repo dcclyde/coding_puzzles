@@ -39,7 +39,7 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
    return false;
 }
 
-#pragma region  // example
+#pragma region  // * example
 
 // std::string s = "abcde";
 // int comb_size = 2;
@@ -50,7 +50,7 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 
 #pragma endregion
 
-#pragma region  // N ints summing to S
+#pragma region  // * N ints summing to S
 // // get all combinations of combN nonnegative ints summing to combS.
 // // that's (N+S-1) choose (S-1).
 // int combN = 7;
@@ -67,6 +67,53 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 //     dbg(combs_ctr, nums);
 //     // ! Do something with nums here.
 // } while (next_combination(ch.begin(), ch.begin() + (combN-1), ch.end()));
+#pragma endregion
+
+#pragma region  // * product-ish using recursion
+// void brute() {
+//     dbgcBold("brute force");
+//     lls(N, S);
+//     vector<ll> L, R;
+//     FOR(k, 0, N) {
+//         ints(l, r);
+//         L.push_back(l);
+//         R.push_back(r);
+//     }
+//     dbgR(N, S, L, R);
+
+//     V<int> curr;
+//     int curr_sum = 0;
+//     ll out = 0;
+
+//     auto do_something = [&]() {
+//         // ! do something here
+//         int g = curr[0];
+//         FOR(k, 1, N) {
+//             g = gcd(g, curr[k]);
+//         }
+//         if (g == 1) {
+//             ++out;
+//         }
+//     };
+
+//     function<void(void)> product_rec_helper = [&]{
+//         if (curr.size() == N) {return do_something();}
+//         int n = curr.size();
+//         FOR(k, L[n], R[n]+1) {
+//             if (curr_sum + k > S) {
+//                 // ! early exit if this product is clearly bad
+//                 break;
+//             }
+//             curr_sum += k;
+//             curr.push_back(k);
+//             product_rec_helper();
+//             curr.pop_back();
+//             curr_sum -= k;
+//         }
+//     };
+//     product_rec_helper();
+//     return ps(out);
+// }
 #pragma endregion
 
 #pragma endregion
