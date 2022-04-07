@@ -1,3 +1,8 @@
+
+// #pragma GCC optimize("Ofast,unroll-loops")
+#pragma GCC optimize("Ofast,unroll-loops")
+#pragma GCC target("avx2")
+
 #pragma region
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -108,8 +113,8 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
 #define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
 #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
 #define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
@@ -538,41 +543,41 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcBold
     #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
 
-    // #undef dbg
-    // #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
-    // #undef dbgc
-    // #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
+    #undef dbg
+    #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
+    #undef dbgc
+    #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
 
-    // #undef dbgY
-    // #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
-    // #undef dbgcY
-    // #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
+    #undef dbgY
+    #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
+    #undef dbgcY
+    #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
 
-    // #undef dbgP
-    // #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
-    // #undef dbgcP
-    // #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
+    #undef dbgP
+    #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
+    #undef dbgcP
+    #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
-    // #undef dbgR
-    // #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
-    // #undef dbgcR
-    // #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
-    // #undef dbgB
-    // #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
-    // #undef dbgcB
-    // #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
+    #undef dbgB
+    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
+    #undef dbgcB
+    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
 
-    // #undef dbgW
-    // #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
-    // #undef dbgcW
-    // #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
+    #undef dbgW
+    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
+    #undef dbgcW
+    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
 
-    // #undef dbg_only
-    // #define dbg_only(...) __VA_ARGS__;
+    #undef dbg_only
+    #define dbg_only(...) __VA_ARGS__;
 
-    // #undef el
-    // #define el std::cerr << std::flush; std::cerr << '\n';  // in my head I say "error line"
+    #undef el
+    #define el std::cerr << std::flush; std::cerr << '\n';  // in my head I say "error line"
 
     #undef local_run
     #define local_run (true)
@@ -680,6 +685,72 @@ string to_string(mint<MOD, RT> modint) {
 
 #endif
 #pragma endregion  // mint
+
+/**
+ * Description: 1D range minimum query. Can also do queries
+ 	* for any associative operation in $O(1)$ with D\&C
+ * Source: KACTL
+ * Verification:
+	* https://cses.fi/problemset/stats/1647/
+	* http://wcipeg.com/problem/ioi1223
+	* https://pastebin.com/ChpniVZL
+ * Memory: O(N\log N)
+ * Time: O(1)
+ */
+
+tcT> struct RMQ {
+	int level(int x) { return 31-__builtin_clz(x); }
+	V<T> v; V<vi> jmp;
+	int cmb(int a, int b) {
+		return v[a]==v[b]?min(a,b):(v[a]<v[b]?a:b); }
+	void init(const V<T>& _v) {
+		v = _v; jmp = {vi(sz(v))};
+		iota(all(jmp[0]),0);
+		for (int j = 1; 1<<j <= sz(v); ++j) {
+			jmp.pb(vi(sz(v)-(1<<j)+1));
+			F0R(i,sz(jmp[j])) jmp[j][i] = cmb(jmp[j-1][i],
+				jmp[j-1][i+(1<<(j-1))]);
+		}
+	}
+	int index(int l, int r) {
+		assert(l <= r); int d = level(r-l+1);
+		return cmb(jmp[d][l],jmp[d][r-(1<<d)+1]); }
+	T query(int l, int r) { return v[index(l,r)]; }
+};
+
+struct SuffixArray {
+	str S; int N; vi sa, isa, lcp;
+	void init(str _S) { N = sz(S = _S)+1; genSa(); genLcp(); }
+	void genSa() { // sa has size sz(S)+1, starts with sz(S)
+		sa = isa = vi(N); sa[0] = N-1; iota(1+all(sa),0);
+		sort(1+all(sa),[&](int a, int b) { return S[a] < S[b]; });
+		FOR(i,1,N) { int a = sa[i-1], b = sa[i];
+			isa[b] = i > 1 && S[a] == S[b] ? isa[a] : i; }
+		for (int len = 1; len < N; len *= 2) { // currently sorted
+			// by first len chars
+			vi s(sa), is(isa), pos(N); iota(all(pos),0);
+			each(t,s) {int T=t-len;if (T>=0) sa[pos[isa[T]]++] = T;}
+			FOR(i,1,N) { int a = sa[i-1], b = sa[i]; /// verify that nothing goes out of bounds
+				isa[b] = is[a]==is[b]&&is[a+len]==is[b+len]?isa[a]:i; }
+		}
+	}
+	void genLcp() { // Kasai's Algo
+		lcp = vi(N-1); int h = 0;
+		F0R(b,N-1) { int a = sa[isa[b]-1];
+			while (a+h < sz(S) && S[a+h] == S[b+h]) ++h;
+			lcp[isa[b]-1] = h; if (h) h--; }
+		R.init(lcp); /// if we cut off first chars of two strings
+		/// with lcp h then remaining portions still have lcp h-1
+	}
+	RMQ<int> R;
+	int getLCP(int a, int b) { // lcp of suffixes starting at a,b
+		if (a == b) return sz(S)-a;
+		int l = isa[a], r = isa[b]; if (l > r) swap(l,r);
+		return R.query(l,r-1);
+	}
+};
+
+SuffixArray SA;
 
 template<int NUM_BASES>
 struct UsetStr {
@@ -824,6 +895,15 @@ struct SubstrHashes {
 
 
 void learn() {
+    RMQ<int> rmq;
+    V<int> A = {3, 4, 5, 6, 7};
+    rmq.init(A);
+    dbg(A);
+    dbg(rmq.query(1, 3));
+    dbg(rmq.query(1, 4));
+    // dbg(rmq.query(1, 5));
+    // exit(0);
+
     string dat = "acbac";
     SubstrHashes<1, true> sh;
     sh.init(dat);
@@ -837,15 +917,15 @@ void learn() {
     return;
 }
 
-int lis(vi v) {
-	vi min_last{INT_MIN}; // min last term of increasing sequence with i terms
-	for (int x: v) {
-		int lo = lower_bound(all(min_last),x)-begin(min_last);
-		if (lo == sz(min_last)) min_last.pb(0);
-		min_last[lo] = x;
-	}
-	return sz(min_last)-1;
-}
+// int lis(vi v) {
+// 	vi min_last{INT_MIN}; // min last term of increasing sequence with i terms
+// 	for (int x: v) {
+// 		int lo = lower_bound(all(min_last),x)-begin(min_last);
+// 		if (lo == sz(min_last)) min_last.pb(0);
+// 		min_last[lo] = x;
+// 	}
+// 	return sz(min_last)-1;
+// }
 
 int N;
 string dat;
@@ -856,20 +936,21 @@ function<bool(pii, pii)> compare = [](pii a, pii b) {
     dbgY(a, b);
     auto& [la, lena] = a;
     auto& [lb, lenb] = b;
+    if (lb < 0) {return false;}
+    if (la < 0) {return true;}
     dbg(dat);
     dbg(dat.substr(la, lena), dat.substr(lb, lenb));
     // dbg(pdh(ml));
     // dbg(la, lb);
-
-
     if (la == lb) {
         dbgW(lena < lenb);
         return lena < lenb;
-    }
-    else if (la < lb) {
+    } else if (la < lb) {
         // dbg(match_length[la]);
-        int num_common = match_length[la][lb - la];
+        // int num_common = SA.getLCP(la, lb);
+        int num_common = match_length[la][lb-la];
         if (min(lena, lenb) <= num_common) {
+            if (lena == lenb) {return false;}
             dbgP(lena < lenb);
             return lena < lenb;
         }
@@ -881,8 +962,10 @@ function<bool(pii, pii)> compare = [](pii a, pii b) {
         return (idxb < N && dat[idxa] < dat[idxb]);
     } else {
         // dbg(match_length[lb]);
-        int num_common = match_length[lb][la - lb];
+        // int num_common = SA.getLCP(la, lb);
+        int num_common = match_length[lb][la-lb];
         if (min(lena, lenb) <= num_common) {
+            if (lena == lenb) {return false;}
             dbg(lena < lenb);
             return lena < lenb;
         }
@@ -903,7 +986,7 @@ function<bool(pii, pii)> compare_brute = [](pii a, pii b) {
 
 
 int lis(V<pii> v) {
-	V<pii> min_last{{0,0}}; // min last term of increasing sequence with i terms
+	V<pii> min_last{{-1,-1}}; // min last term of increasing sequence with i terms
 	for (pii& x : v) {
         dbg(min_last);
 		int lo = lower_bound(all(min_last),x, compare)-begin(min_last);
@@ -913,63 +996,81 @@ int lis(V<pii> v) {
 	return sz(min_last)-1;
 }
 
+/**
+ * Description: \texttt{f[i]} is the max \texttt{len} such that
+ 	* \texttt{s.substr(0,len) == s.substr(i,len)}
+ * Time: O(N)
+ * Source: http://codeforces.com/blog/entry/3107
+ * Verification: POI 12 Template, https://codeforces.com/contest/1137/problem/B
+ */
+
+vi z(str s) {
+	int N = sz(s), L = 1, R = 0; s += '#';
+	vi ans(N); ans[0] = N;
+	FOR(i,1,N) {
+		if (i <= R) ans[i] = min(R-i+1,ans[i-L]);
+		while (s[i+ans[i]] == s[ans[i]]) ++ans[i];
+		if (i+ans[i]-1 > R) L = i, R = i+ans[i]-1;
+	}
+	return ans;
+}
+vi getPrefix(str a, str b) { // find prefixes of a in b
+	vi t = z(a+b); t = vi(sz(a)+all(t));
+	each(u,t) ckmin(u,sz(a));
+	return t;
+}
+/// Usage: pr(z("abcababcabcaba"),getPrefix("abcab","uwetrabcerabcab"));
+
+
 
 void solve() {
     cin >> N;
     cin >> dat;
     dbgR(N, dat);
-    auto t0 = TIME();
 
 
+    SA.init(dat);
     match_length.resize(N);
-    SubstrHashes<1> sh;
-    sh.init(dat);
     FOR(a, 0, N) {
         el; el;
-        auto& mla = match_length[a];
-        mla.resize(N-a);
-        // dbgY(a, ss, pdh(sh.prefix_hashes));
-        FOR(offset, 0, N-a) {
-            int lower_bound = 0;
-            // if (a > 0) {
-            //     lower_bound = max(0, match_length[a-1][offset] - 1);
-            // }
-            mla[offset] = lstTrue(lower_bound, N-offset, [&](int len) {
-                return sh.query(a, a+offset, len);
-            });
-        }
+        // SubstrHashes<5> sh;
+        // auto zv = z(dat.substr(a));
+        match_length[a] = z(dat.substr(a));
+        // sh.init(ss);
+        // auto& mla = match_length[a];
+        // mla.resize(N-a);
+        // // dbgY(a, ss, pdh(sh.prefix_hashes));
+        // FOR(offset, 0, N-a) {
+        //     mla[offset] =
+
+        //     lstTrue(0, N, [&](int len) {
+        //         return sh.query(0, offset, len);
+        //     });
+        // }
     }
     dbg(dat);
     dbg(pdh(match_length));
-    cerr << TIME() - t0 << endl;
     // exit(0);
 
-    V<pair<pii, int>> pairs;
+    V<pii> pairs;
     pairs.reserve((N*(N-1)) / 2);
-    int ctr = 0;
     FOR(l, 0, N) FOR(r, l, N) {
-        pairs.emplace_back(MP(l, r-l+1), ctr++);
-    }
-    V<int> inverted(pairs.size());
-    FOR(k, 0, pairs.size()) {
-        inverted[pairs[k].second] = k;
+        pairs.emplace_back(l, r-l+1);
     }
 
     #ifdef DCCLYDE_LOCAL
     for(auto& pa : pairs) {
         for(auto& pb : pairs) {
-            if (!(compare(pa.first, pb.first) == compare_brute(pa.first, pb.first))) {
-                dbg(pa, pb, compare(pa.first, pb.first));
+            if (!(compare(pa, pb) == compare_brute(pa, pb))) {
+                dbg(pa, pb, compare(pa, pb));
                 assert(false);
             }
         }
     }
     #endif
 
-    // int out = lis(pairs);
-    int out = lis(inverted);
+    int out = lis(pairs);
     ps(out);
-    cerr << TIME() - t0 << endl;
 
     return;
 }
@@ -980,7 +1081,7 @@ void solve() {
 #pragma region
 int main() {
     setIO();
-    // learn();
+    learn();
 
     int T = 1;
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.

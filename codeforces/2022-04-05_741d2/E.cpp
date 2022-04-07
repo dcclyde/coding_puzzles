@@ -60,14 +60,6 @@ using vpd = V<pd>;
 //// tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 //// tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
-mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
-#pragma region  // rng examples
-// std::uniform_real_distribution<db> rand_dbl(0, 1);  // [L, R)
-// db ard = unif_db(rng);
-// std::uniform_int_distribution<int> rand_int(1, 2);  // inclusive
-// int ri = rand_int(rng);
-#pragma endregion
-
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
@@ -108,11 +100,9 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FOR(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
-#define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
@@ -143,6 +133,13 @@ const db PI = acos((db)-1);
 vector<pii> stepsOrthogonal = {{1,0},{0,1},{-1,0},{0,-1}};
 vector<pii> stepsDiagonal = {{1,1},{1,-1},{-1,-1},{-1,1}};
 vector<pii> steps8dirs = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
+#pragma region  // rng examples
+// std::uniform_real_distribution<db> rand_dbl(0, 1);  // [L, R)
+// db ard = unif_db(rng);
+// std::uniform_int_distribution<int> rand_int(1, 2);  // inclusive
+// int ri = rand_int(rng);
+#pragma endregion
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
 
 // bitwise ops
@@ -538,41 +535,41 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcBold
     #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
 
-    // #undef dbg
-    // #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
-    // #undef dbgc
-    // #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
+    #undef dbg
+    #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
+    #undef dbgc
+    #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
 
-    // #undef dbgY
-    // #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
-    // #undef dbgcY
-    // #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
+    #undef dbgY
+    #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
+    #undef dbgcY
+    #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
 
-    // #undef dbgP
-    // #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
-    // #undef dbgcP
-    // #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
+    #undef dbgP
+    #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
+    #undef dbgcP
+    #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
-    // #undef dbgR
-    // #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
-    // #undef dbgcR
-    // #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+    #undef dbgR
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #undef dbgcR
+    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
-    // #undef dbgB
-    // #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
-    // #undef dbgcB
-    // #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
+    #undef dbgB
+    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
+    #undef dbgcB
+    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
 
-    // #undef dbgW
-    // #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
-    // #undef dbgcW
-    // #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
+    #undef dbgW
+    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
+    #undef dbgcW
+    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
 
-    // #undef dbg_only
-    // #define dbg_only(...) __VA_ARGS__;
+    #undef dbg_only
+    #define dbg_only(...) __VA_ARGS__;
 
-    // #undef el
-    // #define el std::cerr << std::flush; std::cerr << '\n';  // in my head I say "error line"
+    #undef el
+    #define el std::cerr << std::flush; std::cerr << '\n';  // in my head I say "error line"
 
     #undef local_run
     #define local_run (true)
@@ -596,280 +593,104 @@ void debug_out(Head H, Tail... T) {
 
     If f[a][b] = x then f[a+1][b+1] >= x-1.
         But it could be bigger: If
-
-    Try hashing?
-    V<int> f with f[k] = hash of 0...k-1
-    then I want to quickly test whether [a, a+k) == [l, l+k).
-    Hash of [a, a+k) is (f[a+k] - f[a]) / B^a.
 */
 
-#pragma region  // mint
 /**
- * Description: modular arithmetic operations
- * Source:
-	* KACTL
-	* https://codeforces.com/blog/entry/63903
-	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
-	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
-	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
- * Verification:
-	* https://open.kattis.com/problems/modulararithmetic
+ * Source: KACTL
+ * Time: O(N)
+ * Description: \texttt{f[i]} is length of the longest proper suffix
+ 	* of the $i$-th prefix of $s$ that is a prefix of $s$
+ * Verification: https://open.kattis.com/problems/stringmatching
  */
 
-#ifndef BENQ_MODINT
-#define BENQ_MODINT
-const int MOD = 1'000'000'007;
-
-template<int MOD, int RT> struct mint {
-	static const int mod = MOD;
-	static constexpr mint rt() { return RT; } // primitive root for FFT
-	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
-	mint():v(0) {}
-	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
-		if (v < 0) v += MOD; }
-	bool operator==(const mint& o) const {
-		return v == o.v; }
-	friend bool operator!=(const mint& a, const mint& b) {
-		return !(a == b); }
-	friend bool operator<(const mint& a, const mint& b) {
-		return a.v < b.v; }
-	friend void re(mint& a) { ll x; re(x); a = mint(x); }
-	friend str ts(mint a) { return ts(a.v); }
-
-	mint& operator+=(const mint& o) {
-		if ((v += o.v) >= MOD) v -= MOD;
-		return *this; }
-	mint& operator-=(const mint& o) {
-		if ((v -= o.v) < 0) v += MOD;
-		return *this; }
-	mint& operator*=(const mint& o) {
-		v = int((ll)v*o.v%MOD); return *this; }
-	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
-	friend mint pow(mint a, ll p) {
-		mint ans = 1; assert(p >= 0);
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
-		return ans; }
-	friend mint inv(const mint& a) { assert(a.v != 0);
-		return pow(a,MOD-2); }
-
-	mint operator-() const { return mint(-v); }
-	mint& operator++() { return *this += 1; }
-	mint& operator--() { return *this -= 1; }
-	friend mint operator+(mint a, const mint& b) { return a += b; }
-	friend mint operator-(mint a, const mint& b) { return a -= b; }
-	friend mint operator*(mint a, const mint& b) { return a *= b; }
-	friend mint operator/(mint a, const mint& b) { return a /= b; }
-};
-
-using mi = mint<MOD,5>; // 5 is primitive root for both common mods
-using vmi = V<mi>;
-using pmi = pair<mi,mi>;
-using vpmi = V<pmi>;
-
-V<vmi> scmb; // small combinations
-void genComb(int SZ) {
-	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
-	FOR(i,1,SZ) F0R(j,i+1)
-		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+vi kmp(str s) {
+	int N = sz(s); vi f(N+1); f[0] = -1;
+	FOR(i,1,N+1) {
+		for (f[i]=f[i-1];f[i]!=-1&&s[f[i]]!=s[i-1];)f[i]=f[f[i]];
+		++f[i]; }
+	return f;
 }
-
-template <int MOD, int RT>
-string to_string(mint<MOD, RT> modint) {
-    return to_string((int)modint);
+vi kmp(str s_in, int l) {
+	int N = sz(s_in) - l; char* s = &(s_in[l]); vi f(N+1); f[0] = -1;
+	FOR(i,1,N+1) {
+		for (f[i]=f[i-1];f[i]!=-1&&s[f[i]]!=s[i-1];)f[i]=f[f[i]];
+		++f[i]; }
+	return f;
 }
+vi getOc(str a, str b) { // find occurrences of a in b
+	vi f = kmp(a+"@"+b), ret;
+	FOR(i,sz(a),sz(b)+1) {
+        if (f[i+sz(a)+1] == sz(a)) {
+		    ret.pb(i-sz(a));
+        }
+    }
+	return ret;
+}
+void process(vi& f) {
+    // FOR(k, 1, f.size()) {
+    //     f[k-f[k]] = f[k];
+    //     f[k] = 0;
+    // }
 
-#endif
-#pragma endregion  // mint
+    // FOR(k, 1, f.size()) {
+    //     if (dat[f[k]] == dat[0]) {
+    //         f[k] =
+    //     }
+    // }
 
-template<int NUM_BASES>
-struct UsetStr {
-    static const int P = 1'000'000'007;
-    using mihash = mint<P, NUM_BASES>;
-    V<int> bases;
-    uset<int> sets[NUM_BASES];
-    UsetStr() {
-        while (bases.size() < NUM_BASES) {
-            bases.push_back(rng() % (int)1e6 + 256);
-        }
-    }
-    int single_hash(const string& s, int baseID) {
-        mihash hash = 0;
-        mihash b = bases[baseID];
-        mihash bk = 1;
-        FOR(k, 0, s.size()) {
-            hash += bk * s[k];
-            bk *= b;
-        }
-        return (int)hash;
-    }
-    void insert(const string& s) {
-        FOR(baseID, 0, NUM_BASES) {
-            sets[baseID].insert(single_hash(s, baseID));
-        }
-    }
-    void insert_incl_suffixes(const string& s) {
-        FOR(baseID, 0, NUM_BASES) {
-            mihash hash = 0;
-            mihash b = bases[baseID];
-            mihash bk = 1;
-            ROF(k, 0, s.size()) {
-                hash *= bk;
-                hash += s[k];
-                bk *= b;
-                sets[baseID].insert((int)hash);
-            }
-        }
-    }
-    void insert_incl_prefixes(const string& s) {
-        FOR(baseID, 0, NUM_BASES) {
-            mihash hash = 0;
-            mihash b = bases[baseID];
-            mihash bk = 1;
-            FOR(k, 0, s.size()) {
-                hash += bk * s[k];
-                bk *= b;
-                sets[baseID].insert((int)hash);
-            }
-        }
-    }
-    bool contains(const string& s) {
-        bool out = true;
-        FOR(k, 0, NUM_BASES) {
-            if (sets[k].find() == sets[k].end()) {
-                out = false;
-                break;
-            }
-        }
-        return out;
-    }
-};
-
-template<int NUM_BASES, bool DEBUG_MODE=false>
-struct SubstrHashes {
-    static const int P = 1'000'000'007;
-    using mihash = mint<P, NUM_BASES>;
-    V<int> bases;
-    V<mihash> prefix_hashes[NUM_BASES];
-    V<mihash> base_powers[NUM_BASES];
-    int n =  -1;
-    SubstrHashes() {
-        while (bases.size() < NUM_BASES) {
-            if (DEBUG_MODE) {
-                bases.push_back(10*(bases.size()+1));
-            } else {
-                bases.push_back(rng() % (int)1e6 + 256);
-            }
-        }
-    }
-    void init(string& s) {
-        n = s.size();
-        static const int DEBUG_MODE_OFFSET = 'a'-1;
-        if (DEBUG_MODE) {
-            for(auto& c : s) {
-                c -= DEBUG_MODE_OFFSET;
-            }
-        }
-        FOR(baseID, 0, NUM_BASES) {
-            auto& ph = prefix_hashes[baseID];
-            assert(ph.size() == 0);
-            ph.resize(n+1);
-            auto& bp = base_powers[baseID];
-            assert(bp.size() == 0);
-            bp.resize(n+1);
-            bp[0] = 1;
-
-            mihash hash = 0;
-            mihash b = bases[baseID];
-            mihash bk = 1;
-            FOR(k, 0, n) {
-                hash += bk * s[k];
-                ph[k+1] = hash;
-                bk *= b;
-                bp[k+1] = bk;
-            }
-        }
-        if (DEBUG_MODE) {
-            for(auto& c : s) {
-                c += DEBUG_MODE_OFFSET;
-            }
-        }
-    }
-    // Is [a, a+len) same as [b, b+len)?
-    bool query(int a, int b, int len) {
-        dbgcP("query", a, b, len);
-        if (a+len > n || b+len > n) {
-            dbgcR("len too big");
-            return false;
-        }
-        FOR(baseID, 0, NUM_BASES) {
-            mihash ahash = prefix_hashes[baseID][a+len] - prefix_hashes[baseID][a];
-            mihash bhash = prefix_hashes[baseID][b+len] - prefix_hashes[baseID][b];
-            dbgW(prefix_hashes[baseID][a+len], prefix_hashes[baseID][a]);
-            dbgW(prefix_hashes[baseID][b+len], prefix_hashes[baseID][b]);
-            dbgR(baseID, ahash, bhash);
-            ahash *= base_powers[baseID][n-a];
-            bhash *= base_powers[baseID][n-b];
-            dbgR(baseID, ahash, bhash);
-            if (ahash != bhash) {
-                dbgP(false);
-                return false;
-            }
-        }
-        dbgP(true);
-        return true;
-    }
-};
-
-
-
+    // f.erase(f.begin());
+    return;
+}
 
 void learn() {
     string dat = "acbac";
-    SubstrHashes<1, true> sh;
-    sh.init(dat);
-    dbg(pdh(sh.prefix_hashes));
-    dbgP(pdh(sh.base_powers));
+    auto f = kmp(dat);
+    dbg(dat, f);
 
     // dat = "abababcabaq";
     // dat = "aaaabaaaa";
     dat = "abababab";
-    // exit(0);
+    f = kmp(dat);
+    dbg(dat, f);
+    process(f);
+    dbg(dat,f);
+    exit(0);
     return;
 }
 
-int lis(vi v) {
-	vi min_last{INT_MIN}; // min last term of increasing sequence with i terms
-	for (int x: v) {
-		int lo = lower_bound(all(min_last),x)-begin(min_last);
-		if (lo == sz(min_last)) min_last.pb(0);
-		min_last[lo] = x;
-	}
-	return sz(min_last)-1;
-}
+// int lis(vi v) {
+// 	vi min_last{INT_MIN}; // min last term of increasing sequence with i terms
+// 	for (int x: v) {
+// 		int lo = lower_bound(all(min_last),x)-begin(min_last);
+// 		if (lo == sz(min_last)) min_last.pb(0);
+// 		min_last[lo] = x;
+// 	}
+// 	return sz(min_last)-1;
+// }
 
 int N;
 string dat;
-V<V<int>> match_length;
-auto& ml = match_length;
+V<V<int>> kmp_all;
+auto& ka = kmp_all;
 
 function<bool(pii, pii)> compare = [](pii a, pii b) {
     dbgY(a, b);
     auto& [la, lena] = a;
     auto& [lb, lenb] = b;
+    if (lb < 0) {return false;}
+    if (la < 0) {return true;}
     dbg(dat);
     dbg(dat.substr(la, lena), dat.substr(lb, lenb));
-    // dbg(pdh(ml));
+    dbg(pdh(ka));
     // dbg(la, lb);
-
-
     if (la == lb) {
         dbgW(lena < lenb);
         return lena < lenb;
-    }
-    else if (la < lb) {
-        // dbg(match_length[la]);
-        int num_common = match_length[la][lb - la];
+    } else if (la < lb) {
+        // dbg(kmp_all[la]);
+        int num_common = kmp_all[la][lb - la];
         if (min(lena, lenb) <= num_common) {
+            if (lena == lenb) {return false;}
             dbgP(lena < lenb);
             return lena < lenb;
         }
@@ -880,9 +701,10 @@ function<bool(pii, pii)> compare = [](pii a, pii b) {
         dbgR(idxb < N && dat[idxa] < dat[idxb]);
         return (idxb < N && dat[idxa] < dat[idxb]);
     } else {
-        // dbg(match_length[lb]);
-        int num_common = match_length[lb][la - lb];
+        // dbg(kmp_all[lb]);
+        int num_common = kmp_all[lb][la - lb];
         if (min(lena, lenb) <= num_common) {
+            if (lena == lenb) {return false;}
             dbg(lena < lenb);
             return lena < lenb;
         }
@@ -903,7 +725,7 @@ function<bool(pii, pii)> compare_brute = [](pii a, pii b) {
 
 
 int lis(V<pii> v) {
-	V<pii> min_last{{0,0}}; // min last term of increasing sequence with i terms
+	V<pii> min_last{{-1,-1}}; // min last term of increasing sequence with i terms
 	for (pii& x : v) {
         dbg(min_last);
 		int lo = lower_bound(all(min_last),x, compare)-begin(min_last);
@@ -918,58 +740,33 @@ void solve() {
     cin >> N;
     cin >> dat;
     dbgR(N, dat);
-    auto t0 = TIME();
 
-
-    match_length.resize(N);
-    SubstrHashes<1> sh;
-    sh.init(dat);
-    FOR(a, 0, N) {
-        el; el;
-        auto& mla = match_length[a];
-        mla.resize(N-a);
-        // dbgY(a, ss, pdh(sh.prefix_hashes));
-        FOR(offset, 0, N-a) {
-            int lower_bound = 0;
-            // if (a > 0) {
-            //     lower_bound = max(0, match_length[a-1][offset] - 1);
-            // }
-            mla[offset] = lstTrue(lower_bound, N-offset, [&](int len) {
-                return sh.query(a, a+offset, len);
-            });
-        }
+    kmp_all.resize(N);
+    FOR(k, 0, N) {
+        kmp_all[k] = kmp(dat, k);
+        process(kmp_all[k]);
     }
-    dbg(dat);
-    dbg(pdh(match_length));
-    cerr << TIME() - t0 << endl;
-    // exit(0);
+    dbg(pdh(kmp_all));
 
-    V<pair<pii, int>> pairs;
+    V<pii> pairs;
     pairs.reserve((N*(N-1)) / 2);
-    int ctr = 0;
     FOR(l, 0, N) FOR(r, l, N) {
-        pairs.emplace_back(MP(l, r-l+1), ctr++);
-    }
-    V<int> inverted(pairs.size());
-    FOR(k, 0, pairs.size()) {
-        inverted[pairs[k].second] = k;
+        pairs.emplace_back(l, r-l+1);
     }
 
     #ifdef DCCLYDE_LOCAL
     for(auto& pa : pairs) {
         for(auto& pb : pairs) {
-            if (!(compare(pa.first, pb.first) == compare_brute(pa.first, pb.first))) {
-                dbg(pa, pb, compare(pa.first, pb.first));
+            if (!(compare(pa, pb) == compare_brute(pa, pb))) {
+                dbg(pa, pb, compare(pa, pb));
                 assert(false);
             }
         }
     }
     #endif
 
-    // int out = lis(pairs);
-    int out = lis(inverted);
+    int out = lis(pairs);
     ps(out);
-    cerr << TIME() - t0 << endl;
 
     return;
 }
@@ -980,7 +777,7 @@ void solve() {
 #pragma region
 int main() {
     setIO();
-    // learn();
+    learn();
 
     int T = 1;
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
