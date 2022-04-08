@@ -188,6 +188,22 @@ tcTU> void erase(T& t, const U& u) { // don't erase
     auto it = t.find(u); assert(it != end(t));
     t.erase(it); } // element that doesn't exist from (multi)set
 
+// use like sumv(all(dat))
+template<class ForwardIt>
+auto sumv(ForwardIt first, ForwardIt last)
+{
+    typename std::iterator_traits<ForwardIt>::value_type out {};
+    for (; first != last; ++first) {
+        out += *first;
+        dbgP(*first, out);
+    }
+    return out;
+}
+template<class T> auto sumv(const T& data) {return sumv(all(data));}
+template<class T> auto max_element(const T& data) {return *max_element(all(data));}
+template<class T> auto min_element(const T& data) {return *min_element(all(data));}
+
+
 #define tcTUU tcT, class ...U
 
 inline namespace Helpers {
@@ -361,6 +377,7 @@ inline namespace FileIO {
     }
 }
 
+#pragma region  // debugging
 // * debug setup mostly stolen from tourist. https://codeforces.com/contest/1540/submission/120602670
 // * dcclyde added line numbers, colors, probably some other stuff.
 
@@ -584,6 +601,7 @@ void debug_out(Head H, Tail... T) {
     #undef local_run
     #define local_run (true)
 #endif
+#pragma endregion
 
 #define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
 
@@ -615,19 +633,22 @@ void solve() {
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 // ! Read the sample cases before writing code!
+// #define SINGLE_CASE
 #pragma region
 int main() {
     setIO();
 
     int T = 1;
+#ifndef SINGLE_CASE
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+#endif
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
         el;
 #ifndef DCCLYDE_BRUTEFORCE
         dbgcBold("CASE" , CASE );
         solve();
 #else
-        dbgcBold("BRUTE FORCE" , CASE );
+        dbgcBold("brute force" , CASE );
         brute();
 #endif
     }
