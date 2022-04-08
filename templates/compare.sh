@@ -1,7 +1,7 @@
 #! /usr/bin/bash
 set -e
 
-PROBLEM="E"
+PROBLEM="invalid"
 
 g++ --std=c++2a "$PROBLEM".cpp -o a.out \
     -DDCCLYDE_LOCAL
