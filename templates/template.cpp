@@ -622,10 +622,12 @@ int main() {
     int T = 1;
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
-        el; dbgcBold("CASE" , CASE );
+        el;
 #ifndef DCCLYDE_BRUTEFORCE
+        dbgcBold("CASE" , CASE );
         solve();
 #else
+        dbgcBold("BRUTE FORCE" , CASE );
         brute();
 #endif
     }

@@ -11,16 +11,19 @@ def ps(*args, **kwargs):
         print(' '.join(str(x) for x in args), **kwargs)
 
 def pv(q): ps(*q)
-def ps1(*args, **kwargs): alocal = tuple(tuple(x+1 for x in q) for q in args); ps(*alocal, **kwargs)
+def ps1(*args, **kwargs):
+    if hasattr(args[0], '__iter__'):
+        print(' '.join(str(x+1) for x in args[0]), **kwargs)
+    else:
+        print(' '.join(str(x+1) for x in args), **kwargs)
 def pv1(q): ps1(*q)
 def pvn(q):
     for x in q: ps(x)
 def pvn1(q):
     for x in q: ps1(x)
 #endregion
-#region  randomness helpers
 import random
-#region  ints, lists
+#region  ri, rv
 def ri(q):
     if isinstance(q, int):
         q = (q,q)
@@ -31,19 +34,20 @@ def rv(q, n):
     return [ri(q) for _ in range(N)]
 #endregion
 #region  rgraph
-def rgraph(nr, er):
+def rgraph(nr, er, mute=False):
     N = ri(nr)
     E = ri(er)
     E = min(E, N*(N-1)//2)
     edge_options = [(a, b) for a in range(N) for b in range(a+1, N)]
     edges = random.sample(edge_options, E)
 
-    print(N, E)
-    pvn1(edges)
-    return
+    if not mute:
+        print(N, E)
+        pvn1(edges)
+    return N, E, edges
 #endregion
 #region  rtree
-#region  DSU (for tree)
+#region  DSU
 class DSU:
     def __init__(self, _N):
         self.N = _N
@@ -63,21 +67,55 @@ class DSU:
         self.e[y] = x
         return True
 #endregion
-
-def rtree(nr):
+def rtree(nr, mute=False):
     N = ri(nr)
-    dsu = DSU(N)
     edges = []
-    for _ in range(N-1):
-        while True:
-            a, b = rv((0,N-1), 2)
-            if dsu.unite(a, b):
-                break
-        edges.append((a,b))
-    print(N)
-    pvn1(edges)
-    return
+    for a in range(1, N):
+        b = ri((0, a-1))
+        edges.append([a,b])
+        random.shuffle(edges[-1])
+
+    perm = list(range(N))
+    random.shuffle(perm)
+    edges = [[perm[x] for x in q] for q in edges]
+    if not mute:
+        print(N)
+        pvn1(edges)
+    return N, edges
 #endregion
+#region  rtree_rooted
+def rtree_rooted(nr, mute=False):
+    N, edges = rtree(nr, mute=True)
+    G = [[] for _ in range(N)]
+    for a, b in edges:
+        G[a].append(b)
+        G[b].append(a)
+    root = 0
+    parents = [-2] * N
+    parents[root] = -1
+    # traverse.
+    todo = [root]
+    while len(todo) > 0:
+        curr = todo.pop()
+        for o in G[curr]:
+            if parents[o] == -2:
+                parents[o] = curr
+                todo.append(o)
+
+    parents = parents[1:]
+    if not mute:
+        print(N)
+        pv1(parents)
+    return N, parents
+
+def rtree_rooted_v2(nr, mute=False):
+    # this version assumes v's parent will have an index < v.
+    N = ri(nr)
+    parents = [ri((0, k)) for k in range(N-1)]
+    if not mute:
+        print(N)
+        pv1(parents)
+    return N, parents
 #endregion
 
 N_RANGE = (2, 8)
@@ -85,11 +123,12 @@ V_RANGE = (1, 8)
 S_RANGE = (1, 50)
 
 def gen_test():
-#     rtree(N_RANGE)
-#     rgraph(N_RANGE, S_RANGE)
-#     rv(N_RANGE, LR_RANGE)
+    # rtree_rooted_v2(N_RANGE)
+    # rgraph(N_RANGE, S_RANGE)
+    # rv(N_RANGE, LR_RANGE)
     N = ri(N_RANGE)
-    dat = [rv(V_RANGE) for _ in range(N)]
+    # dat = [rv(V_RANGE, 2) for _ in range(N)]
+    dat = rv(V_RANGE, N)
     ps(1)
     ps(N)
     pvn(dat)
