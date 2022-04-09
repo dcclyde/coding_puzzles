@@ -190,12 +190,12 @@ tcTU> void erase(T& t, const U& u) { // don't erase
 
 // use like sumv(all(dat))
 template<class ForwardIt>
-auto sumv(ForwardIt first, ForwardIt last)
+ll sumv(ForwardIt first, ForwardIt last)
 {
-    typename std::iterator_traits<ForwardIt>::value_type out {};
+    // typename std::iterator_traits<ForwardIt>::value_type out {};  // acc in int can overflow
+    ll out = 0;
     for (; first != last; ++first) {
         out += *first;
-        dbgP(*first, out);
     }
     return out;
 }
