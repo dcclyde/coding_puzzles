@@ -626,15 +626,16 @@ ll cost_one(int dx, int n) {
     ll cost_big = num_big * (base_size + 1) * (base_size + 1);
     ll cost_base = num_base * (base_size) * (base_size);
     ll result = cost_big + cost_base;
-    dbgcP("c_o", dx, n, result);
+    // dbgcP("c_o", dx, n, result);
     return result;
 }
 
 ll cost_delta(int dx, int n) {
-    dbgcR("c_d", dx, n);
+    // dbgcR("c_d", dx, n);
     return cost_one(dx, n) - cost_one(dx, n+1);
 }
 
+#pragma region  // brute
 void brute() {
     lls(N);
     ++N;
@@ -665,6 +666,85 @@ void brute() {
         reduction = cost_delta(dx, n+1);
         intervals.emplace(reduction, dx, n+1);
     }
+    V<t3> intervals_debug;
+    while (!intervals.empty()) {
+        intervals_debug.push_back(intervals.top());
+        intervals.pop();
+    }
+    sort(all(intervals_debug));
+    dbgP(intervals_debug);
+    ps(out);
+}
+#pragma endregion
+
+void solve() {
+    lls(N);
+    ++N;
+    vector<ll> dat(N);
+    FOR(k, 1, N) {
+        cin >> dat[k];
+    }
+    lls(GOAL);
+    dbgR(N, GOAL, dat);
+
+    ll total_cost = 0;
+    // (reduction from next post here, interval length, num posts)
+    using t4 = tuple<ll,int,int,int>;
+    set<t4> intervals;
+    FOR(k, 0, N-1) {
+        ll dx = dat[k+1] - dat[k];
+        total_cost += dx*dx;
+        intervals.emplace(cost_delta(dx, 0), dx, 0, k);
+    }
+
+    auto check = [&](ll T) {
+        ll nc = T - N;  // number of non-constrained things we'll be inserting.
+        // that breaks the space up into nc+1 intervals.
+
+        ll tc_local = total_cost;
+        set<t4> intervals_local;
+        // ll T_local = T;
+        ll cost_local = N;
+        dbgY(T, T-N);
+
+        /*
+            Before doing priority queue stuff, do the "obvious part".
+            We'd like all our intervals to have size S = dat[N-1] / (T-1).
+            So, if an interval currently has size >= k*S
+            then it should get at least k-1 help.
+        */
+        dbgP(db(dat[N-1]) / (nc+1));
+        for(auto& [_1, dx, _2, iidx] : intervals) {
+            ll n_new = dx * (nc+1) / dat[N-1] - 1;
+            ckmax(n_new, 0);
+            dbg(dx, n_new);
+            ll reduction = cost_one(dx, 0) - cost_one(dx, n_new);
+            tc_local -= reduction;
+            cost_local += n_new;
+            intervals_local.emplace(cost_delta(dx, n_new), dx, n_new, iidx);
+        }
+        dbg(intervals_local, cost_local);
+        if (cost_local > T) {dbg(false); return false;}
+
+        while (tc_local > GOAL) {
+            ++cost_local;
+            if (cost_local > T) {dbg(false); return false;}
+            auto it = intervals_local.rbegin();
+            auto [reduction, dx, n, iidx] = *it;
+            if (reduction == 0) {dbg(false); return false;}
+            tc_local -= reduction;
+            dbg(cost_local, dx, n, reduction, tc_local, GOAL);
+            intervals_local.erase(*it);
+            reduction = cost_delta(dx, n+1);
+            intervals_local.emplace(reduction, dx, n+1, iidx);
+        }
+        dbgP(intervals_local);
+        dbg(true);
+        return true;
+    };
+    dbgBold(N, dat[N-1]+1);
+    ll teleporters_total = fstTrue(N, dat[N-1] + 1, check);
+    ll out = teleporters_total - N;
     ps(out);
 }
 
@@ -675,7 +755,8 @@ void brute() {
     jb[k] * R <= dat[k] * (T-1)
 */
 
-void solve() {
+#pragma region  // solve_old
+void solve_old() {
     // dbg(cost_one(14, 13));
     // dbg(cost_one(14, 14));
     // dbg(cost_one(14, 15));
@@ -689,33 +770,81 @@ void solve() {
     lls(GOAL);
     dbgR(N, GOAL, dat);
 
+    // resort the intervals in dat to be from smallest to biggest.
+    V<int> interval_sizes;
+    FOR(k, 0, N-1) {
+        interval_sizes.push_back(dat[k+1] - dat[k]);
+    }
+    sort(all(interval_sizes));
+    FOR(k, 1, N) {
+        dat[k] = dat[k-1] + interval_sizes[k-1];
+    }
+
     ll R = dat.back();
     V<ll> jb(N);  // "just below"
     V<V<ll>> dp(2, V<ll>(N+1, INF));
-    function<bool(ll)> check_out = [&](ll T) {
-        el; dbgY(T);
+    V<ll> dat_local;
+    // function<bool(ll)> check_out = [&](ll T) {
+    auto check_out = [&](ll T) {
+        el; dbgY(T, T-N);
         dbg(R, dat);
-        FOR(k, 0, N) {
-            jb[k] = dat[k] * (T-1) / R;
+
+        // Throw out intervals that are too small to receive any help.
+        // We ideally wish every interval would have size R / (T-1).
+        dat_local = {0};
+        ll cost_pre = 0;
+        ll offset = 0;
+        ll T_local = T;
+        ll R_local = R;
+        dbg(db(R) / (T-1));
+        FOR(k, 1, N) {
+            ll dx = dat[k]-offset - dat_local.back();
+            // dbgP(k, dx, offset, dat[k], dat_local, dat[k]-offset);
+            if (dx * (T_local-1) <= R_local) {
+                // handle this interval right now and then don't think about it.
+                cost_pre += dx*dx;
+                offset += dx;
+                R_local = R - offset;
+                --T_local;
+            } else {
+                dat_local.push_back(dat[k] - offset);
+            }
+        }
+        dbg(db(R_local) / (T_local-1));
+        ll N_local = dat_local.size();
+        dbgP(N_local, R_local, dat_local);
+        if (R_local == 0) {
+            bool out = (cost_pre <= GOAL);
+            dbgcY("done early", out);
+            return out;
+        }
+
+
+        dbg_only(jb.resize(N_local));
+        FOR(k, 0, N_local) {
+            jb[k] = dat_local[k] * (T_local-1) / R_local;
+            // dbgR(k, dat_local[k], T_local-1, R_local, jb[k]);
         }
         dbg(jb);
-        FOR(o,0,2) FOR(k,0,N+1) {dp[o][k] = INF;}
+        FOR(o,0,2) FOR(k,0,N_local+1) {dp[o][k] = INF;}
         dp[0][0] = 0;
-        FOR(n,0,N-1) FOR(o,0,2) {
+        FOR(n,0,N_local-1) FOR(o,0,2) {
             if (dp[o][n] == INF) {
                 continue;
             }
-            dbgBold(o, n, dp[o][n]);
+            // dbgBold(o, n, dp[o][n]);
             FOR(p,0,2) {
                 int num_between = jb[n+1] - jb[n] + p - o - 1;
-                dbg(o, n, p, num_between);
-                ll cost_here = cost_one(dat[n+1] - dat[n], num_between);
+                // dbg(o, n, p, num_between);
+                ll cost_here = cost_one(dat_local[n+1] - dat_local[n], num_between);
                 ckmin(dp[p][n+1], dp[o][n] + cost_here);
             }
         }
-        ll result = dp[0][N-1];
-        dbgY(result, pdh(dp));
-        return (result <= GOAL);
+        ll result = dp[0][N_local-1];
+        result += cost_pre;
+        bool out = (result <= GOAL);
+        dbgY(result, out, pdh(dp));
+        return out;
     };
 
     // bool test = check_out(4);
@@ -727,6 +856,7 @@ void solve() {
     ps(out);
     return;
 }
+#pragma endregion
 
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds

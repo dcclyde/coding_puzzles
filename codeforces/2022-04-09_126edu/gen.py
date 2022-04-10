@@ -120,8 +120,24 @@ def rtree_rooted_v2(nr, mute=False):
     return N, parents
 #endregion
 
-N_RANGE = (1, 5)
-X_MAX = 100
+X_MAX = 1000
+N_RANGE = (1, 100)
+ISIZE_RANGE = (1, 1000)
+# X_MAX = 10
+# N_RANGE = (1, 10)
+# ISIZE_RANGE = (1, 1000)
+
+def gen_test_v2():
+    N = ri(N_RANGE)
+    isizes = rv(ISIZE_RANGE, N-1)
+    isizes.sort()
+    dat = [0]
+    for q in isizes:
+        dat.append(dat[-1] + q)
+    S = ri(dat[-1], dat[-1]**2)
+    ps(N)
+    pv(dat)
+    ps(S)
 
 def gen_test():
     while True:
@@ -130,10 +146,11 @@ def gen_test():
         dat.sort()
         if dat[-1] <= N**2:
             break
-    S = ri(dat[-1], X_MAX**2)
+    S = ri(dat[-1], dat[-1]**2)
     ps(N)
     pv(dat)
     ps(S)
 
 # ! If it passes small random tests then the problem is likely overflow.
-gen_test()
+# gen_test()
+gen_test_v2()
