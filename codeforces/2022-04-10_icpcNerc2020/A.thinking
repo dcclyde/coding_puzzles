@@ -1,0 +1,17 @@
+
+If next_sword > nt:
+    Jump to nt
+    update next_sword
+    update available
+    continue
+
+OK, make the next sword.
+
+Now fast forward until nt.
+    Make as many swords as we can.
+
+Update next_sword: It could be right after the previous, or it could use new guy.
+    Not if this event is removing a guy though!
+
+
+.
