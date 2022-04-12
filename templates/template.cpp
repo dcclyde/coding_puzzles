@@ -1,7 +1,11 @@
 #pragma region
+#ifdef DCCLYDE_LOCAL
+#include "/home/dcclyde/puzzles/code/templates/superheader.h"
+#else
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#endif
 using namespace std;
 using namespace __gnu_pbds;
 
@@ -127,7 +131,6 @@ V<int> rangeint(int start, int end, int inc=1) {
 }
 #pragma endregion
 
-//// const int MOD = 1e9+7; // 998244353;  // I can add this myself.
 // const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
@@ -148,8 +151,10 @@ template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
 // also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
 constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
 constexpr ll pct(ll x) { return __builtin_popcountll(x); }
-constexpr int bits(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+constexpr int bigbit(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
     return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
+constexpr int bigbitll(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+    return x == 0 ? 0 : 63-__builtin_clzll(x); } // floor(log2(x))
 constexpr int p2(int x) { return 1<<x; }
 constexpr int msk2(int x) { return p2(x)-1; }
 
@@ -608,8 +613,8 @@ void debug_out(Head H, Tail... T) {
 #define yes ps("YES");
 #define no ps("NO");
 
-// const int MOD = 1000000007;
-
+// const int MOD = 1'000'000'007;
+// const int MOD = 998'244'353;
 #pragma endregion
 
 // ! ---------------------------------------------------------------------------

@@ -24,8 +24,10 @@ def pvn1(q):
 #endregion
 import random
 #region  ri, rv
-def ri(q):
-    if isinstance(q, int):
+def ri(q, b=None):
+    if isinstance(b, int):
+        q = (q, b)
+    elif isinstance(q, int):
         q = (q,q)
     return random.randint(q[0], q[1])
 
@@ -133,5 +135,9 @@ def gen_test():
     ps(N)
     pvn(dat)
 
-# ! If it passes small random tests then the problem is likely overflow.
+# ! IF RANDOM TESTS PASS:
+# !   * OVERFLOW! Remember pii, FOR, maxi/mini.
+# !   * Brute force wrong
+# !   * Misunderstanding the problem rules?
+# !   * Edge case not buildable in brute forceable inputs (or needs mid size AND pathological)
 gen_test()

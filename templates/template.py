@@ -59,6 +59,27 @@ def bootstrap(f, stack=[]):
 # remember .bashrc should contain `export PYTHON_CONTEST_HELPER="dummy"`
 
 local_run = False
+def dbg(*args, **kwargs): pass
+def dbgG(*args, **kwargs): pass
+def dbgP(*args, **kwargs): pass
+def dbgY(*args, **kwargs): pass
+def dbgR(*args, **kwargs): pass
+def dbgB(*args, **kwargs): pass
+def dbgW(*args, **kwargs): pass
+def dbgBackground(*args, **kwargs): pass
+def dbgc(*args, **kwargs): pass
+def dbgcG(*args, **kwargs): pass
+def dbgcP(*args, **kwargs): pass
+def dbgcY(*args, **kwargs): pass
+def dbgcR(*args, **kwargs): pass
+def dbgcB(*args, **kwargs): pass
+def dbgcW(*args, **kwargs): pass
+def dbgcBackground(*args, **kwargs): pass
+def el(n=1): pass
+def print_details_helper(*args, **kwargs): pass
+def print_tsv_helper(*args, **kwargs): pass
+def pdh(*args, **kwargs): pass
+def pth(*args, **kwargs): pass
 if os.environ.get("PYTHON_CONTEST_HELPER"):
     local_run = True
 
@@ -134,28 +155,6 @@ if os.environ.get("PYTHON_CONTEST_HELPER"):
     def dbgcB(*args, **kwargs): dbgBase(comment_first=True, color=OUT_BLUE, *args, **kwargs)
     def dbgcW(*args, **kwargs): dbgBase(comment_first=True, color=OUT_WHITE, *args, **kwargs)
     def dbgcBackground(*args, **kwargs): dbgBase(comment_first=True, color=OUT_BACKGROUND, *args, **kwargs)
-else:
-    def dbg(*args, **kwargs): pass
-    def dbgG(*args, **kwargs): pass
-    def dbgP(*args, **kwargs): pass
-    def dbgY(*args, **kwargs): pass
-    def dbgR(*args, **kwargs): pass
-    def dbgB(*args, **kwargs): pass
-    def dbgW(*args, **kwargs): pass
-    def dbgBackground(*args, **kwargs): pass
-    def dbgc(*args, **kwargs): pass
-    def dbgcG(*args, **kwargs): pass
-    def dbgcP(*args, **kwargs): pass
-    def dbgcY(*args, **kwargs): pass
-    def dbgcR(*args, **kwargs): pass
-    def dbgcB(*args, **kwargs): pass
-    def dbgcW(*args, **kwargs): pass
-    def dbgcBackground(*args, **kwargs): pass
-    def el(n=1): pass
-    def print_details_helper(*args, **kwargs): pass
-    def print_tsv_helper(*args, **kwargs): pass
-    def pdh(*args, **kwargs): pass
-    def pth(*args, **kwargs): pass
 #endregion
 #region  FastIO
 from io import BytesIO, IOBase
@@ -240,7 +239,8 @@ def lm():
 def solve(testID):
     N = nn()
     dat = lm()
-    dbg(N, dat)
+    dbgR(N, dat)
+    el();
 
 
 
