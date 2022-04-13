@@ -120,23 +120,19 @@ def rtree_rooted_v2(nr, mute=False):
     return N, parents
 #endregion
 
-N_RANGE = (2, 8)
-V_RANGE = (1, 8)
-S_RANGE = (1, 50)
+N_RANGE = (1, 5)
+V_RANGE = (1, 5)
 
 def gen_test():
-    # rtree_rooted_v2(N_RANGE)
-    # rgraph(N_RANGE, S_RANGE)
-    # rv(N_RANGE, LR_RANGE)
     N = ri(N_RANGE)
-    # dat = [rv(V_RANGE, 2) for _ in range(N)]
     dat = rv(V_RANGE, N)
     ps(1)
     ps(N)
-    pvn(dat)
+    pv(dat)
+
 
 # ! IF RANDOM TESTS PASS:
-# !   * OVERFLOW! Remember pii, FOR, maxi/mini.
+# !   * OVERFLOW! Remember pii, FOR, maxi/mini. Write an "overflow gen"?
 # !   * Brute force wrong
 # !   * Misunderstanding the problem rules?
 # !   * Edge case not buildable in brute forceable inputs (or needs mid size AND pathological)

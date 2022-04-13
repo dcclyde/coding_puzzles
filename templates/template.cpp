@@ -2,6 +2,7 @@
 #ifdef DCCLYDE_LOCAL
 #include "/home/dcclyde/puzzles/code/templates/superheader.h"
 #else
+#define NDEBUG  // don't bother with assertions on the judge server.
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
@@ -64,6 +65,30 @@ using vpd = V<pd>;
 //// tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 //// tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
+// bitwise ops
+// also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
+constexpr ll pct(ll x) { return __builtin_popcountll(x); }
+constexpr int bigbit(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+    return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
+constexpr int bigbitll(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+    return x == 0 ? 0 : 63-__builtin_clzll(x); } // floor(log2(x))
+constexpr int p2(int x) { return 1<<x; }
+constexpr int msk2(int x) { return p2(x)-1; }
+
+ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
+ll fdiv(auto a, auto b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
+
+tcTU> bool ckmin(T& a, const U& b) {
+    return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
+tcTU> bool ckmax(T& a, const U& b) {
+    return a < (T)b ? a = (T)b, 1 : 0; } // set a = max(a,b)
+
+int maxi(int a, int b) {return max((int)a, (int)b);}
+int mini(int a, int b) {return min((int)a, (int)b);}
+ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
+ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
+
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
@@ -104,15 +129,31 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
 #define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
+// #define FOR3(i,a,b) for (int i = (a); i < (b); ++i)
+#define FOR3(i,a,b) FORll(i,a,b)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
 #define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
+// #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) ROFll(i,a,b)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
 #define foreach(a,x) each(a,x)
+
+#define FOR1(x) for(auto x)
+#if __cplusplus >= 202002L
+auto stepped_iota(ll start, ll end, ll step=1) {
+    ll iter_count = cdiv(end-start, step);
+    ckmax(iter_count, 0);
+  return std::ranges::views::iota(0LL, iter_count) |
+         std::ranges::views::transform([=](ll x) { return x * step + start; });
+}
+#define FOR4(i,s,e,step) FOR1(i : stepped_iota(s, e, step))
+#endif
+
+#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
+#define FOR(...) GET_MACRO(__VA_ARGS__, FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
 
 #pragma region  // rangeint
 V<int> rangeint(int start, int end, int inc=1) {
@@ -146,30 +187,6 @@ mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 // int ri = rand_int(rng);
 #pragma endregion
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
-
-// bitwise ops
-// also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
-constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
-constexpr ll pct(ll x) { return __builtin_popcountll(x); }
-constexpr int bigbit(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
-    return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
-constexpr int bigbitll(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
-    return x == 0 ? 0 : 63-__builtin_clzll(x); } // floor(log2(x))
-constexpr int p2(int x) { return 1<<x; }
-constexpr int msk2(int x) { return p2(x)-1; }
-
-ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
-ll fdiv(ll a, ll b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
-
-tcTU> bool ckmin(T& a, const U& b) {
-    return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
-tcTU> bool ckmax(T& a, const U& b) {
-    return a < (T)b ? a = (T)b, 1 : 0; } // set a = max(a,b)
-
-int maxi(int a, int b) {return max((int)a, (int)b);}
-int mini(int a, int b) {return min((int)a, (int)b);}
-ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
-ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
 
 tcT> ll fstTrue(ll lo, ll hi, T f) {
     ++hi; assert(lo <= hi); // assuming f is increasing
@@ -272,7 +289,7 @@ inline namespace Input {
     void rv1(size_t) {}
     tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
         t.resize(N); re(t); for(auto& x : t) --x;
-        rv(N,u...); }
+        rv1(N,u...); }
 
 
     // dumb shortcuts to read in ints
@@ -626,7 +643,7 @@ void debug_out(Head H, Tail... T) {
 
 void solve() {
     lls(N);
-    vector<ll> dat;
+    V<ll> dat;
     rv(N, dat);
     dbgR(N, dat);
 

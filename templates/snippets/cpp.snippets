@@ -1,0 +1,62 @@
+snippet compress "coordinate compression"
+V<ll> uncompressed;
+FOR(k, 0, N) {
+    uncompressed.push_back(dat[k]);
+}
+remDup(uncompressed);
+umap<ll,ll> uncinv;
+FOR(k, 0, uncompressed.size()) {
+    uncinv[uncompressed[k]] = k;
+}
+FOR(k, 0, N) {
+    dat[k] = uncinv[dat[k]];
+}
+endsnippet
+
+snippet rgraph "read graph from stdin"
+V<V<int>> G(N);
+FOR(k, 0, E) {
+    int1(a, b);
+    G[a].emplace_back(b);
+    G[b].emplace_back(a);
+}
+dbgY(pdh(G));
+endsnippet
+
+snippet rtree "read tree from stdin"
+V<V<int>> G(N);
+V<int> parent(N); parent[0] = -1;
+V<V<int>> children(N);
+FOR(a, 0, E) {
+    int1(b);
+    G[a].emplace_back(b);
+    G[b].emplace_back(a);
+    parent[b] = a;
+    children[a].emplace_back(b);
+}
+dbgY(pdh(G));
+endsnippet
+
+snippet dfsRecursive "DFS (recursive using lambda)"
+V<int> subtree_size(N);
+auto dfs = [&](int curr, int parent, auto&& self) {
+    // work on parent
+    subtree_size[curr] = 0;
+    // todo
+    $1
+    for (auto& o : G[curr]) {
+        if (o == parent) {continue;}
+        self(o, curr);
+
+        // update parent per child
+        subtree_size[curr] += subtree_size[o];
+        // todo
+        $1
+    }
+    // update parent after all children
+    // todo
+    $1
+    // dbgP(curr, parent, subtree_size[curr]);
+};
+$2
+endsnippet
