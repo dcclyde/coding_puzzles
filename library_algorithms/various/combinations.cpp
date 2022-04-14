@@ -53,8 +53,8 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 #pragma region  // * N ints summing to S
 // // get all combinations of combN nonnegative ints summing to combS.
 // // that's (N+S-1) choose (S-1).
-// int combN = 7;
-// int combS = 3;
+// int combN = TODO;
+// int combS = TODO;
 // V<int> ch = rangeint(0, combN+combS-1);
 // V<int> nums(combN);
 // int combs_ctr = 0;
@@ -70,49 +70,23 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 #pragma endregion
 
 #pragma region  // * product-ish using recursion
-// void brute() {
-//     dbgcBold("brute force");
-//     lls(N, S);
-//     vector<ll> L, R;
-//     FOR(k, 0, N) {
-//         ints(l, r);
-//         L.push_back(l);
-//         R.push_back(r);
-//     }
-//     dbgR(N, S, L, R);
+// {
+//    V<int> curr;
+//    auto do_something = [&]() {
+//       // ! do something here using curr
 
-//     V<int> curr;
-//     int curr_sum = 0;
-//     ll out = 0;
+//    };
 
-//     auto do_something = [&]() {
-//         // ! do something here
-//         int g = curr[0];
-//         FOR(k, 1, N) {
-//             g = gcd(g, curr[k]);
-//         }
-//         if (g == 1) {
-//             ++out;
-//         }
-//     };
-
-//     function<void(void)> product_rec_helper = [&]{
-//         if (curr.size() == N) {return do_something();}
-//         int n = curr.size();
-//         FOR(k, L[n], R[n]+1) {
-//             if (curr_sum + k > S) {
-//                 // ! early exit if this product is clearly bad
-//                 break;
-//             }
-//             curr_sum += k;
+//    function<void(void)> product_rec_helper = [&]{
+//       if (curr.size() == TODO_MAX_DEPTH) {return do_something();}  // ! define max depth
+//       int n = curr.size();
+//       FOR(k, 0, TODO) {  // ! iterate over options at depth n
 //             curr.push_back(k);
 //             product_rec_helper();
 //             curr.pop_back();
-//             curr_sum -= k;
-//         }
-//     };
-//     product_rec_helper();
-//     return ps(out);
+//       }
+//    };
+//    product_rec_helper();
 // }
 #pragma endregion
 
