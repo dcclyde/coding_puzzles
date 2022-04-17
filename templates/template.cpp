@@ -129,11 +129,11 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
+#define FORll(i,a,b) for (ll i = ((ll)a); i < ((ll)b); ++i)
 // #define FOR3(i,a,b) for (int i = (a); i < (b); ++i)
 #define FOR3(i,a,b) FORll(i,a,b)
 #define F0R(i,a) FOR(i,0,a)
-#define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
+#define ROFll(i,a,b) for (ll i = ((ll)b)-1; i >= ((ll)a); --i)
 // #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
 #define ROF(i,a,b) ROFll(i,a,b)
 #define R0F(i,a) ROF(i,0,a)
@@ -149,7 +149,7 @@ auto stepped_iota(ll start, ll end, ll step=1) {
   return std::ranges::views::iota(0LL, iter_count) |
          std::ranges::views::transform([=](ll x) { return x * step + start; });
 }
-#define FOR4(i,s,e,step) FOR1(i : stepped_iota(s, e, step))
+#define FOR4(i,s,e,step) for(auto i : stepped_iota(s, e, step))
 #endif
 
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
@@ -494,9 +494,19 @@ template<class T>
 string print_details_helper(T& q) {
     string out = "\n";
     int ctr = 0;
-    for ( auto& x : q ) {
+    for ( auto&& x : q ) {
         out.push_back('\t');
         out += to_string(ctr) + ":\t" + to_string(x) + "\n";
+        ++ctr;
+    }
+    return out;
+}
+string print_details_helper(V<bool>& q) {
+    string out = "\n";
+    int ctr = 0;
+    for ( auto&& x : q ) {
+        out.push_back('\t');
+        out += to_string(ctr) + ":\t" + to_string(static_cast<bool>(x)) + "\n";
         ++ctr;
     }
     return out;
@@ -625,10 +635,12 @@ void debug_out(Head H, Tail... T) {
 #endif
 #pragma endregion
 
-#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
+#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
 
-#define yes ps("YES");
-#define no ps("NO");
+#define yes ps("Yes");
+#define no ps("No");
+// #define yes ps("YES");
+// #define no ps("NO");
 
 // const int MOD = 1'000'000'007;
 // const int MOD = 998'244'353;
@@ -646,6 +658,7 @@ void solve() {
     V<ll> dat;
     rv(N, dat);
     dbgR(N, dat);
+    el;
 
 
 
