@@ -130,10 +130,12 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
 #define FORll(i,a,b) for (ll i = ((ll)a); i < ((ll)b); ++i)
+#define FORint(i,a,b) for (int i = ((int)a); i < ((int)b); ++i)
 // #define FOR3(i,a,b) for (int i = (a); i < (b); ++i)
 #define FOR3(i,a,b) FORll(i,a,b)
 #define F0R(i,a) FOR(i,0,a)
 #define ROFll(i,a,b) for (ll i = ((ll)b)-1; i >= ((ll)a); --i)
+#define ROFint(i,a,b) for (int i = ((int)b)-1; i >= ((int)a); --i)
 // #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
 #define ROF(i,a,b) ROFll(i,a,b)
 #define R0F(i,a) ROF(i,0,a)
