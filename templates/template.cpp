@@ -90,6 +90,18 @@ ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
 ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
 
 
+template <typename, typename = void>
+constexpr bool is_iterable_v{};
+
+template <typename T>
+constexpr bool is_iterable_v<
+    T,
+    std::void_t< decltype(std::declval<T>().begin()),
+                decltype(std::declval<T>().end())
+    >
+> = true;
+
+
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
     static uint64_t splitmix64(uint64_t x) {
@@ -109,6 +121,18 @@ struct custom_hash {
         uint64_t a = (*this)(x.first);
         uint64_t b = (*this)(x.second);
         return a + 3*b;
+    }
+
+    template<typename A>
+    typename enable_if<is_iterable_v<A>, size_t>::type operator()(const A& v) const {
+        uint64_t out = 0;
+        uint64_t offset = 1;
+        for (const auto& x : v) {
+            uint64_t curr = (*this)(x);
+            out ^= curr * offset;
+            offset *= 3;
+        }
+        return out;
     }
 };
 
@@ -231,15 +255,15 @@ template<class T> auto min_element(const T& data) {return *min_element(all(data)
 #define tcTUU tcT, class ...U
 
 inline namespace Helpers {
-    // is_iterable
-    // https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
-    // this gets used only when we can call begin() and end() on that type
-    tcT, class = void> struct is_iterable : false_type {};
-    tcT> struct is_iterable<T, void_t<decltype(begin(declval<T>())),
-                                      decltype(end(declval<T>()))
-                                     >
-                           > : true_type {};
-    tcT> constexpr bool is_iterable_v = is_iterable<T>::value;
+    // // is_iterable
+    // // https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+    // // this gets used only when we can call begin() and end() on that type
+    // tcT, class = void> struct is_iterable : false_type {};
+    // tcT> struct is_iterable<T, void_t<decltype(begin(declval<T>())),
+    //                                   decltype(end(declval<T>()))
+    //                                  >
+    //                        > : true_type {};
+    // tcT> constexpr bool is_iterable_v = is_iterable<T>::value;
 
     // is_readable
     tcT, class = void> struct is_readable : false_type {};
@@ -639,13 +663,19 @@ void debug_out(Head H, Tail... T) {
 
 #define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
 
+#define YES ps("YES");
+#define NO ps("NO");
 #define yes ps("Yes");
 #define no ps("No");
 // #define yes ps("YES");
 // #define no ps("NO");
 
+const ll INF_ll = 3e18;
+const int INF_i = int(2e9) + 1;
+
 // const int MOD = 1'000'000'007;
 // const int MOD = 998'244'353;
+
 #pragma endregion
 
 // ! ---------------------------------------------------------------------------
