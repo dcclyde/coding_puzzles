@@ -668,7 +668,7 @@ void debug_out(Head H, Tail... T) {
 #define Yes ps("Yes");
 #define No ps("No");
 
-const ll INF_ll = 3e18;
+const ll INF_ll = ll(2e18) + 1;
 const int INF_i = int(2e9) + 1;
 
 // const int MOD = 1'000'000'007;
@@ -690,6 +690,8 @@ void solve() {
     dbgR(N, dat);
     el;
 
+    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problmes!
+
 
 
     return;
@@ -698,7 +700,6 @@ void solve() {
 // ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
-// ! Read the sample cases before writing code!
 // #define SINGLE_CASE
 #pragma region
 int main() {
