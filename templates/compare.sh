@@ -3,6 +3,8 @@ set -e
 
 PROBLEM="invalid"
 
+# any commands needed to prepare the solutions.
+# just comment out if one/both uses Python or otherwise doesn't need prep.
 g++ --std=c++2a "$PROBLEM".cpp -o a.out \
     -DDCCLYDE_LOCAL
 g++ --std=c++2a -DDCCLYDE_BRUTEFORCE "$PROBLEM".cpp -o b.out \
@@ -15,5 +17,8 @@ for((k = 1; k < 100000 ; ++k)); do
         # 2> /dev/null
     b.out < gen.in > brute.out \
         # 2> /dev/null
+    # pypy3 brute.py < gen.in > brute.out \
+    #     # 2> /dev/null
+
     diff -w fast.out brute.out
 done

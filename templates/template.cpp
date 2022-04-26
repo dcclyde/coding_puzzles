@@ -665,10 +665,8 @@ void debug_out(Head H, Tail... T) {
 
 #define YES ps("YES");
 #define NO ps("NO");
-#define yes ps("Yes");
-#define no ps("No");
-// #define yes ps("YES");
-// #define no ps("NO");
+#define Yes ps("Yes");
+#define No ps("No");
 
 const ll INF_ll = 3e18;
 const int INF_i = int(2e9) + 1;
@@ -697,6 +695,7 @@ void solve() {
     return;
 }
 
+// ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 // ! Read the sample cases before writing code!

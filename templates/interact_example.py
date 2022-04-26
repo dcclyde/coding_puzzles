@@ -1,11 +1,13 @@
+
+# ! Example used in 2022-04-23_global20
+#region  helpers that shouldn't be in submittable solutions
+import functools
+print = functools.partial(print, flush=True)  # including this in debug_only section of template.py could cause server-only bugs.
+#endregion
 #region  load template's helpers
 import sys
 sys.path.append("/home/dcclyde/puzzles/code/templates")
 from template import *
-#endregion
-#region  helpers that shouldn't be in submittable solutions
-import functools
-print = functools.partial(print, flush=True)  # including this in debug_only section of template.py could cause server-only bugs.
 #endregion
 #region  ri, rv
 def ri(q, b=None):
@@ -105,15 +107,63 @@ def rtree_rooted_v2(nr, mute=False):
 #endregion
 
 
-N_RANGE = (1, 5)
-V_RANGE = (1, 5)
+N_RANGE = (1, 100)
+# L_RANGE = (1, 10)
+L_RANGE = (1998, 2000)
 
-def gen_test():
+def num_lines(N, dat, W):
+    out = 0
+    idx = 0
+    if max(dat) > W: return 0
+    while idx < N:
+        curr_len = -1
+        out += 1
+        while idx < N and dat[idx] + curr_len + 1 <= W:
+            curr_len += dat[idx] + 1
+            idx += 1
+    return out
+
+def interact():
     N = ri(N_RANGE)
-    dat = rv(V_RANGE, N)
-    # ps(1)  # ! uncomment for multi-case
+    dat = rv(L_RANGE, N)
+    # dat = [2000, 1000]
+
     ps(N)
-    pv(dat)
+
+    nl = [num_lines(N, dat, w) for w in range(len(dat) * (max(dat)+1) + 1)]
+    best = 10**18
+    for (w, nlw) in enumerate(nl):
+        if nlw > 0 and w * nlw < best:
+            best = w * nlw
+    dbgcY("hidden", dat)
+    # dbgP(nl)
+    dbg(best)
+
+    queries_allowed = N + 30
+    while True:
+        raw = input().split()
+        # dbgP(raw)
+        qtype = raw[0]
+        query = int(raw[1])
+        if qtype == '!':
+            if query == best:
+                dbgc("! good", query)
+                sys.exit(0)
+            else:
+                dbgcR("! bad", query, best)
+                sys.exit(1)
+        else:
+            queries_allowed -= 1
+            if queries_allowed < 0:
+                dbgcR("too many queries", query)
+                sys.exit(1)
+            if query <= 0 or query > 10**9:
+                dbgcR("invalid query", query)
+                sys.exit(1)
+            if query >= len(nl):
+                print(1)
+            else:
+                print(nl[query])
 
 
 # ! IF RANDOM TESTS PASS:
@@ -126,4 +176,4 @@ def gen_test():
 # * Uninitialized variable
 # * I used INF = 1e9 but answer could be bigger
 #endregion
-gen_test()
+interact()

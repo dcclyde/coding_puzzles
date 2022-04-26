@@ -5,6 +5,7 @@ from collections import deque
 import math
 import sys
 import os
+import random
 #endregion
 #region  @bootstrap for recursive functions
 # # TLDR:
@@ -213,14 +214,88 @@ input = lambda: sys.stdin.readline().rstrip("\r\n")
 def nn():
     return int(input())
 
+def nn1():
+    return nn() - 1
+
 def li():
     return list(input())
 
 def lm():
     return list(map(int, input().split()))
 
+def lm1():
+    return list(map(lambda x : int(x) - 1, input().split()))
+
+rv = lm
+rv1 = lm1
+
 # To print while flushing output for interactive problems:
 # print(x, flush=True)
+#endregion
+#region  output helpers
+def ps(*args, **kwargs):
+    if hasattr(args[0], '__iter__') and not isinstance(args[0], str):
+        print(' '.join(str(x) for x in args[0]), **kwargs)
+    else:
+        print(' '.join(str(x) for x in args), **kwargs)
+
+def pv(q): ps(*q)
+def ps1(*args, **kwargs):
+    if hasattr(args[0], '__iter__'):
+        print(' '.join(str(x+1) for x in args[0]), **kwargs)
+    else:
+        print(' '.join(str(x+1) for x in args), **kwargs)
+def pv1(q): ps1(*q)
+def pvn(q):
+    for x in q: ps(x)
+def pvn1(q):
+    for x in q: ps1(x)
+#endregion
+#region  logic
+
+def YES(): return print("YES")
+def NO(): return print("NO")
+def Yes(): return print("Yes")
+def No(): return print("No")
+
+def remDup(v):
+    v = list(set(v))
+
+steps_orthogonal = [(1,0), (0,1), (-1,0), (0,-1)]
+steps_diagonal = [(1,1), (1,-1), (-1,-1), (-1,1)]
+steps_8dirs = [(-1,-1), (0,-1), (1,-1), (-1,0), (1,0), (-1,1), (0,1), (1,1)]
+
+def fstTrue(lo, hi, f):
+    hi += 1
+    assert lo <= hi
+    while lo < hi:
+        mid = lo + (hi-lo) // 2
+        if f(mid): hi = mid
+        else: lo = mid + 1
+    return lo
+
+first_true = fstTrue
+
+def lstTrue(lo, hi, f):
+    lo -= 1
+    assert lo <= hi
+    while lo < hi:
+        mid = lo + (hi-lo+1) // 2
+        if f(mid): lo = mid
+        else: hi = mid-1
+    return lo
+
+last_true = lstTrue
+
+# "ceiling divide" and "floor divide"
+def cdiv(a, b): return a//b + (1 if ((a^b)>0 and a%b != 0) else 0)
+def fdiv(a, b): return a//b - (1 if ((a^b)<0 and a%b != 0) else 0)
+
+def bits_set(x): return bin(x).count('1')
+pct = bits_set
+popcount = bits_set
+
+
 #endregion
 
 #########################################################################
@@ -240,7 +315,7 @@ def solve(testID):
     N = nn()
     dat = lm()
     dbgR(N, dat)
-    el();
+    el()
 
 
 
