@@ -367,36 +367,43 @@ class LazySeg:
     def build(self):
         for k in reversed(range(1, self.n)): self.pull(k)
 
+    @bootstrap
     def push_all(self, ind=1, L=0, R=None):
         if R is None: R = self.n - 1
         self.push(ind,L,R)
         if L < R:
             M = (L+R)>>1
-            self.push_all(2*ind,L,M)
-            self.push_all(2*ind+1,M+1,R)
+            (yield self.push_all(2*ind,L,M))
+            (yield self.push_all(2*ind+1,M+1,R))
+        yield None
 
+    @bootstrap
     def upd(self, lo, hi, inc, ind=1, L=0, R=None):
         if R is None: R = self.n - 1
         self.push(ind,L,R)
-        if hi < L or R < lo: return
+        if hi < L or R < lo: yield None
         if lo <= L and R <= hi:
             self.lazy[ind] = inc
             self.push(ind,L,R)
-            return
+            yield None
         M = (L+R)>>1
-        self.upd(lo,hi,inc,2*ind,L,M)
-        self.upd(lo,hi,inc,2*ind+1,M+1,R)
+        (yield self.upd(lo,hi,inc,2*ind,L,M))
+        (yield self.upd(lo,hi,inc,2*ind+1,M+1,R))
         self.pull(ind)
+        yield None
 
+    @bootstrap
     def query(self, lo, hi, ind=1, L=0, R=None):
         if R is None: R = self.n - 1
         self.push(ind,L,R)
-        if hi < L or R < lo: return self.idSeg
-        if lo <= L and R <= hi: return self.seg[ind]
+        if hi < L or R < lo:
+            yield self.idSeg
+        if lo <= L and R <= hi:
+            yield self.seg[ind]
         M = (L+R)>>1
-        return self.cmb(
-            self.query(lo,hi,2*ind,L,M),
-            self.query(lo,hi,2*ind+1,M+1,R)
+        yield self.cmb(
+            (yield self.query(lo,hi,2*ind,L,M)),
+            (yield self.query(lo,hi,2*ind+1,M+1,R))
         )
 
     # return smallest x s.t. query(base, x) satisfies some criterion.
