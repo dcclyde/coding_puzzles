@@ -317,162 +317,173 @@ a=1: increase range by b
 a=2: set range to b
 '''
 
-class LazySeg:
-    idSeg = 0  # ! seg identity, must satisfy a+idSeg = idSeg+a = a
-    idLazy = (0,0)  # ! lazy identity, must satisfy idLazy * a = a
-    def cmb(self, a, b):  # ! seg * seg
-        return a + b
-    def init(self, _n):
-        self.orig_n = _n
-        self.n = 1
-        while self.n < _n: self.n *= 2
-        self.SZ = self.n
-        self.seg = [self.idSeg for _ in range(2*self.n)]
-        self.lazy = [self.idLazy for _ in range(2*self.n)]
+# class LazySeg:
+n = -1
+orig_n = -1
+seg = None
+lazy = None
+idSeg = 0  # ! seg identity, must satisfy a+idSeg = idSeg+a = a
+idLazy = (0,0)  # ! lazy identity, must satisfy idLazy * a = a
+def cmb(a, b):  # ! seg * seg
+    return a + b
+def init(_n):
+    global orig_n
+    global n
+    global seg
+    global lazy
+    global SZ
+    orig_n = _n
+    n = 1
+    while n < _n: n *= 2
+    SZ = n
+    seg = [idSeg for _ in range(2*n)]
+    lazy = [idLazy for _ in range(2*n)]
 
-    def push(self, ind, L, R):
-        a, b = self.lazy[ind]
-        if a == 0: return
-        if a == 1: self.seg[ind] += (R-L+1) * b  # ! lazy * seg
-        else: self.seg[ind] = (R-L+1) * b  # ! lazy * seg
-        if L != R:
-            for i in range(2):
-                ca, cb = self.lazy[2*ind+i]
-                '''
-                    ca == 0: just use a, b.
-                    ca == 1 and a == 1: sum them
-                    ca == 1, a == 2: replace
-                    ca == 2, a == 1: add onto existing set
-                    ca == 2, a == 2: replace
-                '''
-                if ca == 0 or a == 2: ca, cb = a, b
-                else: cb += b
-                self.lazy[2*ind+i] = (ca, cb)  # ! lazy * lazy
+def push(ind, L, R):
+    global seg
+    global lazy
+    a, b = lazy[ind]
+    if a == 0: return
+    if a == 1: seg[ind] += (R-L+1) * b  # ! lazy * seg
+    else: seg[ind] = (R-L+1) * b  # ! lazy * seg
+    if L != R:
+        for i in range(2):
+            ca, cb = lazy[2*ind+i]
+            '''
+                ca == 0: just use a, b.
+                ca == 1 and a == 1: sum them
+                ca == 1, a == 2: replace
+                ca == 2, a == 1: add onto existing set
+                ca == 2, a == 2: replace
+            '''
+            if ca == 0 or a == 2: ca, cb = a, b
+            else: cb += b
+            lazy[2*ind+i] = (ca, cb)  # ! lazy * lazy
 
-        self.lazy[ind] = self.idLazy
+    lazy[ind] = idLazy
 
-    def pull(self, ind): self.seg[ind] = self.cmb(self.seg[2*ind],self.seg[2*ind+1])
-    def build(self):
-        for k in reversed(range(1, self.n)): self.pull(k)
+def pull(ind):
+    global seg
+    seg[ind] = cmb(seg[2*ind],seg[2*ind+1])
+def build():
+    for k in reversed(range(1, n)): pull(k)
+    for k in range(1, 2*n): assert lazy[k] == idLazy
 
-    # def push_all(self, ind=1, L=0, R=None):
-    #     if R is None: R = self.n - 1
-    #     self.push(ind,L,R)
-    #     if L < R:
-    #         M = (L+R)>>1
-    #         self.push_all(2*ind,L,M)
-    #         self.push_all(2*ind+1,M+1,R)
-
-    def push_all(self):
-        todo = [(1, 0, self.n-1)]
-        while len(todo) > 0:
-            ind, L, R = todo.pop()
-            self.push(ind,L,R)
-            if L < R:
-                M = (L+R)>>1
-                todo.append((2*ind,L,M))
-                todo.append((2*ind+1,M+1,R))
-
-    def upd(self, lo, hi, inc):
-        todo = [(1, 0, self.n-1)]
-        post = []
-        while len(todo) > 0:
-            ind, L, R = todo.pop()
-            self.push(ind, L, R)
-            if hi < L or R < lo: continue
-            if lo <= L and R <= hi:
-                self.lazy[ind] = inc
-                self.push(ind,L,R)
-                continue
+def push_all():
+    todo = [(1, 0, n-1)]
+    while len(todo) > 0:
+        ind, L, R = todo.pop()
+        push(ind,L,R)
+        if L < R:
             M = (L+R)>>1
             todo.append((2*ind,L,M))
             todo.append((2*ind+1,M+1,R))
-            post.append(ind)
-        for ind in reversed(post):
-            self.pull(ind)
 
-    def query(self, l, r):
-        ra = self.idSeg
-        rb = self.idSeg
-        l += self.n
-        r += self.n+1
-        while l < r:
-            if l&1:
-                ra = self.cmb(ra, self.seg[l])
-                l += 1
-            if r&1:
-                r -= 1
-                rb = self.cmb(self.seg[r], rb)
-            l >>= 1
-            r >>= 1
-        return self.cmb(ra, rb)
+def upd(lo, hi, inc):
+    global seg
+    global lazy
+    todo = [(1, 0, n-1)]
+    post = []
+    while len(todo) > 0:
+        ind, L, R = todo.pop()
+        push(ind, L, R)
+        if hi < L or R < lo: continue
+        if lo <= L and R <= hi:
+            lazy[ind] = inc
+            push(ind,L,R)
+            continue
+        M = (L+R)>>1
+        todo.append((2*ind,L,M))
+        todo.append((2*ind+1,M+1,R))
+        post.append(ind)
+    for ind in reversed(post):
+        pull(ind)
 
-    # return smallest x s.t. query(base, x) satisfies some criterion.
-    def first_satisfying_R(self, base, val, ind=1, l=0, r=None):
-        if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.query(l,r,ind,l,r) >= val)
-        if r < base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind,l,m)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind+1,m+1,r)
+def query(l, r):
+    ra = idSeg
+    rb = idSeg
+    l += n
+    r += n+1
+    while l < r:
+        if l&1:
+            ra = cmb(ra, seg[l])
+            l += 1
+        if r&1:
+            r -= 1
+            rb = cmb(seg[r], rb)
+        l >>= 1
+        r >>= 1
+    return cmb(ra, rb)
 
-    # return largest x s.t. query(x, base) satisfies some criterion.
-    def first_satisfying_L(self, base, val, ind=1, l=0, r=None):
-        if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.query(l,r,ind,l,r) >= val)
-        if l > base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind+1,m+1,r)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind,l,m)
+# return smallest x s.t. query(base, x) satisfies some criterion.
+def first_satisfying_R(base, val, ind=1, l=0, r=None):
+    if r is None: r = n - 1
+    # ! Is there a good idx in [l, r]?
+    ok = (query(l,r,ind,l,r) >= val)
+    if r < base or not ok: return -1
+    if l == r: return l
+    m = (l+r) // 2
+    res = first_satisfying_R(base,val,2*ind,l,m)
+    if res != -1: return res
+    return first_satisfying_R(base,val,2*ind+1,m+1,r)
 
-    def __str__(self):  # make the class nicely printable, including via dbg()
-        if not local_run: return  # if we call this then we lose all lazy benefits.
-        self.push_all()  # get rid of all laziness.
-        out = [self.seg[k] for k in range(self.n, self.n + self.orig_n)]
-        return str(out)
+# return largest x s.t. query(x, base) satisfies some criterion.
+def first_satisfying_L(base, val, ind=1, l=0, r=None):
+    if r is None: r = n - 1
+    # ! Is there a good idx in [l, r]?
+    ok = (query(l,r,ind,l,r) >= val)
+    if l > base or not ok: return -1
+    if l == r: return l
+    m = (l+r) // 2
+    res = first_satisfying_R(base,val,2*ind+1,m+1,r)
+    if res != -1: return res
+    return first_satisfying_R(base,val,2*ind,l,m)
 
-    def detailed_printouts(self):
-        #region
-        if not local_run: return  # this function is expensive.
-        ST_SIZE = self.n
-        ST_PRINT_SIZE = self.orig_n
-        el()
-        dbgc("LazySeg DETAILS")
-        for k in range(1, ST_SIZE + ST_PRINT_SIZE):
-            if k >= ST_SIZE:
-                p = k - ST_SIZE
-                dbgP(k, p, self.seg[k], self.lazy[k])
-            else:
-                binary_digits = bin(k)[2:]
-                l = 0
-                r = ST_SIZE - 1
-                for d in binary_digits:
-                    m = (l+r) // 2
-                    if d == '1': l = m+1
-                    else: r = m
-                if l < ST_PRINT_SIZE:
-                    dbgY(k, (l,r), self.seg[k], self.lazy[k])
-        el()
-        #endregion
+def to_string():
+    if not local_run: return  # if we call this then we lose all lazy benefits.
+    push_all()  # get rid of all laziness.
+    out = [seg[k] for k in range(n, n + orig_n)]
+    return str(out)
+
+def detailed_printouts():
+    #region
+    if not local_run: return  # this function is expensive.
+    ST_SIZE = n
+    ST_PRINT_SIZE = orig_n
+    dbg(ST_SIZE)
+    dbg(ST_PRINT_SIZE)
+    el()
+    dbgc("LazySeg DETAILS")
+    for k in range(1, ST_SIZE + ST_PRINT_SIZE):
+        if k >= ST_SIZE:
+            p = k - ST_SIZE
+            dbgP(k, p, seg[k], lazy[k])
+        else:
+            binary_digits = bin(k)[2:]
+            l = 0
+            r = ST_SIZE - 1
+            for d in binary_digits:
+                m = (l+r) // 2
+                if d == '1': l = m+1
+                else: r = m
+            if l < ST_PRINT_SIZE:
+                dbgY(k, (l,r), seg[k], lazy[k])
+    el()
+    #endregion
 
 
 def solve(testID):
+    global seg
     N, Q = lm()
     dat = lm()
     dbgR(N, dat)
     el()
 
-    st = LazySeg()
-    st.init(N)
-    for k, v in enumerate(dat): st.seg[st.n + k] = v
-    st.build()
-    dbgY(st)
+    init(N)
+    for k, v in enumerate(dat): seg[n + k] = v
+    build()
+    dbgY(to_string())
+    detailed_printouts()
     el()
 
     for qid in range(Q):
@@ -484,12 +495,12 @@ def solve(testID):
         l, r = l-1, r-1
         if qtype <= 2:
             x = int(iraw[3])
-            st.upd(l, r, (qtype,x))
+            upd(l, r, (qtype,x))
         else:
             # query range
-            result = st.query(l, r)
+            result = query(l, r)
             ps(result)
-        dbg(qid, iraw, st)
+        dbg(qid, iraw, to_string())
 
     return
 
