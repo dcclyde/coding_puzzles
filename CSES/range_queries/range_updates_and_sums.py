@@ -82,8 +82,8 @@ def print_details_helper(*args, **kwargs): pass
 def print_tsv_helper(*args, **kwargs): pass
 def pdh(*args, **kwargs): pass
 def pth(*args, **kwargs): pass
-# if os.environ.get("PYTHON_CONTEST_HELPER"):
-if False:
+if os.environ.get("PYTHON_CONTEST_HELPER"):
+# if False:
     local_run = True
 
     # call like dbg(print_details_helper(stuff))
@@ -467,36 +467,132 @@ class LazySeg:
         el()
         #endregion
 
+'''
+Key differences:
+PG uses [a, b) but I want to use [a, b].
+PG initializes all at once in __init__.
+'''
+
+class LazySegmentTree:
+    def __init__(self, data, padding = 0):
+        """initialize the lazy segment tree with data"""
+        self._len = len(data)
+        self._size = _size = 1 << (self._len - 1).bit_length()
+
+        self.data = [padding] * (2 * _size)
+        self.data[_size:_size + self._len] = data
+        for i in reversed(range(1, _size)):
+            self.data[i] = self.data[2 * i] + self.data[2 * i + 1]
+        self._lazy = [1,0] * (2 * _size)
+
+    def _push(self, idx):
+        """push query on idx to its children"""
+        # Let the children know of the queries
+        idx *= 2
+        a = self._lazy[idx]
+        b = self._lazy[idx + 1] >> 1
+        self._lazy[idx] = 1
+        self._lazy[idx + 1] = 0
+
+        self.data[idx] = a * self.data[idx] + b
+        self.data[idx + 1] = a * self.data[ idx + 1] + b
+
+        idx *= 2
+        self._lazy[idx] = a * self._lazy[idx]
+        self._lazy[idx + 1] = a * self._lazy[idx + 1] + b
+        self._lazy[idx + 2] = a * self._lazy[idx + 2]
+        self._lazy[idx + 3] = a * self._lazy[idx + 3] + b
+
+    def _build(self, idx):
+        """make the changes to idx be known to its ancestors"""
+        idx >>= 1
+        while idx:
+            # TODO
+            self.data[idx] = self.data[2 * idx] + self.data[2 * idx + 1]
+            idx >>= 1
+
+    def _update(self, idx):
+        """updates the node idx to know of all queries applied to it via its ancestors"""
+        for i in reversed(range(1, idx.bit_length())):
+            self._push(idx >> i)
+
+    def add(self, start, stop, q):
+        """lazily add value to [start, stop)"""
+        (a, b) = q
+        start = start_copy = start + self._size
+        stop = stop_copy = stop + self._size
+
+        # Apply all the lazily stored queries
+        self._update(start); self._update(stop - 1)
+
+        while start < stop:
+            if start & 1:
+                self.data[start] = a * self.data[start] + b
+                self._lazy[2 * start] = a * self._lazy[2 * start]
+                self._lazy[2 * start + 1] = a * self._lazy[2 * start + 1] + b
+                start += 1
+            if stop & 1:
+                stop -= 1
+                self.data[stop] = a * self.data[stop] + b
+                self._lazy[2 * stop] = a * self._lazy[2 * stop]
+                self._lazy[2 * stop + 1] = a * self._lazy[2 * stop + 1] + b
+            start >>= 1; stop >>= 1; b <<= 1
+
+        while not start_copy&1: start_copy >>= 1
+        while not stop_copy&1: stop_copy >>= 1
+        self._build(start_copy); self._build(stop_copy - 1)
+
+    def query(self, start, stop, res = 0):
+        """func of data[start, stop)"""
+        start += self._size; stop += self._size
+
+        # Apply all the lazily stored queries
+        self._update(start); self._update(stop - 1)
+        while start < stop:
+            if start & 1:
+                res += self.data[start]
+                start += 1
+            if stop & 1:
+                stop -= 1
+                res += self.data[stop]
+            start >>= 1; stop >>= 1
+        return res
+
 
 def solve(testID):
     N, Q = lm()
     dat = lm()
-    dbgR(N, dat)
+    # dbgR(N, dat)
     el()
 
-    st = LazySeg()
-    st.init(N)
-    for k, v in enumerate(dat): st.seg[st.n + k] = v
-    st.build()
-    dbgY(st)
-    el()
+    st = LazySegmentTree(dat)
+    # st = LazySeg()
+    # st.init(N)
+    # for k, v in enumerate(dat): st.seg[st.n + k] = v
+    # st.build()
+    # dbgY(st)
+    # el()
 
     for qid in range(Q):
         iraw = input().split()
-        dbg(iraw)
-        dbgY(st.lazy)
+        # dbg(qid, iraw)
+        # dbg(iraw)
+        # dbgY(st.lazy)
+        # dbgY(st.data, st._lazy)
+
         qtype = int(iraw[0])
         l = int(iraw[1])
         r = int(iraw[2])
         l, r = l-1, r-1
         if qtype <= 2:
             x = int(iraw[3])
-            st.upd(l, r, [qtype,x])
+            # st.upd(l, r, [qtype,x])
+            st.add(l, r+1, (qtype%2,x))
         else:
             # query range
-            result = st.query(l, r)
+            # result = st.query(l, r)
+            result = st.query(l, r+1)
             ps(result)
-        dbg(qid, iraw, st)
 
     return
 
