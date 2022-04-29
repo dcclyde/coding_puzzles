@@ -473,16 +473,20 @@ PG uses [a, b) but I want to use [a, b].
 PG initializes all at once in __init__.
 '''
 
+idSeg = 0
+def cmb(a, b):
+    return a+b
+
 class LazySegmentTree:
-    def __init__(self, data, padding = 0):
+    def __init__(self, data):
         """initialize the lazy segment tree with data"""
         self._len = len(data)
         self._size = _size = 1 << (self._len - 1).bit_length()
 
-        self.data = [padding] * (2 * _size)
+        self.data = [idSeg] * (2 * _size)
         self.data[_size:_size + self._len] = data
         for i in reversed(range(1, _size)):
-            self.data[i] = self.data[2 * i] + self.data[2 * i + 1]
+            self.data[i] = cmb(self.data[2 * i], self.data[2 * i + 1])
         self._lazy = [1,0] * (2 * _size)
 
     def _push(self, idx):
@@ -548,15 +552,21 @@ class LazySegmentTree:
 
         # Apply all the lazily stored queries
         self._update(start); self._update(stop - 1)
+
+        res_left = idSeg
+        res_right = idSeg
         while start < stop:
             if start & 1:
-                res += self.data[start]
+                res_left = cmb(res_left, self.data[start])
+                # res += self.data[start]
                 start += 1
             if stop & 1:
                 stop -= 1
-                res += self.data[stop]
+                res_right = cmb(self.data[stop], res_right)
+                # res += self.data[stop]
             start >>= 1; stop >>= 1
-        return res
+        # return res
+        return cmb(res_left, res_right)
 
 
 def solve(testID):
