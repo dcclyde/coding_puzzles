@@ -319,7 +319,7 @@ a=2: set range to b
 
 class LazySeg:
     idSeg = 0  # ! seg identity, must satisfy a+idSeg = idSeg+a = a
-    idLazy = [0,0]  # ! lazy identity, must satisfy idLazy * a = a
+    # idLazy = [0,0]  # ! lazy identity, must satisfy idLazy * a = a
     def cmb(self, a, b):  # ! seg * seg
         return a + b
     def init(self, _n):
@@ -328,15 +328,15 @@ class LazySeg:
         while self.n < _n: self.n *= 2
         self.SZ = self.n
         self.seg = [self.idSeg for _ in range(2*self.n)]
-        self.lazy = [self.idLazy for _ in range(2*self.n)]
+        self.lazy = [0 for _ in range(2*2*self.n)]
 
     def push(self, ind, L, R):
         # a, b = self.lazy[ind]
         # if a == 0: return
         # if a == 1: self.seg[ind] += (R-L+1) * b  # ! lazy * seg
-        if self.lazy[ind][0] == 0: return
-        if self.lazy[ind][0] == 1: self.seg[ind] += (R-L+1) * self.lazy[ind][1]
-        else: self.seg[ind] = (R-L+1) * self.lazy[ind][1]  # ! lazy * seg
+        if self.lazy[ind*2+0] == 0: return
+        if self.lazy[ind*2+0] == 1: self.seg[ind] += (R-L+1) * self.lazy[ind*2+1]
+        else: self.seg[ind] = (R-L+1) * self.lazy[ind*2+1]  # ! lazy * seg
         if L != R:
             for i in range(2):
                 # ca, cb = self.lazy[2*ind+i]
@@ -347,15 +347,18 @@ class LazySeg:
                     ca == 2, a == 1: add onto existing set
                     ca == 2, a == 2: replace
                 '''
-                if self.lazy[2*ind+i][0] == 0 or self.lazy[ind][0] == 2:
-                    self.lazy[2*ind+i] = self.lazy[ind]
+                if self.lazy[(2*ind+i)*2+0] == 0 or self.lazy[ind*2+0] == 2:
+                    self.lazy[(2*ind+i)*2+0] = self.lazy[ind*2+0]
+                    self.lazy[(2*ind+i)*2+1] = self.lazy[ind*2+1]
                 else:
-                    self.lazy[2*ind+i][1] += self.lazy[ind][1]
+                    self.lazy[(2*ind+i)*2+1] += self.lazy[ind*2+1]
                 # if ca == 0 or a == 2: ca, cb = a, b
                 # else: cb += b
                 # self.lazy[2*ind+i] = (ca, cb)  # ! lazy * lazy
 
-        self.lazy[ind] = self.idLazy
+        # self.lazy[ind] = self.idLazy
+        self.lazy[ind*2+0] = 0
+        self.lazy[ind*2+1] = 0
 
     def pull(self, ind): self.seg[ind] = self.cmb(self.seg[2*ind],self.seg[2*ind+1])
     def build(self):
@@ -387,7 +390,9 @@ class LazySeg:
             self.push(ind, L, R)
             if hi < L or R < lo: continue
             if lo <= L and R <= hi:
-                self.lazy[ind] = inc
+                # self.lazy[ind] = inc
+                self.lazy[ind*2+0] = inc[0]
+                self.lazy[ind*2+1] = inc[1]
                 self.push(ind,L,R)
                 continue
             M = (L+R)>>1
@@ -569,7 +574,45 @@ class LazySegmentTree:
         return cmb(res_left, res_right)
 
 
-def solve(testID):
+def solve_LazySeg(testID):
+    N, Q = lm()
+    dat = lm()
+    # dbgR(N, dat)
+    el()
+
+    # st = LazySegmentTree(dat)
+    st = LazySeg()
+    st.init(N)
+    for k, v in enumerate(dat): st.seg[st.n + k] = v
+    st.build()
+    # dbgY(st)
+    # el()
+
+    for qid in range(Q):
+        iraw = input().split()
+        # dbg(qid, iraw)
+        # dbg(iraw)
+        # dbgY(st.lazy)
+        # dbgY(st.data, st._lazy)
+
+        qtype = int(iraw[0])
+        l = int(iraw[1])
+        r = int(iraw[2])
+        l, r = l-1, r-1
+        if qtype <= 2:
+            x = int(iraw[3])
+            st.upd(l, r, [qtype,x])
+            # st.add(l, r+1, (qtype%2,x))
+        else:
+            # query range
+            result = st.query(l, r)
+            # result = st.query(l, r+1)
+            ps(result)
+
+    return
+
+
+def solve_LazySegmentTree(testID):
     N, Q = lm()
     dat = lm()
     # dbgR(N, dat)
@@ -606,6 +649,8 @@ def solve(testID):
 
     return
 
+solve = solve_LazySeg
+# solve = solve_LazySegmentTree
 
 if __name__ == '__main__':
     T = 1
