@@ -829,9 +829,9 @@ def solve_LST(testID):
     return
 
 
-# solve = solve_LazySeg
+solve = solve_LazySeg
 # solve = solve_LazySegmentTree
-solve = solve_LST
+# solve = solve_LST
 
 if __name__ == '__main__':
     T = 1
