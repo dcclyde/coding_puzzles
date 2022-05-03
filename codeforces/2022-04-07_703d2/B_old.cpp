@@ -1,12 +1,7 @@
 #pragma region
-#ifdef DCCLYDE_LOCAL
-#include "/home/dcclyde/puzzles/code/templates/superheader.h"
-#else
-#define NDEBUG  // don't bother with assertions on the judge server.
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-#endif
 using namespace std;
 using namespace __gnu_pbds;
 
@@ -65,42 +60,6 @@ using vpd = V<pd>;
 //// tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 //// tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
-// bitwise ops
-// also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
-constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
-constexpr ll pct(ll x) { return __builtin_popcountll(x); }
-constexpr int bigbit(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
-    return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
-constexpr int bigbitll(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
-    return x == 0 ? 0 : 63-__builtin_clzll(x); } // floor(log2(x))
-constexpr int p2(int x) { return 1<<x; }
-constexpr int msk2(int x) { return p2(x)-1; }
-
-ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
-ll fdiv(auto a, auto b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
-
-tcTU> bool ckmin(T& a, const U& b) {
-    return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
-tcTU> bool ckmax(T& a, const U& b) {
-    return a < (T)b ? a = (T)b, 1 : 0; } // set a = max(a,b)
-
-int maxi(int a, int b) {return max((int)a, (int)b);}
-int mini(int a, int b) {return min((int)a, (int)b);}
-ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
-ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
-
-
-template <typename, typename = void>
-constexpr bool is_iterable_v{};
-
-template <typename T>
-constexpr bool is_iterable_v<
-    T,
-    std::void_t< decltype(std::declval<T>().begin()),
-                decltype(std::declval<T>().end())
-    >
-> = true;
-
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
@@ -122,18 +81,6 @@ struct custom_hash {
         uint64_t b = (*this)(x.second);
         return a + 3*b;
     }
-
-    template<typename A>
-    typename enable_if<is_iterable_v<A>, size_t>::type operator()(const A& v) const {
-        uint64_t out = 0;
-        uint64_t offset = 1;
-        for (const auto& x : v) {
-            uint64_t curr = (*this)(x);
-            out ^= curr * offset;
-            offset *= 3;
-        }
-        return out;
-    }
 };
 
 template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
@@ -153,33 +100,15 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FORll(i,a,b) for (ll i = ((ll)a); i < ((ll)b); ++i)
-#define FORint(i,a,b) for (int i = ((int)a); i < ((int)b); ++i)
-// #define FOR3(i,a,b) for (int i = (a); i < (b); ++i)
-#define FOR3(i,a,b) FORll(i,a,b)
+#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROFll(i,a,b) for (ll i = ((ll)b)-1; i >= ((ll)a); --i)
-#define ROFint(i,a,b) for (int i = ((int)b)-1; i >= ((int)a); --i)
-// #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
-#define ROF(i,a,b) ROFll(i,a,b)
+#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
 #define each(a,x) for (auto& a: x)
 #define foreach(a,x) each(a,x)
-
-#define FOR1(x) for(auto x)
-#if __cplusplus >= 202002L
-auto stepped_iota(ll start, ll end, ll step=1) {
-    ll iter_count = cdiv(end-start, step);
-    ckmax(iter_count, 0);
-  return std::ranges::views::iota(0LL, iter_count) |
-         std::ranges::views::transform([=](ll x) { return x * step + start; });
-}
-#define FOR4(i,s,e,step) for(auto i : stepped_iota(s, e, step))
-#endif
-
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define FOR(...) GET_MACRO(__VA_ARGS__, FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
 
 #pragma region  // rangeint
 V<int> rangeint(int start, int end, int inc=1) {
@@ -198,6 +127,7 @@ V<int> rangeint(int start, int end, int inc=1) {
 }
 #pragma endregion
 
+//// const int MOD = 1e9+7; // 998244353;  // I can add this myself.
 // const int MX = 2e5+5;
 const ll BIG = 1e18; // not too close to LLONG_MAX
 const db PI = acos((db)-1);
@@ -214,18 +144,40 @@ mt19937 rng((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 #pragma endregion
 template<class T> using pqg = priority_queue<T,vector<T>,greater<T>>;
 
-tcT> ll fstTrue(ll lo, ll hi, T f) {
+// bitwise ops
+// also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
+constexpr ll pct(ll x) { return __builtin_popcountll(x); }
+constexpr int bits(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+    return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
+constexpr int p2(int x) { return 1<<x; }
+constexpr int msk2(int x) { return p2(x)-1; }
+
+ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
+ll fdiv(ll a, ll b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
+
+tcTU> bool ckmin(T& a, const U& b) {
+    return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
+tcTU> bool ckmax(T& a, const U& b) {
+    return a < (T)b ? a = (T)b, 1 : 0; } // set a = max(a,b)
+
+int maxi(int a, int b) {return max((int)a, (int)b);}
+int mini(int a, int b) {return min((int)a, (int)b);}
+ll maxll(ll a, ll b) {return max((ll)a, (ll)b);}
+ll minll(ll a, ll b) {return min((ll)a, (ll)b);}
+
+tcTU> T fstTrue(T lo, T hi, U f) {
     ++hi; assert(lo <= hi); // assuming f is increasing
     while (lo < hi) { // find first index such that f is true
-        ll mid = lo+(hi-lo)/2;
+        T mid = lo+(hi-lo)/2;
         f(mid) ? hi = mid : lo = mid+1;
     }
     return lo;
 }
-tcT> ll lstTrue(ll lo, ll hi, T f) {
+tcTU> T lstTrue(T lo, T hi, U f) {
     --lo; assert(lo <= hi); // assuming f is decreasing
     while (lo < hi) { // find first index such that f is true
-        ll mid = lo+(hi-lo+1)/2;
+        T mid = lo+(hi-lo+1)/2;
         f(mid) ? lo = mid : hi = mid-1;
     }
     return lo;
@@ -236,34 +188,18 @@ tcTU> void erase(T& t, const U& u) { // don't erase
     auto it = t.find(u); assert(it != end(t));
     t.erase(it); } // element that doesn't exist from (multi)set
 
-// use like sumv(all(dat))
-template<class ForwardIt>
-ll sumv(ForwardIt first, ForwardIt last)
-{
-    // typename std::iterator_traits<ForwardIt>::value_type out {};  // acc in int can overflow
-    ll out = 0;
-    for (; first != last; ++first) {
-        out += *first;
-    }
-    return out;
-}
-template<class T> auto sumv(const T& data) {return sumv(all(data));}
-template<class T> auto max_element(const T& data) {return *max_element(all(data));}
-template<class T> auto min_element(const T& data) {return *min_element(all(data));}
-
-
 #define tcTUU tcT, class ...U
 
 inline namespace Helpers {
-    // // is_iterable
-    // // https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
-    // // this gets used only when we can call begin() and end() on that type
-    // tcT, class = void> struct is_iterable : false_type {};
-    // tcT> struct is_iterable<T, void_t<decltype(begin(declval<T>())),
-    //                                   decltype(end(declval<T>()))
-    //                                  >
-    //                        > : true_type {};
-    // tcT> constexpr bool is_iterable_v = is_iterable<T>::value;
+    // is_iterable
+    // https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+    // this gets used only when we can call begin() and end() on that type
+    tcT, class = void> struct is_iterable : false_type {};
+    tcT> struct is_iterable<T, void_t<decltype(begin(declval<T>())),
+                                      decltype(end(declval<T>()))
+                                     >
+                           > : true_type {};
+    tcT> constexpr bool is_iterable_v = is_iterable<T>::value;
 
     // is_readable
     tcT, class = void> struct is_readable : false_type {};
@@ -315,7 +251,7 @@ inline namespace Input {
     void rv1(size_t) {}
     tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
         t.resize(N); re(t); for(auto& x : t) --x;
-        rv1(N,u...); }
+        rv(N,u...); }
 
 
     // dumb shortcuts to read in ints
@@ -391,25 +327,17 @@ inline namespace Output {
     template<class ...T> void ps(const T&... t) { pr_sep(cout," ",t...); ps(); }
     void ps1() { cout << "\n"; }
     template<class ...T> void ps1(const T&... t) { pr_sep1(cout," ",t...); ps1(); }
-    void pso() {}
-    template<class ...T> void pso(const T&... t) { pr_sep(cout," ",t...); pso(); }
-    void pso1() {}
-    template<class ...T> void pso1(const T&... t) { pr_sep1(cout," ",t...); pso1(); }
 
     template<class T>
-    void pv(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x;} cout<<'\n';}
+    void pv(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x;} cout<<'\n';}
     template<class T>
-    void pv1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x+1;} cout<<'\n';}
-    template<class T>
-    void pvn(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x;} cout<<'\n';}
-    template<class T>
-    void pvn1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x+1;} cout<<'\n';}
+    void pv1(T& dat) {bool first=true; for(auto& x : dat) {if (!first) {cout<<' ';} first=false; cout << x+1;} cout<<'\n';}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
     // #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
     db TIME() {return (db)(clock()-beg)/CLOCKS_PER_SEC;}
-    void flush() {std::cout << std::flush;}
+
 }
 
 inline namespace FileIO {
@@ -425,7 +353,6 @@ inline namespace FileIO {
     }
 }
 
-#pragma region  // debugging
 // * debug setup mostly stolen from tourist. https://codeforces.com/contest/1540/submission/120602670
 // * dcclyde added line numbers, colors, probably some other stuff.
 
@@ -520,19 +447,9 @@ template<class T>
 string print_details_helper(T& q) {
     string out = "\n";
     int ctr = 0;
-    for ( auto&& x : q ) {
+    for ( auto& x : q ) {
         out.push_back('\t');
         out += to_string(ctr) + ":\t" + to_string(x) + "\n";
-        ++ctr;
-    }
-    return out;
-}
-string print_details_helper(V<bool>& q) {
-    string out = "\n";
-    int ctr = 0;
-    for ( auto&& x : q ) {
-        out.push_back('\t');
-        out += to_string(ctr) + ":\t" + to_string(static_cast<bool>(x)) + "\n";
         ++ctr;
     }
     return out;
@@ -659,22 +576,13 @@ void debug_out(Head H, Tail... T) {
     #undef local_run
     #define local_run (true)
 #endif
-#pragma endregion
 
-#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
+#define timebomb(a) {static int _bomb = 0; if(++_bomb>=a) {dbgc("BOOM");exit(1);}}
 
-#define YES ps("YES");
-#define NO ps("NO");
-#define yes ps("Yes");
-#define no ps("No");
-// #define yes ps("YES");
-// #define no ps("NO");
+#define yes ps("YES");
+#define no ps("NO");
 
-const ll INF_ll = 3e18;
-const int INF_i = int(2e9) + 1;
-
-// const int MOD = 1'000'000'007;
-// const int MOD = 998'244'353;
+// const int MOD = 1000000007;
 
 #pragma endregion
 
@@ -687,42 +595,46 @@ const int INF_i = int(2e9) + 1;
 
 void solve() {
     lls(N);
-    V<ll> dat;
+    vector<pii> dat;
     rv(N, dat);
     dbgR(N, dat);
-    el;
 
-    set<ll> seen;
-    seen.insert(all(dat));
-
-    ll missing = 0;
-    FOR(k, dat[0], dat[N-1]+1) {
-        if (seen.find(k) == seen.end()) {++missing;}
-        if (missing > 2) {break;}
+    V<int> vx, vy;
+    FOR(k, 0, N) {
+        auto& [x, y] = dat[k];
+        vx.push_back(x);
+        vy.push_back(y);
     }
-    if (missing <= 2) {return YES;}
-    return NO;
+
+    auto subsolve = [&](auto& v) {
+        if (v.size() % 2 == 1) {
+            return 1;
+        }
+        sort(all(v));
+        int m = v.size() / 2;
+        return v[m] - v[m-1] + 1;
+    };
+
+    int out = subsolve(vx) * subsolve(vy);
+    ps(out);
+
+    return;
 }
 
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 // ! Read the sample cases before writing code!
-// #define SINGLE_CASE
 #pragma region
 int main() {
     setIO();
 
     int T = 1;
-#ifndef SINGLE_CASE
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
-#endif
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
-        el;
+        el; dbgcBold("CASE" , CASE );
 #ifndef DCCLYDE_BRUTEFORCE
-        dbgcBold("CASE" , CASE );
         solve();
 #else
-        dbgcBold("brute force" , CASE );
         brute();
 #endif
     }

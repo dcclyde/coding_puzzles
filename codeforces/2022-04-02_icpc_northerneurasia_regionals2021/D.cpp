@@ -636,7 +636,50 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 
 #pragma endregion
 
+void brute() {
+    dbgcBold("brute force");
+    lls(N, TARGET);
+    vector<ll> dat;
+    rv(N, dat);
+    dbgR(N, TARGET, dat);
+    sort(all(dat));
+    int num_ones = 0;
+    while (num_ones < N && dat[num_ones] == 1) {
+        ++num_ones;
+    }
+    // V<ll> temp; FOR(k, num_ones, N) temp.push_back(dat[k]); dat = temp;
+    dat.erase(dat.begin(), dat.begin() + num_ones);
+    N = dat.size();
 
+    int MASK_MAX = (1<<N);
+    ll best = 0;
+    V<ll> best_values;
+    FOR(mask, 1, MASK_MAX) {
+        V<ll> curr_values;
+        FOR(b, 0, N) {
+            if ((mask>>b) & 1) {
+                curr_values.push_back(dat[b]);
+            }
+        }
+        ll prod = 1;
+        for(auto& x : curr_values) {
+            prod *= x;
+        }
+        dbg(prod, curr_values);
+        if (prod % 10 == TARGET && ckmax(best, prod)) {
+            best_values = curr_values;
+            dbgcY("update best", prod, best_values);
+        }
+    }
+    if (best == 0 && (TARGET != 1 || num_ones == 0)) {
+        return ps(-1);
+    }
+    rep(num_ones) best_values.push_back(1);
+    sort(all(best_values));
+    ps(best_values.size());
+    pv(best_values);
+    return;
+}
 
 
 
@@ -705,14 +748,14 @@ void solve() {
                 nums[k] = ch[k] - ch[k-1] - 1;
             }
             ++combs_ctr;
-            dbg(combs_ctr, nums);
+            // dbg(combs_ctr, nums);
 
             // timebomb(100);
             ll curr_omitted_product = 1;
             int curr_product_digit = 1;
             FOR(d, 0, 10) {
                 if (nums[d] > per_digit[d].size()) {
-                    dbgc("omitted too many", d, nums[d], per_digit[d]);
+                    // dbgc("omitted too many", d, nums[d], per_digit[d]);
                     curr_omitted_product = INF + 1;
                     break;
                 }
@@ -723,7 +766,7 @@ void solve() {
                 // dbgP(d, k, nums[k], nums, sp[d][nums[k]], sp[d], curr_product_digit);
                 curr_product_digit %= 10;
             }
-            dbg(curr_omitted_product, curr_product_digit);
+            // dbg(curr_omitted_product, curr_product_digit);
             if (curr_product_digit != TARGET) {
                 continue;
             }

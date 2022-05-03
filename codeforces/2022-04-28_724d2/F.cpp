@@ -101,6 +101,17 @@ constexpr bool is_iterable_v<
     >
 > = true;
 
+template <typename, typename=void>
+constexpr bool is_tuplelike_v{};
+
+template <typename T>
+constexpr bool is_tuplelike_v<
+    T,
+    void_t<
+        decltype(std::get<0>(declval<T>())),
+        decltype(std::tuple_size_v<T>)
+    >
+> = true;
 
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
@@ -283,10 +294,32 @@ inline namespace Helpers {
             >
         > : true_type {};
     tcT> constexpr bool is_printable_v = is_printable<T>::value;
+
+
+    tcT> typename enable_if<!is_iterable_v<T> && !is_tuplelike_v<T>, void>::type increment_one(T& x, int inc) {x += inc;}
+    tcT> typename enable_if<is_tuplelike_v<T>, void>::type increment_one(T& t, int inc);
+    tcT> typename enable_if<is_iterable_v<T>, void>::type increment_one(T& t, int inc) { for(auto& x : t) {increment_one(x, inc);} }
+
+    template<class T, size_t k>
+    void increment_one_tuplehelper(T& t, int inc) {
+        increment_one(get<k>(t), inc);
+        if constexpr (k < tuple_size_v<T> - 1) {
+            increment_one_tuplehelper<T, k+1>(t, inc);
+        }
+    }
+    tcT> typename enable_if<is_tuplelike_v<T>, void>::type increment_one(T& t, int inc) {
+        increment_one_tuplehelper<T,0>(t, inc);
+    }
+
+    void increment() {} // add one from each, for output.  BE CAREFUL TO UNDO MODIFICATIONS
+    tcTUU> void increment(T& t, U&... u) { increment_one(t,+1); increment(u...); }
+    void decrement() {} // subtract one from each, for input. MODIFICATION IS THE GOAL
+    tcTUU> void decrement(T& t, U&... u) { increment_one(t,-1); decrement(u...); }
 }
 
 inline namespace Input {
     tcT> constexpr bool needs_input_v = !is_readable_v<T> && is_iterable_v<T>;
+
     tcTUU> void re(T& t, U&... u);
     tcTU> void re(pair<T,U>& p); // pairs
 
@@ -314,13 +347,11 @@ inline namespace Input {
         rv(N2,u...); }
     void rv1(size_t) {}
     tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
-        t.resize(N); re(t); for(auto& x : t) --x;
+        t.resize(N); re(t); for(auto& x : t) decrement(x);
         rv1(N,u...); }
 
 
     // dumb shortcuts to read in ints
-    void decrement() {} // subtract one from each
-    tcTUU> void decrement(T& t, U&... u) { --t; decrement(u...); }
     #define ints(...) int __VA_ARGS__; re(__VA_ARGS__);
     #define int1(...) ints(__VA_ARGS__); decrement(__VA_ARGS__);
     #define chars(...) char __VA_ARGS__; re(__VA_ARGS__);
@@ -378,11 +409,21 @@ inline namespace ToString {
 }
 
 inline namespace Output {
-    template<class T> void pr_sep(ostream& os, str, const T& t) { os << ts(t); }
+    template<class T, size_t k>
+    void tsish_tuplehelper(T& t, string& out) {
+        out += ts(get<k>(t)); out.push_back(' ');
+        if constexpr (k < tuple_size_v<T> - 1) { tsish_tuplehelper<T, k+1>(t, out); }
+    }
+    tcT> typename enable_if<is_tuplelike_v<T>, string>::type tsish(T& t) {
+        string out; tsish_tuplehelper<T,0>(t, out); out.pop_back(); return out;
+    }
+    tcT> typename enable_if<!is_tuplelike_v<T>, string>::type tsish(T& t) { return ts(t); }
+
+    template<class T> void pr_sep(ostream& os, str, const T& t) { os << tsish(t); }
     template<class T, class... U> void pr_sep(ostream& os, str sep, const T& t, const U&... u) {
         pr_sep(os,sep,t); os << sep; pr_sep(os,sep,u...); }
-    template<class T> void pr_sep1(ostream& os, str, const T& t) { os << ts(t+1); }
-    template<class T, class... U> void pr_sep1(ostream& os, str sep, const T& t, const U&... u) {
+    template<class T> void pr_sep1(ostream& os, str, T& t) { increment(t); os << tsish(t); decrement(t); }
+    template<class T, class... U> void pr_sep1(ostream& os, str sep, T& t, U&... u) {
         pr_sep1(os,sep,t); os << sep; pr_sep1(os,sep,u...); }
     // print w/ no spaces
     template<class ...T> void pr(const T&... t) { pr_sep(cout,"",t...); }
@@ -390,20 +431,20 @@ inline namespace Output {
     void ps() { cout << "\n"; }
     template<class ...T> void ps(const T&... t) { pr_sep(cout," ",t...); ps(); }
     void ps1() { cout << "\n"; }
-    template<class ...T> void ps1(const T&... t) { pr_sep1(cout," ",t...); ps1(); }
+    template<class ...T> void ps1(T&... t) { pr_sep1(cout," ",t...); ps1(); }
     void pso() {}
     template<class ...T> void pso(const T&... t) { pr_sep(cout," ",t...); pso(); }
     void pso1() {}
-    template<class ...T> void pso1(const T&... t) { pr_sep1(cout," ",t...); pso1(); }
+    template<class ...T> void pso1(T&... t) { pr_sep1(cout," ",t...); pso1(); }
 
     template<class T>
-    void pv(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x;} cout<<'\n';}
+    void pv(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n';}
     template<class T>
-    void pv1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << x+1;} cout<<'\n';}
+    void pv1(T& dat) {bool f=1; increment(dat); for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
     template<class T>
-    void pvn(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x;} cout<<'\n';}
+    void pvn(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n';}
     template<class T>
-    void pvn1(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << x+1;} cout<<'\n';}
+    void pvn1(T& dat) {bool f=1; increment(dat); for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
@@ -665,12 +706,10 @@ void debug_out(Head H, Tail... T) {
 
 #define YES ps("YES");
 #define NO ps("NO");
-#define yes ps("Yes");
-#define no ps("No");
-// #define yes ps("YES");
-// #define no ps("NO");
+#define Yes ps("Yes");
+#define No ps("No");
 
-const ll INF_ll = 3e18;
+const ll INF_ll = ll(2e18) + 1;
 const int INF_i = int(2e9) + 1;
 
 // const int MOD = 1'000'000'007;
@@ -680,9 +719,29 @@ const int INF_i = int(2e9) + 1;
 
 // ! ---------------------------------------------------------------------------
 
+/**
+    2nd player always wins?
+    Just need to count sequences of legal moves?
 
+    First move is clearly 2*N options. That can be a special case.
+    dp states are like (n, p), p=parity of the endpoints.
 
+    Starting from (n, p), what are the legal moves?
+        Choose either color in an interior space, or 1 option at endpoints.
+        Either endpoint gives dp(n-1, p^1), so I get 2*dp(n-1, p^1) total.
+        Interior: Index from 0..n-1.
+            If I place at k with 1 <= k < n-1
+            then I get dp(k, ?) * dp(n-k-1, ?).
 
+    dp(20, 0)?
+        c=0: dp(k,0) * dp(n-k-1, 0) for k in 1..18. = dp (*) dp, eval at n-1
+        c=1: dp(k,1) * dp(n-k-1, 1) for k in 1..18
+
+    dp(20, 1)?
+        2 * dp(k,1) * dp(n-k-1, 0) for k in 1..18
+ */
+
+const ll MOD = int(1e9) + 7;
 
 
 void solve() {
@@ -692,21 +751,16 @@ void solve() {
     dbgR(N, dat);
     el;
 
-    set<ll> seen;
-    seen.insert(all(dat));
+    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problmes!
 
-    ll missing = 0;
-    FOR(k, dat[0], dat[N-1]+1) {
-        if (seen.find(k) == seen.end()) {++missing;}
-        if (missing > 2) {break;}
-    }
-    if (missing <= 2) {return YES;}
-    return NO;
+
+
+    return;
 }
 
+// ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
-// ! Read the sample cases before writing code!
 // #define SINGLE_CASE
 #pragma region
 int main() {

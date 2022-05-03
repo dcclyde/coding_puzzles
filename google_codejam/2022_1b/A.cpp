@@ -678,6 +678,32 @@ const int INF_i = int(2e9) + 1;
 
 // ! ---------------------------------------------------------------------------
 
+void brute() {
+    lls(N);
+    V<ll> dat;
+    rv(N, dat);
+    dbgR(N, dat);
+    el;
+
+    deque<ll> todo;
+    FOR(k, 0, N) {todo.push_back(dat[k]);}
+    ll out = 0;
+    ll prev = 0;
+    while (!todo.empty()) {
+        ll curr;
+        if (todo.front() <= todo.back()) {
+            curr = todo.front();
+            todo.pop_front();
+        } else {
+            curr = todo.back();
+            todo.pop_back();
+        }
+        out += (curr >= prev);
+        ckmax(prev, curr);
+    }
+    ps(out);
+    return;
+}
 
 
 
@@ -693,7 +719,7 @@ void solve() {
     deque<ll> todo;
     FOR(k, 0, N) {todo.push_back(dat[k]);}
     ll out = 0;
-    ll prev = 0;
+    ll prev = 2;
     while (!todo.empty()) {
         ll curr;
         if (todo.front() <= todo.back()) {

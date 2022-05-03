@@ -105,9 +105,9 @@ def rtree_rooted_v2(nr, mute=False):
 #endregion
 
 
-N_RANGE = (1, 100)
-# L_RANGE = (1, 10)
-L_RANGE = (1998, 2000)
+N_RANGE = (1, 10)
+L_RANGE = (1, 10)
+# L_RANGE = (1998, 2000)
 
 def num_lines(N, dat, W):
     out = 0

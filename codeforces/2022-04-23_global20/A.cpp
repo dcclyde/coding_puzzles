@@ -690,6 +690,7 @@ void solve() {
     dbgR(N, dat);
     el;
     bool out = 0;
+    // bool out;
     for(auto& x : dat) {
         int curr = (x-1) % 2;
         out ^= curr;
