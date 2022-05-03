@@ -28,8 +28,7 @@ do
     done
 done
 
-rm -f a.out  # don't show me an error if this doesn't exist.
-rm -f _.out
+rm -f a.out b.out _.out  # don't show me an error if this doesn't exist.
 
 # if this whole directory is now empty, delete it.
 if [ ! "$(ls -A $(pwd -P))" ]
