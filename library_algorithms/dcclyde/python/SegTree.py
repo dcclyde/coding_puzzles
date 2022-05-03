@@ -25,6 +25,7 @@ class SegTree:
             p >>= 1
 
     def query(self, l, r):  # query the CLOSED range [l, r].
+        if r < l: return self.ID
         ra = self.ID
         rb = self.ID
         l += self.n
@@ -43,28 +44,39 @@ class SegTree:
     # return smallest x s.t. query(base, x) satisfies some criterion.
     def first_satisfying_R(self, base, val, ind=1, l=0, r=None):
         if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.seg[ind] >= val)
-        if r < base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind,l,m)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind+1,m+1,r)
+        can_look_sideways = False
+        while True:
+            # ! Is there a good idx in [l, r]?
+            ok = (self.seg[ind] >= val)
+            if r < base or not ok:
+                if not can_look_sideways: return -1
+                d = r-l+1
+                l, r, ind = l+d, r+d, ind+1
+                # ! May need to modify `base`, e.g. if we're targeting sum >= S.
+                continue
+            if l == r: return l
+            m = (l+r) // 2
+            l, r, ind, can_look_sideways = l, m, 2*ind, True
 
     # return largest x s.t. query(x, base) satisfies some criterion.
     def first_satisfying_L(self, base, val, ind=1, l=0, r=None):
         if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.seg[ind] >= val)
-        if l > base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind+1,m+1,r)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind,l,m)
+        can_look_sideways = False
+        while True:
+            # ! Is there a good idx in [l, r]?
+            ok = (self.seg[ind] >= val)
+            if l > base or not ok:
+                if not can_look_sideways: return -1
+                d = r-l+1
+                l, r, ind = l-d, r-d, ind-1
+                # ! May need to modify `base`, e.g. if we're targeting sum >= S.
+                continue
+            if l == r: return l
+            m = (l+r) // 2
+            l, r, ind, can_look_sideways = m+1, r, 2*ind+1, True
 
     def __str__(self):  # make the class nicely printable, including via dbg()
+        if not local_run: return ''
         out = [self.seg[k] for k in range(self.n, self.n + self.orig_n)]
         return str(out)
 

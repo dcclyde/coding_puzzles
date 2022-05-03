@@ -2,6 +2,12 @@
 '''
 If you need two segtrees with different operations, just paste the whole template twice and rename one of the classes.
 Usually you don't need that though, you can just make one segtree store multiple pieces of data by making seg[k] a tuple.
+
+If you make seg and/or lazy hold multiple values, watch out for reference shenanigans if you use lists.
+Tuples will be cleaner but can't be modified in-place.
+
+Partial validation in https://codeforces.com/contest/1674/submission/155796621.
+TODO check the first_satisfying_* functions, I haven't tested the new iterative versions at all.
 '''
 #endregion
 
@@ -19,73 +25,100 @@ class LazySeg:
         self.lazy = [self.idLazy for _ in range(2*self.n)]
 
     def push(self, ind, L, R):
-        self.seg[ind] += (R-L+1) * self.lazy[ind]  # ! lazy * seg
+        # ! lazy * seg
+        self.seg[ind] += self.lazy[ind] * (R-L+1)
         if L != R:
-            for i in range(2):
-                self.lazy[2*ind+i] += self.lazy[ind]
+            for k in range(2):
+                # ! lazy * lazy
+                self.lazy[2*ind+k] += self.lazy[ind]
+
         self.lazy[ind] = self.idLazy
 
     def pull(self, ind): self.seg[ind] = self.cmb(self.seg[2*ind],self.seg[2*ind+1])
     def build(self):
         for k in reversed(range(1, self.n)): self.pull(k)
 
-    def push_all(self, ind=1, L=0, R=None):
-        if R is None: R = self.n - 1
-        self.push(ind,L,R)
-        if L < R:
-            M = (L+R)>>1
-            self.push_all(2*ind,L,M)
-            self.push_all(2*ind+1,M+1,R)
-
-    def upd(self, lo, hi, inc, ind=1, L=0, R=None):
-        if R is None: R = self.n - 1
-        self.push(ind,L,R)
-        if hi < L or R < lo: return
-        if lo <= L and R <= hi:
-            self.lazy[ind] = inc
+    def push_all(self):
+        todo = [(1, 0, self.n-1)]
+        while len(todo) > 0:
+            ind, L, R = todo.pop()
             self.push(ind,L,R)
-            return
-        M = (L+R)>>1
-        self.upd(lo,hi,inc,2*ind,L,M)
-        self.upd(lo,hi,inc,2*ind+1,M+1,R)
-        self.pull(ind)
+            if L < R:
+                M = (L+R)>>1
+                todo.append((2*ind,L,M))
+                todo.append((2*ind+1,M+1,R))
 
-    def query(self, lo, hi, ind=1, L=0, R=None):
-        if R is None: R = self.n - 1
-        self.push(ind,L,R)
-        if hi < L or R < lo: return self.idSeg
-        if lo <= L and R <= hi: return self.seg[ind]
-        M = (L+R)>>1
-        return self.cmb(
-            self.query(lo,hi,2*ind,L,M),
-            self.query(lo,hi,2*ind+1,M+1,R)
-        )
+    def upd(self, lo, hi, inc):
+        todo = [(1, 0, self.n-1)]
+        post = []
+        while len(todo) > 0:
+            ind, L, R = todo.pop()
+            self.push(ind, L, R)
+            if hi < L or R < lo: continue
+            if lo <= L and R <= hi:
+                self.lazy[ind] = inc
+                self.push(ind,L,R)
+                continue
+            M = (L+R)>>1
+            todo.append((2*ind,L,M))
+            todo.append((2*ind+1,M+1,R))
+            post.append(ind)
+        for ind in reversed(post):
+            self.pull(ind)
+
+    def query(self, l, r):
+        if l > r: return self.idSeg
+        ra = self.idSeg
+        rb = self.idSeg
+        l += self.n
+        r += self.n+1
+        while l < r:
+            if l&1:
+                ra = self.cmb(ra, self.seg[l])
+                l += 1
+            if r&1:
+                r -= 1
+                rb = self.cmb(self.seg[r], rb)
+            l >>= 1
+            r >>= 1
+        return self.cmb(ra, rb)
 
     # return smallest x s.t. query(base, x) satisfies some criterion.
     def first_satisfying_R(self, base, val, ind=1, l=0, r=None):
         if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.query(l,r,ind,l,r) >= val)
-        if r < base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind,l,m)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind+1,m+1,r)
+        can_look_sideways = False
+        while True:
+            # ! Is there a good idx in [l, r]?
+            ok = (self.query(l,r,ind,l,r) >= val)
+            if r < base or not ok:
+                if not can_look_sideways: return -1
+                d = r-l+1
+                l, r, ind = l+d, r+d, ind+1
+                # ! May need to modify `base`, e.g. if we're targeting sum >= S.
+                continue
+            if l == r: return l
+            m = (l+r) // 2
+            l, r, ind, can_look_sideways = l, m, 2*ind, True
 
     # return largest x s.t. query(x, base) satisfies some criterion.
     def first_satisfying_L(self, base, val, ind=1, l=0, r=None):
         if r is None: r = self.n - 1
-        # ! Is there a good idx in [l, r]?
-        ok = (self.query(l,r,ind,l,r) >= val)
-        if l > base or not ok: return -1
-        if l == r: return l
-        m = (l+r) // 2
-        res = self.first_satisfying_R(base,val,2*ind+1,m+1,r)
-        if res != -1: return res
-        return self.first_satisfying_R(base,val,2*ind,l,m)
+        can_look_sideways = False
+        while True:
+            # ! Is there a good idx in [l, r]?
+            ok = (self.query(l,r,ind,l,r) >= val)
+            if l > base or not ok:
+                if not can_look_sideways: return -1
+                d = r-l+1
+                l, r, ind = l-d, r-d, ind-1
+                # ! May need to modify `base`, e.g. if we're targeting sum >= S.
+                continue
+            if l == r: return l
+            m = (l+r) // 2
+            l, r, ind, can_look_sideways = m+1, r, 2*ind+1, True
 
     def __str__(self):  # make the class nicely printable, including via dbg()
+        if not local_run: return  # if we call this then we lose all lazy benefits.
         self.push_all()  # get rid of all laziness.
         out = [self.seg[k] for k in range(self.n, self.n + self.orig_n)]
         return str(out)
