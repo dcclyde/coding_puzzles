@@ -100,10 +100,10 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // loops
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define FOR(i,a,b) for (int i = ((int)a); i < ((int)b); ++i)
 #define FORll(i,a,b) for (ll i = (a); i < (b); ++i)
 #define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define ROF(i,a,b) for (int i = ((int)b)-1; i >= ((int)a); --i)
 #define ROFll(i,a,b) for (ll i = (b)-1; i >= (a); --i)
 #define R0F(i,a) ROF(i,0,a)
 #define rep(a) F0R(CONCAT(_,__LINE__),a)
@@ -675,7 +675,7 @@ void solve() {
 
     ll out = 0;
     ll t = 0;
-    set<pair<int,int>> available;
+    set<pair<ll,int>> available;
     ll next_sword = INF;
     while (true) {
         el; el;
