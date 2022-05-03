@@ -319,7 +319,7 @@ a=2: set range to b
 
 class LazySeg:
     idSeg = 0  # ! seg identity, must satisfy a+idSeg = idSeg+a = a
-    idLazy = [0,0]  # ! lazy identity, must satisfy idLazy * a = a
+    idLazy = [1,0]  # ! lazy identity, must satisfy idLazy * a = a
     def cmb(self, a, b):  # ! seg * seg
         return a + b
     def init(self, _n):
@@ -331,43 +331,19 @@ class LazySeg:
         self.lazy = [self.idLazy for _ in range(2*self.n)]
 
     def push(self, ind, L, R):
-        # a, b = self.lazy[ind]
-        # if a == 0: return
-        # if a == 1: self.seg[ind] += (R-L+1) * b  # ! lazy * seg
-        if self.lazy[ind][0] == 0: return
-        if self.lazy[ind][0] == 1: self.seg[ind] += (R-L+1) * self.lazy[ind][1]
-        else: self.seg[ind] = (R-L+1) * self.lazy[ind][1]  # ! lazy * seg
+        # ! lazy * seg
+        self.seg[ind] = self.lazy[ind][0] * self.seg[ind] + (R-L+1) * self.lazy[ind][1]
         if L != R:
-            for i in range(2):
-                # ca, cb = self.lazy[2*ind+i]
-                '''
-                    ca == 0: just use a, b.
-                    ca == 1 and a == 1: sum them
-                    ca == 1, a == 2: replace
-                    ca == 2, a == 1: add onto existing set
-                    ca == 2, a == 2: replace
-                '''
-                if self.lazy[2*ind+i][0] == 0 or self.lazy[ind][0] == 2:
-                    self.lazy[2*ind+i] = self.lazy[ind]
-                else:
-                    self.lazy[2*ind+i][1] += self.lazy[ind][1]
-                # if ca == 0 or a == 2: ca, cb = a, b
-                # else: cb += b
-                # self.lazy[2*ind+i] = (ca, cb)  # ! lazy * lazy
+            for k in range(2):
+                # ! lazy * lazy
+                self.lazy[2*ind+k][0] *= self.lazy[ind][0]
+                self.lazy[2*ind+k][1] = self.lazy[2*ind+k][1] * self.lazy[ind][0] + self.lazy[ind][1]
 
         self.lazy[ind] = self.idLazy
 
     def pull(self, ind): self.seg[ind] = self.cmb(self.seg[2*ind],self.seg[2*ind+1])
     def build(self):
         for k in reversed(range(1, self.n)): self.pull(k)
-
-    # def push_all(self, ind=1, L=0, R=None):
-    #     if R is None: R = self.n - 1
-    #     self.push(ind,L,R)
-    #     if L < R:
-    #         M = (L+R)>>1
-    #         self.push_all(2*ind,L,M)
-    #         self.push_all(2*ind+1,M+1,R)
 
     def push_all(self):
         todo = [(1, 0, self.n-1)]
@@ -572,23 +548,30 @@ class LazySegmentTree:
 # ! ########################################################################
 
 class LST:
-    _seg_seg = lambda self,x,y : x+y
-    _lazy_seg = lambda self,p,x,idx: p[0]*x + p[1]*self.node_size(idx)
-    _lazy_lazy = lambda self,p,q: [p[0]*q[0], p[1] + p[0]*q[1]]
+    _idSeg = 0
+    _idLazy = [1, 0]
+    def _seg_seg(self, x, y):
+        return x + y
 
-    def init(self, data, idSeg, idLazy, seg_seg, lazy_seg, lazy_lazy):
+    # _lazy[idx] is replaced by inc o _lazy[idx]. (apply inc AFTER)
+    def _lazy_lazy(self, idx, inc):
+        # dbgcP("l_l", idx, inc)
+        self._lazy[idx][1] = inc[0] * self._lazy[idx][1] + inc[1]
+        self._lazy[idx][0] *= inc[0]
+
+    def _lazy_seg(self, idx, inc):
+        # dbgc("l_s", idx, inc)
+        self.data[idx] = inc[0] * self.data[idx] + inc[1] * self.node_size(idx)
+
+    def init(self, data):
         """initialize the lazy segment tree with data"""
-        self._idSeg = idSeg
-        self._idLazy = idLazy
-        # self._seg_seg = seg_seg
-        # self._lazy_seg = lazy_seg
-        # self._lazy_lazy = lazy_lazy
-
         self._len = len(data)
         self._size = _size = 1 << (self._len - 1).bit_length()
-        self._lazy = [idLazy] * (2 * _size)
+        # self._lazy = [self._idLazy] * (2 * _size)
+        self._lazy = [[1, 0] for _ in range(2*_size)]
 
-        self.data = [idSeg] * (2 * _size)
+        # self.data = [self._idSeg] * (2 * _size)
+        self.data = [self._idSeg for _ in range(2 * _size)]
         self.data[_size:_size + self._len] = data
         for i in reversed(range(_size)):
             self.data[i] = self._seg_seg(self.data[i + i], self.data[i + i + 1])
@@ -599,15 +582,13 @@ class LST:
     def _push(self, idx):
         """push query on idx to its children"""
         # Let the children know of the queries
-        q, self._lazy[idx] = self._lazy[idx], self._idLazy
+        q, self._lazy[idx] = self._lazy[idx], [1, 0]
 
-        # self._lazy[2 * idx] += q
-        # self._lazy[2 * idx + 1] += q
-        # self.data[2 * idx] += q
-        # self.data[2 * idx + 1] += q
         for k in range(2):
-            self._lazy[2*idx + k] = self._lazy_lazy(q, self._lazy[2*idx + k])
-            self.data[2*idx + k] = self._lazy_seg(q, self.data[2*idx + k], 2*idx+k)
+            # self._lazy[2*idx + k] = self._lazy_lazy(q, self._lazy[2*idx + k])
+            self._lazy_lazy(2*idx + k, q)
+            # self.data[2*idx + k] = self._lazy_seg(q, self.data[2*idx + k], 2*idx+k)
+            self._lazy_seg(2*idx+k, q)
 
     def _update(self, idx):
         """updates the node idx to know of all queries applied to it via its ancestors"""
@@ -616,33 +597,55 @@ class LST:
 
     def _build(self, idx):
         """make the changes to idx be known to its ancestors"""
+        # self.detailed_printouts()
+        # dbgcY("build", idx)
         idx >>= 1
         while idx:
-            self.data[idx] = self._lazy_seg(
-                self._lazy[idx],
-                self._seg_seg(self.data[2 * idx], self.data[2 * idx + 1]),
-                idx
-            )
+            # dbgW('idx', idx, 'data', self.data[idx], self.data[2*idx], self.data[2*idx+1])
+            self.data[idx] = self._seg_seg(self.data[2*idx], self.data[2*idx+1])
+            # dbgW(idx, self.data[idx])
+            # self._lazy_seg(idx, self._lazy[idx])
+            # self.data[idx] = self._lazy_seg(
+            #     self._lazy[idx],
+            #     self._seg_seg(self.data[2 * idx], self.data[2 * idx + 1]),
+            #     idx
+            # )
             idx >>= 1
 
     def add(self, start, stop, value):
         """lazily add value to [start, stop)"""
         # el()
+        # dbgcP("add", start, stop, value)
         start = start_copy = start + self._size
         stop = stop_copy = stop + self._size
         while start < stop:
+            # dbgR(start, stop)
+            # dbgR(self._lazy)
             if start & 1:
-                self._lazy[start] = self._lazy_lazy(value, self._lazy[start])
-                self.data[start] = self._lazy_seg(value, self.data[start],start)
+                # self._lazy[start] = self._lazy_lazy(value, self._lazy[start])
+
+                # dbgW(self.data[start], self._lazy[start])
+                self._lazy_lazy(start, value)
+                # self.data[start] = self._lazy_seg(value, self.data[start],start)
+                self._lazy_seg(start, value)
+                # dbgW(self.data[start], self._lazy[start])
                 start += 1
             if stop & 1:
                 stop -= 1
-                self._lazy[stop] = self._lazy_lazy(value, self._lazy[stop])
-                self.data[stop] = self._lazy_seg(value, self.data[stop],stop)
+                # self._lazy[stop] = self._lazy_lazy(value, self._lazy[stop])
+                # dbgW(self.data[stop], self._lazy[stop])
+                self._lazy_lazy(stop, value)
+                # self.data[stop] = self._lazy_seg(value, self.data[stop],stop)
+                self._lazy_seg(stop, value)
+                # dbgW(self.data[stop], self._lazy[stop])
             start >>= 1
             stop >>= 1
+        # dbg(self.data)
+        # dbgR(self._lazy)
 
         # Tell all nodes above of the updated area of the updates
+        while not start_copy&1: start_copy >>= 1
+        while not stop_copy&1: stop_copy >>= 1
         self._build(start_copy)
         self._build(stop_copy - 1)
 
@@ -672,6 +675,7 @@ class LST:
         return "LazySegmentTree({0})".format(self.data)
 
     def node_size(self, idx):
+        # dbgcP("n_s", idx, self._size, self._size.bit_length(), 1 << self._size.bit_length() - idx.bit_length())
         return 1 << self._size.bit_length() - idx.bit_length()
 
     def node_range_start(self, idx):
@@ -730,7 +734,7 @@ def solve_LazySeg(testID):
         l, r = l-1, r-1
         if qtype <= 2:
             x = int(iraw[3])
-            st.upd(l, r, [qtype,x])
+            st.upd(l, r, [qtype%2,x])
             # st.add(l, r+1, (qtype%2,x))
         else:
             # query range
@@ -786,14 +790,7 @@ def solve_LST(testID):
     # el()
 
     st = LST()
-    st.init(
-        data=dat,
-        idSeg=0,
-        idLazy=[1,0],
-        seg_seg=lambda x,y:x+y,
-        lazy_seg=lambda p,x: p[0]*x+p[1],
-        lazy_lazy=lambda p,q: [p[0]*q[0], p[1] + p[0]*q[1]],
-    )
+    st.init(dat)
     # dbg(st.data, st._lazy)
     # st.detailed_printouts()
     # st = LazySeg()
@@ -807,9 +804,7 @@ def solve_LST(testID):
         iraw = input().split()
         # el(3)
         # dbgBackground(qid, iraw)
-        # dbg(iraw)
-        # dbgY(st.lazy)
-        # dbgY(st.data, st._lazy)
+        # st.detailed_printouts()
 
         qtype = int(iraw[0])
         l = int(iraw[1])
@@ -829,9 +824,9 @@ def solve_LST(testID):
     return
 
 
-solve = solve_LazySeg
+# solve = solve_LazySeg
 # solve = solve_LazySegmentTree
-# solve = solve_LST
+solve = solve_LST
 
 if __name__ == '__main__':
     T = 1
