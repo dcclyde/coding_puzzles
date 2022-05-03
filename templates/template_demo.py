@@ -172,6 +172,7 @@ def demo_logic():
             dbgcG("fdiv vs //", fdiv(a,b), a//b)
             el()
 
+    dbgcR("runtime", TIME())
 
 
 

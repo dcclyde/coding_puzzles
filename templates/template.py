@@ -6,6 +6,7 @@ import math
 import sys
 import os
 import random
+import time
 #endregion
 #region  @bootstrap for recursive functions
 # # TLDR:
@@ -19,7 +20,7 @@ import random
 #            (only do this for recursive calls within the recursive function though!)
 # # Example (original version):
 # def f(n):
-#     if n <= 0: yield 1
+#     if n <= 0: return 1
 #     return f(n-1) + f(n-2)
 #
 # print(f(5))
@@ -27,7 +28,7 @@ import random
 # # Example (fixed):
 # @bootstrap
 # def f(n):
-#     if n <= 0: return 1
+#     if n <= 0: yield 1
 #     yield (yield f(n-1)) + (yield f(n-2))
 #
 # print(f(5))  # don't add `yield` to the call from outside!
@@ -253,6 +254,11 @@ def pvn1(q):
 #endregion
 #region  logic
 
+EXECUTION_START_TIME = time.time()
+def TIME():
+    # return time.time() - EXECUTION_START_TIME
+    return int((time.time() - EXECUTION_START_TIME) * 10**6) / 10**6
+
 def YES(): return print("YES")
 def NO(): return print("NO")
 def Yes(): return print("Yes")
@@ -331,3 +337,4 @@ if __name__ == '__main__':
         el()
         dbgBackground(f"Case {testID}")
         solve(testID)
+    dbgcR("runtime", TIME())
