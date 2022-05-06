@@ -11,12 +11,13 @@ FOR(k, 0, uncompressed.size()) {
 FOR(k, 0, N) {
     dat[k] = uncinv[dat[k]];
 }
+ll NN = uncompressed.size();
 endsnippet
 
 snippet rgraph "read graph from stdin"
-V<V<int>> G(N);
-FORint(k, 0, E) {
-    int1(a, b);
+V<V<ll>> G(N);
+FOR(k, 0, E) {
+    ll1(a, b);
     G[a].emplace_back(b);
     G[b].emplace_back(a);
 }
@@ -24,11 +25,11 @@ dbgY(pdh(G));
 endsnippet
 
 snippet rtree "read tree from stdin"
-V<V<int>> G(N);
-V<int> parent(N); parent[0] = -1;
-V<V<int>> children(N);
-FORint(a, 1, E+1) {
-    int1(b);
+V<V<ll>> G(N);
+V<ll> parent(N); parent[0] = -1;
+V<V<ll>> children(N);
+FOR(a, 1, E+1) {
+    ll1(b);
     G[a].emplace_back(b);
     G[b].emplace_back(a);
     parent[b] = a;
@@ -38,10 +39,10 @@ dbgY(pdh(G));
 endsnippet
 
 snippet dfsRecursive "DFS (recursive using lambda)"
-V<int> subtree_size(N);
-auto dfs = [&](int curr, int parent, auto&& self) -> void {
+V<ll> subtree_size(N);
+auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
     // work on parent
-    subtree_size[curr] = 0;
+    subtree_size[curr] = 1;
     // todo
     $1
     for (auto& o : G[curr]) {

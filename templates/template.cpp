@@ -298,7 +298,7 @@ inline namespace Helpers {
 
     tcT> typename enable_if<!is_iterable_v<T> && !is_tuplelike_v<T>, void>::type increment_one(T& x, int inc) {x += inc;}
     tcT> typename enable_if<is_tuplelike_v<T>, void>::type increment_one(T& t, int inc);
-    tcT> typename enable_if<is_iterable_v<T>, void>::type increment_one(T& t, int inc) { for(auto& x : t) {increment_one(x, inc);} }
+    tcT> typename enable_if<is_iterable_v<T>, void>::type increment_one(T& t, int inc) { for(auto&& x : t) {increment_one(x, inc);} }
 
     template<class T, size_t k>
     void increment_one_tuplehelper(T& t, int inc) {
@@ -438,13 +438,13 @@ inline namespace Output {
     template<class ...T> void pso1(T&... t) { pr_sep1(cout," ",t...); pso1(); }
 
     template<class T>
-    void pv(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n';}
+    void pv(T& dat) {bool f=1; for(auto&& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n';}
     template<class T>
-    void pv1(T& dat) {bool f=1; increment(dat); for(auto& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
+    void pv1(T& dat) {bool f=1; increment(dat); for(auto&& x : dat) {if (!f) {cout<<' ';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
     template<class T>
-    void pvn(T& dat) {bool f=1; for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n';}
+    void pvn(T& dat) {bool f=1; for(auto&& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n';}
     template<class T>
-    void pvn1(T& dat) {bool f=1; increment(dat); for(auto& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
+    void pvn1(T& dat) {bool f=1; increment(dat); for(auto&& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
     const clock_t beg = clock();
@@ -522,7 +522,7 @@ string to_string(bitset<N> v) {
 }
 
 template <typename A>
-string to_string(A v) {
+typename enable_if<is_iterable_v<A>, string>::type to_string(A v) {
     bool first = true;
     string res = "{";
     for (const auto &x : v) {
@@ -632,6 +632,7 @@ void debug_out(Head H, Tail... T) {
 #define dbgc(...) ;
 #define dbg(...) ;
 #define el ;
+#define dbgBold(...) ;
 #define dbgcBold(...) ;
 #define dbgY(...) ;
 #define dbgcY(...) ;
@@ -658,6 +659,8 @@ void debug_out(Head H, Tail... T) {
         << B, debug_out(__VA_ARGS__); \
         std::cerr << OUT_RESET << std::endl;
 
+    #undef dbgBold
+    #define dbgBold(...) dbgcbase(OUT_GREEN, OUT_MARK, "", __VA_ARGS__)
     #undef dbgcBold
     #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
 
