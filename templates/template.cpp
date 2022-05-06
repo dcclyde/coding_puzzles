@@ -734,7 +734,7 @@ void solve() {
     dbgR(N, dat);
     el;
 
-    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problmes!
+    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
 
 
 

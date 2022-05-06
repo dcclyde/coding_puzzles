@@ -323,18 +323,27 @@ def solve(testID):
     dbgR(N, dat)
     el()
 
-
+    # ! Read the sample cases AND EXPLANATIONS before writing code for div1 A and later!
 
 
 
     return
 
 
+# ! Do something instead of nothing: write out small cases, code bruteforce
+# ! Check bounds even if I have a solution - are they letting through simpler versions?
+# ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
+SINGLE_CASE = False
+# SINGLE_CASE = True
+#region  main
 if __name__ == '__main__':
     T = 1
-    dbgBackground("Loading num cases!!!!!"); T = nn()  # ! Comment this out for single-case problems!
+    if not SINGLE_CASE:
+        dbgBackground("Loading num cases!!!!!")
+        T = nn()  # ! Comment this out for single-case problems!
     for testID in range(1, T+1):
         el()
         dbgBackground(f"Case {testID}")
         solve(testID)
     dbgcR("runtime", TIME())
+#endregion
