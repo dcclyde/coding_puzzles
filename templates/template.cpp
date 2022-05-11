@@ -187,7 +187,12 @@ auto stepped_iota(ll start, ll end, ll step=1) {
          std::ranges::views::transform([=](ll x) { return x * step + start; });
 }
 #define FOR4(i,s,e,step) for(auto i : stepped_iota(s, e, step))
+#else
+#define FOR4(i,s,e,step) for(ll i = s; i != e && ((i<e) == (s<e)) ; i += step)
 #endif
+
+// just as an example of how to iterate in reverse order
+// for(auto& x : dat | views::reverse) {}
 
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
 #define FOR(...) GET_MACRO(__VA_ARGS__, FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
@@ -536,6 +541,14 @@ typename enable_if<is_iterable_v<A>, string>::type to_string(A v) {
     return res;
 }
 
+template <typename T>
+string to_string(priority_queue<T> PQ) {  // PASS BY VALUE!
+    V<T> working;
+    while (!PQ.empty()) {working.push_back(PQ.top()); PQ.pop();}
+    reverse(all(working));
+    return to_string(working);
+}
+
 template <typename A, typename B>
 string to_string(pair<A, B> p) {
     return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
@@ -711,6 +724,7 @@ void debug_out(Head H, Tail... T) {
 #define NO ps("NO");
 #define Yes ps("Yes");
 #define No ps("No");
+#define IMPOSSIBLE ps("IMPOSSIBLE");
 
 const ll INF_ll = ll(2e18) + 1;
 const int INF_i = int(2e9) + 1;
@@ -754,6 +768,7 @@ int main() {
     dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
 #endif
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
+        // cout << "Case #" << CASE << ": ";
         el;
 #ifndef DCCLYDE_BRUTEFORCE
         dbgcBold("CASE" , CASE );
