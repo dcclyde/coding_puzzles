@@ -71,22 +71,24 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 
 #pragma region  // * product-ish using recursion
 // {
-//    V<int> curr;
-//    auto do_something = [&]() {
-//       // ! do something here using curr
+//     V<ll> curr;
+//     auto do_something = [&]() {
+//         // ! do something here using curr
+//         dbg(curr);
+//     };
 
-//    };
-
-//    function<void(void)> product_rec_helper = [&]{
-//       if (curr.size() == TODO_MAX_DEPTH) {return do_something();}  // ! define max depth
-//       int n = curr.size();
-//       FOR(k, 0, TODO) {  // ! iterate over options at depth n
+//     auto product_rec_helper = [&](auto&& self) {
+//         if (curr.size() == TODO_MAX_DEPTH) {
+//             return do_something();
+//         }  // ! define max depth
+//         // ll n = curr.size();
+//         FOR(k, 0, TODO) {  // ! iterate over options at depth n
 //             curr.push_back(k);
-//             product_rec_helper();
+//             self(self);
 //             curr.pop_back();
-//       }
-//    };
-//    product_rec_helper();
+//         }
+//     };
+//     product_rec_helper(product_rec_helper);
 // }
 #pragma endregion
 
