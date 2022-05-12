@@ -59,6 +59,7 @@ auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
     $1
     // dbgP(curr, parent, subtree_size[curr]);
 };
+dfs(ROOT, -1, dfs);
 $2
 endsnippet
 

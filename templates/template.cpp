@@ -718,7 +718,7 @@ void debug_out(Head H, Tail... T) {
 #endif
 #pragma endregion
 
-#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
+#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);assert(false);}});
 
 #define YES ps("YES");
 #define NO ps("NO");
