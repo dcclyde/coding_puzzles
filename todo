@@ -1,0 +1,123 @@
+
+TODO:
+* Make a version of the IntervalUnion for when I want intervals to overlap?
+    * Or convince myself that I can use sparse segtrees instead? Test it on https://codeforces.com/contest/1061/problem/D
+* Permanently 
+
+In the factorization code,
+add "list of all factors" and "number of factors" functions.
+
+
+
+Figure out why certain folders are in my shortcuts bar,
+and clean it out
+
+
+Add my specializations of the segtree template to the base file?
+Update programs and restart this laptop
+Do atcoder problems not just a contest
+
+
+improve gen.py?
+
+* Need a checker that can handle doubles so I can check if error < epsilon!
+    (or maybe just reduce output precision to like 4-6 decimal places??)
+
+
+
+Patch files for different contest websites:
+These could actually just be short Python programs or mayyyybe even sed.
+Template could have
+#define DCCLYDE_CODEFORCES
+// define DCCLYDE_ATCODER
+// #define DCCLYDE_GOOGLE_CODEJAM
+
+and then "patch" only needs to switch which line is commented.
+It could happen during the initial setup_round, or just make a second script that fixes all cpp files in this directory.
+
+
+
+
+--------------
+
+
+
+Apparently -u in interact.sh doesn't actually protect against lack of flush in interact.py
+
+
+
+terminal.integrated.fontWeightBold ?
+
+
+
+pvn1 for V<V<tuple>>
+
+
+What was that recent problem I talked about with Christine where I suspected FFT but there was actually some DP trick?
+Can that method help on Counting Castles?
+In general I need some fancy method that helps with a DP where each new entry is some convolution thing on the previous stuff.
+
+
+
+For python template setup:
+
+ta = [1, 5, 3]
+dbg(f"{ta + ta = }")
+
+Make a snippet that handles this.
+//////
+Make a new plan where we type an f-string, then remove the letter f, then I handle it nicely within dbg.
+
+https://stackoverflow.com/questions/47339121/how-do-i-convert-a-string-into-an-f-string
+
+
+
+ACTUALLY USEFUL:
+
+
+
+Rewrite my product helper code to use a lambda instead of std::function?
+
+
+Maybe I want assert_same(a, b) where it runs dbg() if failing?
+
+
+
+In pe615 I upgraded so pdh(priority_queue) works. Add that to the main template.
+
+pdh: add an option to print out only up to first N entries?
+
+I definitely added some interesting new templatable functionality in a PE problem on May 31. Not sure which problem though.
+
+
+matpow, matmat, etc looking niceish in PE 511. Add to library somewhere?
+
+
+sumv(V<db>) doesn't work because I'm accumulating the result in a ll.
+If input is 32bit then I should output in ll. Otherwise just match input.
+Maybe I could do this with:
+std::conditional<std::is_integral<A>::value,ll,db>::type C;
+
+
+Upgrade TIME() based on pe806? It should behave differently if I'm using openmp.
+
+
+PE155 has "using frac as pll;" plus arithmetic functions.
+PE165 extends this (includes a few more operators)
+
+
+PE open_boxes_find_all_reds has && arguments for pdh, seems strictly better?
+(for if I want to pass a function output instead of a variable)
+
+Grab all stuff involving _OPENMP from pe783. Includes TIME()
+
+------
+
+PUZZLE HUNT template:
+
+nutrify() doesn't like if I pass in a non-rectangular pile of cells.
+That kinda makes sense actually....
+anyway make sure my functions
+
+Jacob suggests: Is it possible to access formatting info through Javascript macros?
+
