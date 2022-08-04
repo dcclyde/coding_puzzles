@@ -38,16 +38,15 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
    std::rotate(first,k,last);
    return false;
 }
+#pragma endregion
 
-#pragma region  // * example
-
+#pragma region  // * next_combination example
 // std::string s = "abcde";
 // int comb_size = 2;
 // do {
 //     std::cout << std::string(s.begin(),s.begin() + i) << std::endl;
 // }
 // while(next_combination(s.begin(),s.begin() + i,s.end()));
-
 #pragma endregion
 
 #pragma region  // * N ints summing to S
@@ -90,6 +89,4 @@ bool next_combination(const Iterator first, Iterator k, const Iterator last)
 //     };
 //     product_rec_helper(product_rec_helper);
 // }
-#pragma endregion
-
 #pragma endregion

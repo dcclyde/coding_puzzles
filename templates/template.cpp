@@ -39,11 +39,11 @@ using vl = V<ll>;
 using vll = V<ll>;
 using vd = V<db>;
 using vs = V<str>;
-using vpi = V<pi>;
-using vpii = V<pi>;
-using vpl = V<pl>;
+using vpi = V<pii>;
+using vpii = V<pii>;
+using vpl = V<pll>;
 using vpll = V<pll>;
-using vpd = V<pd>;
+using vpd = V<pdd>;
 
 // vectors
 // oops size(x), rbegin(x), rend(x) need C++17
@@ -78,6 +78,23 @@ constexpr int msk2(int x) { return p2(x)-1; }
 
 ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
 ll fdiv(auto a, auto b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
+
+ll powll(ll b, ll e) {
+    ll out = 1;
+    while (e) {
+        if (e&1) {out *= b;}
+        b *= b; e >>= 1;
+    }
+    return out;
+}
+ll powmod(ll b, ll e, ll mod) {
+    ll out = 1;
+    while (e) {
+        if (e&1) {out *= b; out %= mod;}
+        b *= b; b %= mod; e >>= 1;
+    }
+    return out;
+}
 
 tcTU> bool ckmin(T& a, const U& b) {
     return (T)b < a ? a = (T)b, 1 : 0; } // set a = min(a,b)
@@ -718,7 +735,7 @@ void debug_out(Head H, Tail... T) {
 #endif
 #pragma endregion
 
-#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);assert(false);}});
+#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
 
 #define YES ps("YES");
 #define NO ps("NO");

@@ -78,3 +78,22 @@ void finish(ll a) {
     return;
 }
 endsnippet
+
+snippet check "check solve() vs brute()"
+void check() {
+    for(auto& N : {30}) {
+        ll br = brute(N); el;
+        ll so = solve(N); el;
+        dbgY(N, MP(br, so));
+        assert(br == so);
+        el;
+    }
+    FOR(N, 1, 1001) {
+        ll br = brute(N); el;
+        ll so = solve(N); el;
+        dbgY(N, MP(br, so));
+        assert(br == so);
+        el;
+    }
+}
+endsnippet
