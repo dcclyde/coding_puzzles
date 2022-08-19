@@ -1,11 +1,15 @@
 #pragma region
+#ifdef _OPENMP
+    #include <omp.h>
+#endif
 #ifdef DCCLYDE_LOCAL
-#include "/home/dcclyde/puzzles/code/templates/superheader.h"
+    #include "/home/dcclyde/puzzles/code/templates/superheader.h"
 #else
-#define NDEBUG  // don't bother with assertions on the judge server.
-#include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
+    #define NDEBUG  // don't bother with assertions on the judge server.
+    #include <tgmath.h>
+    #include <bits/stdc++.h>
+    #include <ext/pb_ds/assoc_container.hpp>
+    #include <ext/pb_ds/tree_policy.hpp>
 #endif
 using namespace std;
 using namespace __gnu_pbds;
@@ -25,6 +29,7 @@ using pdd = pair<db,db>;
 #define mp make_pair
 #define MP make_pair
 #define MT make_tuple
+// enable these only when they'll be heavily used.
 //// #define f first
 //// #define s second
 
@@ -46,7 +51,7 @@ using vpll = V<pll>;
 using vpd = V<pdd>;
 
 // vectors
-// oops size(x), rbegin(x), rend(x) need C++17
+// size(x), rbegin(x), rend(x) need C++17
 #define sz(x) int((x).size())
 #define bg(x) begin(x)
 #define all(x) bg(x), end(x)
@@ -145,13 +150,27 @@ struct custom_hash {
         return splitmix64(x + FIXED_RANDOM);
     }
     template<class T, class U>
-    size_t operator()(pair<T,U> x) const {
+    size_t operator()(const pair<T,U>& x) const {
         uint64_t a = (*this)(x.first);
         uint64_t b = (*this)(x.second);
         return a + 3*b;
     }
 
-    template<typename A>
+    template<class T, size_t k>
+    void op_tuplehelper(size_t& out, T t) const {
+        out += (*this)(get<k>(t)) * (k+1)*(k+1);
+        if constexpr (k < tuple_size_v<T> - 1) {
+            op_tuplehelper<T, k+1>(out, t);
+        }
+    }
+    template <typename X>
+    typename enable_if<is_tuplelike_v<X>, size_t>::type operator()(const X& t) const {
+        size_t out = 0;
+        op_tuplehelper<X, 0>(out, t);
+        return out;
+    }
+
+    template <typename A>
     typename enable_if<is_iterable_v<A>, size_t>::type operator()(const A& v) const {
         uint64_t out = 0;
         uint64_t offset = 1;
@@ -265,39 +284,37 @@ tcT> ll lstTrue(ll lo, ll hi, T f) {
 }
 tcT> void remDup(vector<T>& v) { // sort and remove duplicates
     sort(all(v)); v.erase(unique(all(v)),end(v)); }
-tcTU> void erase(T& t, const U& u) { // don't erase
+tcTU> void erase(T& t, const U& u) { // don't erase element that doesn't exist from (multi)set
     auto it = t.find(u); assert(it != end(t));
-    t.erase(it); } // element that doesn't exist from (multi)set
+    t.erase(it); }
 
 // use like sumv(all(dat))
 template<class ForwardIt>
-ll sumv(ForwardIt first, ForwardIt last)
+auto sumv(ForwardIt first, ForwardIt last)
 {
-    // typename std::iterator_traits<ForwardIt>::value_type out {};  // acc in int can overflow
-    ll out = 0;
+    /**
+        Careful: accumulation in int could overflow.
+        Therefore, make `out` an ll if the data is any integer type.
+        Otherwise, out is the same type as the data.
+     */
+    typename std::conditional<
+        std::is_integral<typename std::iterator_traits<ForwardIt>::value_type>::value,
+        ll,
+        typename std::iterator_traits<ForwardIt>::value_type
+    >::type out {};
     for (; first != last; ++first) {
         out += *first;
     }
     return out;
 }
-template<class T> auto sumv(const T& data) {return sumv(all(data));}
-template<class T> auto max_element(const T& data) {return *max_element(all(data));}
-template<class T> auto min_element(const T& data) {return *min_element(all(data));}
+template<class T> auto sumv(T&& data) {return sumv(all(data));}
+template<class T> auto max_element(T&& data) {return *max_element(all(data));}
+template<class T> auto min_element(T&& data) {return *min_element(all(data));}
 
 
 #define tcTUU tcT, class ...U
 
 inline namespace Helpers {
-    // // is_iterable
-    // // https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
-    // // this gets used only when we can call begin() and end() on that type
-    // tcT, class = void> struct is_iterable : false_type {};
-    // tcT> struct is_iterable<T, void_t<decltype(begin(declval<T>())),
-    //                                   decltype(end(declval<T>()))
-    //                                  >
-    //                        > : true_type {};
-    // tcT> constexpr bool is_iterable_v = is_iterable<T>::value;
-
     // is_readable
     tcT, class = void> struct is_readable : false_type {};
     tcT> struct is_readable<T,
@@ -333,7 +350,7 @@ inline namespace Helpers {
         increment_one_tuplehelper<T,0>(t, inc);
     }
 
-    void increment() {} // add one from each, for output.  BE CAREFUL TO UNDO MODIFICATIONS
+    void increment() {} // add one to each, for output.  BE CAREFUL TO UNDO MODIFICATIONS
     tcTUU> void increment(T& t, U&... u) { increment_one(t,+1); increment(u...); }
     void decrement() {} // subtract one from each, for input. MODIFICATION IS THE GOAL
     tcTUU> void decrement(T& t, U&... u) { increment_one(t,-1); decrement(u...); }
@@ -469,9 +486,14 @@ inline namespace Output {
     void pvn1(T& dat) {bool f=1; increment(dat); for(auto&& x : dat) {if (!f) {cout<<'\n';} f=0; cout << tsish(x);} cout<<'\n'; decrement(dat);}
     // * Remove debug code; I'll use the tourist+me amalgamation instead.
 
+#ifndef _OPENMP
     const clock_t beg = clock();
-    // #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
+    #define dbg_time() dbg((db)(clock()-beg)/CLOCKS_PER_SEC)
     db TIME() {return (db)(clock()-beg)/CLOCKS_PER_SEC;}
+#else
+    const db beg = omp_get_wtime();
+    db TIME() {return omp_get_wtime() - beg;}
+#endif
     void flush() {std::cout << std::flush;}
 }
 
@@ -495,14 +517,8 @@ inline namespace FileIO {
 template <typename A, typename B>
 string to_string(pair<A, B> p);
 
-template <typename A, typename B, typename C>
-string to_string(tuple<A, B, C> p);
-
-template <typename A, typename B, typename C, typename D>
-string to_string(tuple<A, B, C, D> p);
-
-template <typename A, typename B, typename C, typename D, typename E>
-string to_string(tuple<A, B, C, D, E> p);
+template <typename X>
+typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p);
 
 string to_string(const string& s) {
     return '"' + s + '"';
@@ -558,12 +574,17 @@ typename enable_if<is_iterable_v<A>, string>::type to_string(A v) {
     return res;
 }
 
-template <typename T>
-string to_string(priority_queue<T> PQ) {  // PASS BY VALUE!
+template<typename T>
+V<T> pqueue_to_iterable(priority_queue<T> PQ) { // PASS BY VALUE!
     V<T> working;
     while (!PQ.empty()) {working.push_back(PQ.top()); PQ.pop();}
     reverse(all(working));
-    return to_string(working);
+    return working;
+}
+
+template <typename T>
+string to_string(priority_queue<T>&& PQ) {
+    return to_string(pqueue_to_iterable(PQ));
 }
 
 template <typename A, typename B>
@@ -571,49 +592,83 @@ string to_string(pair<A, B> p) {
     return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
 }
 
-template <typename A, typename B, typename C>
-string to_string(tuple<A, B, C> p) {
-    return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ")";
+template<class T, size_t k>
+void to_string_tuplehelper(string& out, T& t) {
+    out += ", " + to_string(get<k>(t));
+    if constexpr (k < tuple_size_v<T> - 1) {
+        to_string_tuplehelper<T, k+1>(out, t);
+    }
+}
+template <typename X>
+typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p) {
+    string out = "(" + to_string(get<0>(p));
+    to_string_tuplehelper<X, 1>(out, p);
+    out += ")";
+    return out;
 }
 
-template <typename A, typename B, typename C, typename D>
-string to_string(tuple<A, B, C, D> p) {
-    return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ")";
-}
-
-template <typename A, typename B, typename C, typename D, typename E>
-string to_string(tuple<A, B, C, D, E> p) {
-    return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ", " + to_string(get<4>(p)) + ")";
-}
 
 // helpers for debugging complicated objects
+template<class T, class S>
+string print_details_helper_general(T&& q, S f, ll MAX) {
+    string out;
+    ll ctr = 0;
+    bool trimmed = false;
+    for ( auto&& x : q ) {
+        if (ctr == MAX) {trimmed = true; break;}
+        out.push_back('\t');
+        out += to_string(ctr) + ":\t" + to_string(f(x)) + "\n";
+        ++ctr;
+    }
+    string prefix = "len = " + to_string(q.size());
+    if (trimmed) {
+        prefix += ", trimmed to " + to_string(MAX);
+        out.pop_back();
+        out = "\n" + prefix + "\n" + out + "\nOutput trimmed, full length " + to_string(q.size());
+        out.push_back('\n');
+    } else {
+        out = "\n" + prefix + "\n" + out;
+    }
+    return out;
+}
+
+#define PDH_DEFAULT_MAX 10'000
+// "print_details_helper"
 template<class T>
-string print_details_helper(T& q) {
-    string out = "\n";
-    int ctr = 0;
-    for ( auto&& x : q ) {
-        out.push_back('\t');
-        out += to_string(ctr) + ":\t" + to_string(x) + "\n";
-        ++ctr;
-    }
-    return out;
+string pdh(T&& q, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper_general(q, [&](auto x) {return x;}, MAX);
 }
-string print_details_helper(V<bool>& q) {
-    string out = "\n";
-    int ctr = 0;
-    for ( auto&& x : q ) {
-        out.push_back('\t');
-        out += to_string(ctr) + ":\t" + to_string(static_cast<bool>(x)) + "\n";
-        ++ctr;
-    }
-    return out;
+string pdh(V<bool>&& q, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper_general(q, [&](auto x) {return static_cast<bool>(x);}, MAX);
 }
-#define pdh print_details_helper
+template<class T>
+string pdh(priority_queue<T>&& PQ, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper(pqueue_to_iterable(PQ), MAX);
+}
+#define print_details_helper pdh
+
+// "print_details_helper, function version"
+template<class T, class S>
+string pdh_func(T&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper_general(q, f, MAX);
+}
+template<class S>
+string pdh_func(V<bool>&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper_general(q, [&](auto x) {return f(static_cast<bool>(x));}, MAX);
+}
+template<class T, class S>
+string pdh_func(priority_queue<T>&& PQ, S f, ll MAX=PDH_DEFAULT_MAX) {
+    return print_details_helper_general(pqueue_to_iterable(PQ), f, MAX);
+}
+#define pdhf pdh_func
+#define print_details_helper_func pdh_func
+
+
 
 template<class T>
-string print_tsv_helper(T& q) {
+string print_tsv_helper(T&& q) {
     string out = "\n";
-    for ( auto& x : q ) {
+    for ( auto&& x : q ) {
         bool first = true;
         for ( auto& v : x ) {
             if ( !first ) {
@@ -776,27 +831,49 @@ void solve() {
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 // #define SINGLE_CASE
-#pragma region
+#define CF
+#pragma region  // main
+#if defined(CF) || defined(GCJ)
 int main() {
     setIO();
 
     int T = 1;
-#ifndef SINGLE_CASE
-    dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
-#endif
+    #ifndef SINGLE_CASE
+        dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+    #endif
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
-        // cout << "Case #" << CASE << ": ";
+        #ifdef GCJ
+            cout << "Case #" << CASE << ": ";
+        #endif
         el;
-#ifndef DCCLYDE_BRUTEFORCE
-        dbgcBold("CASE" , CASE );
-        solve();
-#else
-        dbgcBold("brute force" , CASE );
-        brute();
-#endif
+        #ifndef DCCLYDE_BRUTEFORCE
+            dbgcBold("CASE" , CASE );
+            solve();
+        #else
+            dbgcBold("brute force" , CASE );
+            brute();
+        #endif
     }
     dbgR(TIME());
-
     return 0;
 }
+#elif defined(PE)
+int main() {
+    #ifdef _OPENMP
+        ll num_procs = omp_get_num_procs();
+        ll max_threads = omp_get_max_threads();
+        dbgBold(num_procs, max_threads);
+        omp_set_num_threads(num_procs - 4);
+    #endif
+    solve();
+    dbgR(TIME());
+    return 0;
+}
+#else
+int main() {
+    dbgcBold("invalid problem type specifier");
+    assert(false);
+    return 0;
+}
+#endif
 #pragma endregion
