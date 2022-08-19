@@ -29,9 +29,8 @@ using pdd = pair<db,db>;
 #define mp make_pair
 #define MP make_pair
 #define MT make_tuple
-// enable these only when they'll be heavily used.
-//// #define f first
-//// #define s second
+#define f first
+#define s second
 
 #define tcT template<class T
 #define tcTU tcT, class U
@@ -62,8 +61,8 @@ using vpd = V<pdd>;
 #define pb push_back
 #define eb emplace_back
 #define emp emplace
-//// #define ft front()
-//// #define bk back()
+#define ft front()
+#define bk back()
 
 //// #define lb lower_bound
 //// #define ub upper_bound
@@ -633,35 +632,33 @@ string print_details_helper_general(T&& q, S f, ll MAX) {
 }
 
 #define PDH_DEFAULT_MAX 10'000
-// "print_details_helper"
 template<class T>
-string pdh(T&& q, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper(T&& q, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(q, [&](auto x) {return x;}, MAX);
 }
-string pdh(V<bool>&& q, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper(V<bool>&& q, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(q, [&](auto x) {return static_cast<bool>(x);}, MAX);
 }
 template<class T>
-string pdh(priority_queue<T>&& PQ, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper(priority_queue<T>&& PQ, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper(pqueue_to_iterable(PQ), MAX);
 }
-#define print_details_helper pdh
+#define pdh print_details_helper
 
-// "print_details_helper, function version"
 template<class T, class S>
-string pdh_func(T&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper_func(T&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(q, f, MAX);
 }
 template<class S>
-string pdh_func(V<bool>&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper_func(V<bool>&& q, S f, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(q, [&](auto x) {return f(static_cast<bool>(x));}, MAX);
 }
 template<class T, class S>
-string pdh_func(priority_queue<T>&& PQ, S f, ll MAX=PDH_DEFAULT_MAX) {
+string print_details_helper_func(priority_queue<T>&& PQ, S f, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(pqueue_to_iterable(PQ), f, MAX);
 }
-#define pdhf pdh_func
-#define print_details_helper_func pdh_func
+#define pdh_func print_details_helper_func
+#define pdhf print_details_helper_func
 
 
 
@@ -703,15 +700,15 @@ void debug_out(Head H, Tail... T) {
 
 #define OUT_RESET       "\033[0m"
 #define OUT_BOLD        "\033[;1m"
-#define OUT_RED         "\033[31" << "m"
-#define OUT_CYAN        "\033[36" << BOLD_MAYBE << "m"
+#define OUT_RED         "\033[31" "m"
+#define OUT_CYAN        "\033[36" BOLD_MAYBE "m"
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
-#define OUT_GREEN       "\033[32" << "m"
-#define OUT_BLUE        "\033[34" << BOLD_MAYBE << "m"
-#define OUT_WHITE       "\033[97" << "m"
+#define OUT_GREEN       "\033[32" "m"
+#define OUT_BLUE        "\033[34" BOLD_MAYBE "m"
+#define OUT_WHITE       "\033[97" "m"
 #define OUT_MARK        "\033[0;30;41;1m"
-#define OUT_YELLOW      "\033[33" << BOLD_MAYBE << "m"
-#define OUT_PURPLE      "\033[35" << BOLD_MAYBE << "m"
+#define OUT_YELLOW      "\033[33" BOLD_MAYBE "m"
+#define OUT_PURPLE      "\033[35" BOLD_MAYBE "m"
 
 
 #define dbgc(...) ;
@@ -733,49 +730,49 @@ void debug_out(Head H, Tail... T) {
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, ...) std::cout << std::flush; \
+    #define dbgcbase(A, B, C, D, ...) std::cout << std::flush; \
         std::cerr << OUT_BOLD << B \
         << std::right << setw(20) << C << ' ' \
         << OUT_RESET << OUT_BOLD << OUT_RED \
         << std::right << setw(7) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
-        << A << "[ " << #__VA_ARGS__ << " ]" \
+        << A << "[ " << D << " ]" \
         << OUT_BOLD << " :   " << OUT_RESET \
         << B, debug_out(__VA_ARGS__); \
         std::cerr << OUT_RESET << std::endl;
 
     #undef dbgBold
-    #define dbgBold(...) dbgcbase(OUT_GREEN, OUT_MARK, "", __VA_ARGS__)
+    #define dbgBold(...) dbgcbase(OUT_GREEN, OUT_MARK, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcBold
     #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
 
     #undef dbg
-    #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", __VA_ARGS__)
+    #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgc
     #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
 
     #undef dbgY
-    #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", __VA_ARGS__)
+    #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcY
     #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
 
     #undef dbgP
-    #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", __VA_ARGS__)
+    #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcP
     #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
 
     #undef dbgR
-    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", __VA_ARGS__)
+    #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcR
     #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
 
     #undef dbgB
-    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", __VA_ARGS__)
+    #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcB
     #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
 
     #undef dbgW
-    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", __VA_ARGS__)
+    #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcW
     #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
 
