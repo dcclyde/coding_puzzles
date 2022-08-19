@@ -14,6 +14,10 @@
 using namespace std;
 using namespace __gnu_pbds;
 
+#define CLEAN 0
+#define CF 1
+#define GCJ 2
+
 using ll = long long;
 using db = long double; // or double, if TL is tight
 using str = string; // yay python!
@@ -204,6 +208,7 @@ template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
 // #define FOR3(i,a,b) for (int i = (a); i < (b); ++i)
 #define FOR3(i,a,b) FORll(i,a,b)
 #define F0R(i,a) FOR(i,0,a)
+#define FOR2(i,a) FOR(i,0,a)
 #define ROFll(i,a,b) for (ll i = ((ll)b)-1; i >= ((ll)a); --i)
 #define ROFint(i,a,b) for (int i = ((int)b)-1; i >= ((int)a); --i)
 // #define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
@@ -827,19 +832,20 @@ void solve() {
 // ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
-// #define SINGLE_CASE
-#define CF
+
+#define PROBLEM_STYLE CF
+// #define SINGLE_CASE  // ! Uncomment this for one-case problems.
 #pragma region  // main
-#if defined(CF) || defined(GCJ)
+#if PROBLEM_STYLE == CF || PROBLEM_STYLE == GCJ
 int main() {
     setIO();
 
     int T = 1;
     #ifndef SINGLE_CASE
-        dbgc("loading num cases!!!"); std::cin >> T;  // ! Comment this out for one-case problems.
+        dbgc("loading num cases!!!"); std::cin >> T;
     #endif
     for ( int CASE = 1 ; CASE <= T ; ++CASE ) {
-        #ifdef GCJ
+        #if PROBLEM_STYLE == GCJ
             cout << "Case #" << CASE << ": ";
         #endif
         el;
@@ -854,7 +860,8 @@ int main() {
     dbgR(TIME());
     return 0;
 }
-#elif defined(PE)
+#else
+// PROBLEM_STYLE is CLEAN or undefined.
 int main() {
     #ifdef _OPENMP
         ll num_procs = omp_get_num_procs();
@@ -864,12 +871,6 @@ int main() {
     #endif
     solve();
     dbgR(TIME());
-    return 0;
-}
-#else
-int main() {
-    dbgcBold("invalid problem type specifier");
-    assert(false);
     return 0;
 }
 #endif

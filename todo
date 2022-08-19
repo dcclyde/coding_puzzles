@@ -74,6 +74,11 @@ https://stackoverflow.com/questions/47339121/how-do-i-convert-a-string-into-an-f
 
 ACTUALLY USEFUL:
 
+Make a new crfast-ish command that passes the openmp flag? Or at this point do I literally just need to add the -fopenmp flag on the end?
+
+
+Consider a version of pdh that accepts a "filter" function and only outputs the rows that pass?
+    (probably wait first to see how often that would actually feel useful...)
 
 Maybe I want assert_same(a, b) where it runs dbg() if failing?
 
