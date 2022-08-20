@@ -735,13 +735,13 @@ void debug_out(Head H, Tail... T) {
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
     // dbgc = "debug with comment"
-    #define dbgcbase(A, B, C, D, ...) std::cout << std::flush; \
+    #define dbgcbase(A, B, C, ARGTEXT, ...) std::cout << std::flush; \
         std::cerr << OUT_BOLD << B \
         << std::right << setw(20) << C << ' ' \
         << OUT_RESET << OUT_BOLD << OUT_RED \
         << std::right << setw(7) << __LINE__        \
         << OUT_BOLD << " : " << OUT_RESET \
-        << A << "[ " << D << " ]" \
+        << A << "[ " << ARGTEXT << " ]" \
         << OUT_BOLD << " :   " << OUT_RESET \
         << B, debug_out(__VA_ARGS__); \
         std::cerr << OUT_RESET << std::endl;
@@ -749,37 +749,37 @@ void debug_out(Head H, Tail... T) {
     #undef dbgBold
     #define dbgBold(...) dbgcbase(OUT_GREEN, OUT_MARK, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcBold
-    #define dbgcBold(...) dbgcbase(OUT_GREEN, OUT_MARK, __VA_ARGS__)
+    #define dbgcBold(MSG, ...) dbgcbase(OUT_GREEN, OUT_MARK, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbg
     #define dbg(...) dbgcbase(OUT_GREEN, OUT_CYAN, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgc
-    #define dbgc(...) dbgcbase(OUT_GREEN, OUT_CYAN, __VA_ARGS__)
+    #define dbgc(MSG, ...) dbgcbase(OUT_GREEN, OUT_CYAN, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbgY
     #define dbgY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcY
-    #define dbgcY(...) dbgcbase(OUT_GREEN, OUT_YELLOW, __VA_ARGS__)
+    #define dbgcY(MSG, ...) dbgcbase(OUT_GREEN, OUT_YELLOW, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbgP
     #define dbgP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcP
-    #define dbgcP(...) dbgcbase(OUT_GREEN, OUT_PURPLE, __VA_ARGS__)
+    #define dbgcP(MSG, ...) dbgcbase(OUT_GREEN, OUT_PURPLE, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbgR
     #define dbgR(...) dbgcbase(OUT_GREEN, OUT_RED, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcR
-    #define dbgcR(...) dbgcbase(OUT_GREEN, OUT_RED, __VA_ARGS__)
+    #define dbgcR(MSG, ...) dbgcbase(OUT_GREEN, OUT_RED, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbgB
     #define dbgB(...) dbgcbase(OUT_GREEN, OUT_BLUE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcB
-    #define dbgcB(...) dbgcbase(OUT_GREEN, OUT_BLUE, __VA_ARGS__)
+    #define dbgcB(MSG, ...) dbgcbase(OUT_GREEN, OUT_BLUE, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbgW
     #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcW
-    #define dbgcW(...) dbgcbase(OUT_GREEN, OUT_WHITE, __VA_ARGS__)
+    #define dbgcW(MSG, ...) dbgcbase(OUT_GREEN, OUT_WHITE, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
