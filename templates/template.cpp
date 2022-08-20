@@ -632,7 +632,7 @@ string print_details_helper_general(T&& q, S f, ll MAX) {
         out = prefix + "\n" + out + "\n\t... (full length " + to_string(q.size()) + ")";
         out.push_back('\n');
     } else {
-        out = "\n" + prefix + "\n" + out;
+        out = prefix + "\n" + out;
     }
     return out;
 }
