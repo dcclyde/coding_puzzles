@@ -624,11 +624,12 @@ string print_details_helper_general(T&& q, S f, ll MAX) {
         out += to_string(ctr) + ":\t" + to_string(f(x)) + "\n";
         ++ctr;
     }
-    string prefix = "len = " + to_string(q.size());
+    // string prefix = "\tlen " + to_string(q.size());
+    string prefix = "";
     if (trimmed) {
-        prefix += ", trimmed to " + to_string(MAX);
+        // prefix += ", trimmed to " + to_string(MAX);
         out.pop_back();
-        out = "\n" + prefix + "\n" + out + "\nOutput trimmed, full length " + to_string(q.size());
+        out = prefix + "\n" + out + "\n\t... (full length " + to_string(q.size()) + ")";
         out.push_back('\n');
     } else {
         out = "\n" + prefix + "\n" + out;
