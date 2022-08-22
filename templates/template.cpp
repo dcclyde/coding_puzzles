@@ -126,18 +126,6 @@ constexpr bool is_iterable_v<
     >
 > = true;
 
-template <typename, typename=void>
-constexpr bool is_tuplelike_v{};
-
-template <typename T>
-constexpr bool is_tuplelike_v<
-    T,
-    void_t<
-        decltype(std::get<0>(declval<T>())),
-        decltype(std::tuple_size_v<T>)
-    >
-> = true;
-
 // Safe hash maps. See https://codeforces.com/blog/entry/62393
 struct custom_hash {
     static uint64_t splitmix64(uint64_t x) {
@@ -159,17 +147,12 @@ struct custom_hash {
         return a + 3*b;
     }
 
-    template<class T, size_t k>
-    void op_tuplehelper(size_t& out, T t) const {
-        out += (*this)(get<k>(t)) * (k+1)*(k+1);
-        if constexpr (k < tuple_size_v<T> - 1) {
-            op_tuplehelper<T, k+1>(out, t);
-        }
-    }
-    template <typename X>
-    typename enable_if<is_tuplelike_v<X>, size_t>::type operator()(const X& t) const {
+    template <class... Ts> size_t operator()(const tuple<Ts...>& t) const {
         size_t out = 0;
-        op_tuplehelper<X, 0>(out, t);
+        apply([&](const Ts& ...args) {
+            ll m = 0;
+            ((out += (*this)(args) * ++m), ...);
+        }, t);
         return out;
     }
 
@@ -339,45 +322,33 @@ inline namespace Helpers {
     tcT> constexpr bool is_printable_v = is_printable<T>::value;
 
 
-    tcT> typename enable_if<!is_iterable_v<T> && !is_tuplelike_v<T>, void>::type increment_one(T& x, int inc) {x += inc;}
-    tcT> typename enable_if<is_tuplelike_v<T>, void>::type increment_one(T& t, int inc);
+    tcT> typename enable_if<!is_iterable_v<T>, void>::type increment_one(T& x, int inc) {x += inc;}
     tcT> typename enable_if<is_iterable_v<T>, void>::type increment_one(T& t, int inc) { for(auto&& x : t) {increment_one(x, inc);} }
 
-    template<class T, size_t k>
-    void increment_one_tuplehelper(T& t, int inc) {
-        increment_one(get<k>(t), inc);
-        if constexpr (k < tuple_size_v<T> - 1) {
-            increment_one_tuplehelper<T, k+1>(t, inc);
-        }
-    }
-    tcT> typename enable_if<is_tuplelike_v<T>, void>::type increment_one(T& t, int inc) {
-        increment_one_tuplehelper<T,0>(t, inc);
+    template <class... Ts> void increment_one(tuple<Ts...>& t, int inc) {
+        apply([&](Ts& ...args) {(increment_one(args, inc), ...);}, t);
     }
 
-    void increment() {} // add one to each, for output.  BE CAREFUL TO UNDO MODIFICATIONS
-    tcTUU> void increment(T& t, U&... u) { increment_one(t,+1); increment(u...); }
-    void decrement() {} // subtract one from each, for input. MODIFICATION IS THE GOAL
-    tcTUU> void decrement(T& t, U&... u) { increment_one(t,-1); decrement(u...); }
+    void increment(auto& ...args) {(increment_one(args, +1), ...);} // add one to each, for output.  BE CAREFUL TO UNDO MODIFICATIONS
+    void decrement(auto& ...args) {(increment_one(args, -1), ...);} // subtract one from each, for input. MODIFICATION IS THE GOAL
 }
 
 inline namespace Input {
     tcT> constexpr bool needs_input_v = !is_readable_v<T> && is_iterable_v<T>;
 
-    tcTUU> void re(T& t, U&... u);
-    tcTU> void re(pair<T,U>& p); // pairs
-
     // re: read
-    tcT> typename enable_if<is_readable_v<T>,void>::type re(T& x) { cin >> x; } // default
+    void re(auto &...args);
+    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }  // pairs
     tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
-    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }
-    template<class A,class B,class C> void re(tuple<A,B,C>& t) {auto& [a,b,c]=t; re(a,b,c);}
-    template<class A,class B,class C, class D> void re(tuple<A,B,C,D>& t) {auto& [a,b,c,d]=t; re(a,b,c,d);}
-    template<class A,class B,class C, class D, class E> void re(tuple<A,B,C>& t) {auto& [a,b,c,d,e]=t; re(a,b,c,d,e);}
-    template<class A,class B,class C, class D, class E, class F> void re(tuple<A,B,C>& t) {auto& [a,b,c,d,e,f]=t; re(a,b,c,d,e,f);}
+
+    template <class... Ts> void re(tuple<Ts...> &t) {
+        apply([](Ts &...args) { re(args...); }, t);
+    }
+
     tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
         each(x,i) re(x); }
-    tcTUU> void re(T& t, U&... u) { re(t); re(u...); } // read multiple
+    void re(auto& ...args) { ((cin >> args), ...); } // read multiple
 
     // rv: resize and read vectors
     void rv(size_t) {}
@@ -452,15 +423,14 @@ inline namespace ToString {
 }
 
 inline namespace Output {
-    template<class T, size_t k>
-    void tsish_tuplehelper(T& t, string& out) {
-        out += ts(get<k>(t)); out.push_back(' ');
-        if constexpr (k < tuple_size_v<T> - 1) { tsish_tuplehelper<T, k+1>(t, out); }
+    template<class... Ts> string tsish(const tuple<Ts...>& t) {
+        string out = "";
+        apply([&](const Ts& ...args) {((out += ts(args), out.push_back(' ')), ...);}, t);
+        out.pop_back();
+        return out;
     }
-    tcT> typename enable_if<is_tuplelike_v<T>, string>::type tsish(T& t) {
-        string out; tsish_tuplehelper<T,0>(t, out); out.pop_back(); return out;
-    }
-    tcT> typename enable_if<!is_tuplelike_v<T>, string>::type tsish(T& t) { return ts(t); }
+    string tsish(const char* s) {return s;}
+    string tsish(const auto& t) {return to_string(t);}
 
     template<class T> void pr_sep(ostream& os, str, const T& t) { os << tsish(t); }
     template<class T, class... U> void pr_sep(ostream& os, str sep, const T& t, const U&... u) {
@@ -521,8 +491,7 @@ inline namespace FileIO {
 template <typename A, typename B>
 string to_string(pair<A, B> p);
 
-template <typename X>
-typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p);
+template<class ...Ts> string to_string(const tuple<Ts...>& t);
 
 string to_string(const string& s) {
     return '"' + s + '"';
@@ -596,19 +565,10 @@ string to_string(pair<A, B> p) {
     return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
 }
 
-template<class T, size_t k>
-void to_string_tuplehelper(string& out, T& t) {
-    out += ", " + to_string(get<k>(t));
-    if constexpr (k < tuple_size_v<T> - 1) {
-        to_string_tuplehelper<T, k+1>(out, t);
-    }
-}
-template <typename X>
-typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p) {
-    string out = "(" + to_string(get<0>(p));
-    to_string_tuplehelper<X, 1>(out, p);
-    out += ")";
-    return out;
+template<class ...Ts> string to_string(const tuple<Ts...>& t) {
+    string out = "(";
+    apply([&](const Ts& ...args) {((out += to_string(args) + ", "), ...);}, t);
+    out.pop_back(); out.pop_back(); out.push_back(')'); return out;
 }
 
 
