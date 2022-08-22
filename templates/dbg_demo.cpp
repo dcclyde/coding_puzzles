@@ -1,4 +1,7 @@
-// run with: g++ --std=c++17 -DDCCLYDE_LOCAL dbg_demo.cpp && ./a.out
+// Stripped-down version of template.cpp that adds only the dbg() functionality.
+// No guarantees that I'll remember to keep this updated as I edit template.cpp going forward.
+// Compile and run with: g++ --std=c++17 -DDCCLYDE_LOCAL dbg_demo.cpp && ./a.out
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -300,12 +303,13 @@ void debug_out(Head H, Tail... T) {
     #undef local_run
     #define local_run (true)
 #endif
-#pragma region  // END setup for dbg() printouts
+#pragma endregion  // END setup for dbg() printouts
 
 
 
 int main() {
     // placeholder code that demos the dbg() functionality
+    // Compile and run with: g++ --std=c++17 -DDCCLYDE_LOCAL dbg_demo.cpp && ./a.out
     int a = 14; double b = -3e-2; char c = '@'; string s = "Test String";
     vector<int> q = {1, 6, 4, 3, 5, 3, 1};
     dbg(a, b, c, "", s, q);
