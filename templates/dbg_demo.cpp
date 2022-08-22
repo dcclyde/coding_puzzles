@@ -6,18 +6,6 @@
 using namespace std;
 
 #pragma region  // setup for dbg() printouts
-template <typename, typename=void>
-constexpr bool is_tuplelike_v{};
-
-template <typename T>
-constexpr bool is_tuplelike_v<
-    T,
-    void_t<
-        decltype(std::get<0>(declval<T>())),
-        decltype(std::tuple_size_v<T>)
-    >
-> = true;
-
 template <typename, typename = void>
 constexpr bool is_iterable_v{};
 
@@ -33,8 +21,7 @@ constexpr bool is_iterable_v<
 template <typename A, typename B>
 string to_string(pair<A, B> p);
 
-template <typename X>
-typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p);
+template<class ...Ts> string to_string(const tuple<Ts...>& t);
 
 string to_string(const string& s) {
     return '"' + s + '"';
@@ -108,19 +95,10 @@ string to_string(pair<A, B> p) {
     return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
 }
 
-template<class T, size_t k>
-void to_string_tuplehelper(string& out, T& t) {
-    out += ", " + to_string(get<k>(t));
-    if constexpr (k < tuple_size_v<T> - 1) {
-        to_string_tuplehelper<T, k+1>(out, t);
-    }
-}
-template <typename X>
-typename enable_if<is_tuplelike_v<X>, string>::type to_string(X p) {
-    string out = "(" + to_string(get<0>(p));
-    to_string_tuplehelper<X, 1>(out, p);
-    out += ")";
-    return out;
+template<class ...Ts> string to_string(const tuple<Ts...>& t) {
+    string out = "(";
+    apply([&](const Ts& ...args) {((out += to_string(args) + ", "), ...);}, t);
+    out.pop_back(); out.pop_back(); out.push_back(')'); return out;
 }
 
 
