@@ -2,7 +2,7 @@
 #ifdef _OPENMP
     #include <omp.h>
 #endif
-#ifdef DCCLYDE_LOCAL
+#if defined(DCCLYDE_LOCAL) && __has_include("/home/dcclyde/puzzles/code/templates/superheader.h")
     #include "/home/dcclyde/puzzles/code/templates/superheader.h"
 #else
     #define NDEBUG  // don't bother with assertions on the judge server.
