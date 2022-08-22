@@ -1,15 +1,13 @@
 #pragma region
-#ifdef _OPENMP
-    #include <omp.h>
-#endif
 #if defined(DCCLYDE_LOCAL) && __has_include("/home/dcclyde/puzzles/code/templates/superheader.h")
     #include "/home/dcclyde/puzzles/code/templates/superheader.h"
 #else
-    #define NDEBUG  // don't bother with assertions on the judge server.
-    #include <tgmath.h>
     #include <bits/stdc++.h>
     #include <ext/pb_ds/assoc_container.hpp>
     #include <ext/pb_ds/tree_policy.hpp>
+#endif
+#ifdef _OPENMP
+    #include <omp.h>
 #endif
 using namespace std;
 using namespace __gnu_pbds;
