@@ -71,13 +71,23 @@ using vpd = V<pdd>;
 //// tcT> int lwb(V<T>& a, const T& b) { return int(lb(all(a),b)-bg(a)); }
 //// tcT> int upb(V<T>& a, const T& b) { return int(ub(all(a),b)-bg(a)); }
 
+// Easily create k-dimensional vectors (C++14).
+template <class T>
+vector<T> ndvec(size_t size, T initialValue) {
+    return vector<T>(size, initialValue);
+}
+
+template <class T, class... Args>
+auto ndvec(size_t head, Args&&... tail) {
+    auto inner = ndvec<T>(tail...);
+    return vector<decltype(inner)>(head, inner);
+}
+
 // bitwise ops
 // also see https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
 constexpr int pct(int x) { return __builtin_popcount(x); } // # of bits set bits_set
 constexpr ll pct(ll x) { return __builtin_popcountll(x); }
-constexpr int bigbit(int x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
-    return x == 0 ? 0 : 31-__builtin_clz(x); } // floor(log2(x))
-constexpr int bigbitll(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
+constexpr int bigbit(ll x) { // assert(x >= 0); // make C++11 compatible until USACO updates ...
     return x == 0 ? 0 : 63-__builtin_clzll(x); } // floor(log2(x))
 constexpr int p2(int x) { return 1<<x; }
 constexpr int msk2(int x) { return p2(x)-1; }
@@ -167,15 +177,34 @@ struct custom_hash {
     }
 };
 
-template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
-// template<class A, class B> using umap = unordered_map<A,B,custom_hash>;  // slower?
-// template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
-// template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
+/**
+    Reasons for different definitions:
+        gp_hash_table seems fastest in general.
+        custom_hash lets me hash some types (tuples, vectors) that aren't hashable by default.
+        I can't use unordered_map on codeforces servers because it's hackable.
+        If _GLIBCXX_DEBUG is defined then gp_hash_table doesn't compile (printability stuff?)
+ */
+#if defined(_GLIBCXX_DEBUG)
+    // template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
+    template<class A, class B> using umap = unordered_map<A,B,custom_hash>;  // slower?
+    // template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
+    // template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
 
-template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
-// template<class A> using uset = unordered_set<A, custom_hash>;
-// template<class A> using uset = set<A>;
-// template<class A> using uset = unordered_set<A>;
+    // template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
+    template<class A> using uset = unordered_set<A, custom_hash>;
+    // template<class A> using uset = set<A>;
+    // template<class A> using uset = unordered_set<A>;
+#else
+    template<class A, class B> using umap = gp_hash_table<A,B,custom_hash>;
+    // template<class A, class B> using umap = unordered_map<A,B,custom_hash>;  // slower?
+    // template<class A, class B> using umap = map<A,B>;  // ok for tiny cases?
+    // template<class A, class B> using umap = unordered_map<A,B>;  // slower and unsafe?
+
+    template<class A> using uset = gp_hash_table<A,null_type,custom_hash>;
+    // template<class A> using uset = unordered_set<A, custom_hash>;
+    // template<class A> using uset = set<A>;
+    // template<class A> using uset = unordered_set<A>;
+#endif
 
 #define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
 #define unordered_set DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_SET
@@ -376,8 +405,8 @@ inline namespace ToString {
     tcT> constexpr bool needs_output_v = !is_printable_v<T> && is_iterable_v<T>;
 
     // ts: string representation to print
-    tcT> typename enable_if<is_printable_v<T>,str>::type ts(T v) {
-        stringstream ss; ss << fixed << setprecision(15) << v;
+    tcT> typename enable_if<is_printable_v<T>,str>::type ts(T v, ll d=15) {
+        stringstream ss; ss << fixed << setprecision(d) << v;
         return ss.str(); } // default
     tcT> str bit_vec(T t) { // bit vector to string
         str res = "{"; F0R(i,sz(t)) res += ts(t[i]);
@@ -428,6 +457,9 @@ inline namespace Output {
         return out;
     }
     string tsish(const char* s) {return s;}
+    string tsish(double x) {return ToString::ts(x);}
+    string tsish(long double x) {return ToString::ts(x);}
+    string tsish(const string& x) {return x;}
     string tsish(const auto& t) {return to_string(t);}
 
     template<class T> void pr_sep(ostream& os, str, const T& t) { os << tsish(t); }
@@ -487,27 +519,48 @@ inline namespace FileIO {
 // * dcclyde added line numbers, colors, probably some other stuff.
 
 template <typename A, typename B>
-string to_string(pair<A, B> p);
+string tsdbg(pair<A, B> p);
 
-template<class ...Ts> string to_string(const tuple<Ts...>& t);
+template<class ...Ts> string tsdbg(const tuple<Ts...>& t);
 
-string to_string(const string& s) {
+string tsdbg(db x) {
+    return ts(x, 3);
+    // ostringstream out;
+    // out.precision(3);
+    // out << fixed << x;
+    // return out.str();
+}
+string tsdbg(double x) { return ts(x, 3); }
+string tsdbg(float x) { return ts(x, 3); }
+
+string tsdbg(const string& s) {
     return '"' + s + '"';
 }
 
-string to_string(char c) {
+string tsdbg(char c) {
     return "'" + string(1, c) + "'";
 }
 
-string to_string(const char* s) {
-    return to_string((string) s);
+string tsdbg(ll x) {return to_string(x);}
+string tsdbg(int x) {return to_string(x);}
+string tsdbg(size_t x) {return to_string(x);}
+string tsdbg(__int128_t x) {
+    if (x == 0) {return "0";}
+    string out;
+    while (x > 0) {out.push_back('0' + (x%10)); x /= 10;}
+    reverse(all(out));
+    return out;
 }
 
-string to_string(bool b) {
+string tsdbg(const char* s) {
+    return tsdbg((string) s);
+}
+
+string tsdbg(bool b) {
     return (b ? "true" : "false");
 }
 
-string to_string(vector<bool> v) {
+string tsdbg(vector<bool> v) {
     bool first = true;
     string res = "{";
     for (int i = 0; i < static_cast<int>(v.size()); i++) {
@@ -515,14 +568,14 @@ string to_string(vector<bool> v) {
             res += ", ";
         }
         first = false;
-        res += to_string(v[i]);
+        res += tsdbg(v[i]);
     }
     res += "}";
     return res;
 }
 
 template <size_t N>
-string to_string(bitset<N> v) {
+string tsdbg(bitset<N> v) {
     string res = "";
     for (size_t i = 0; i < N; i++) {
         res += static_cast<char>('0' + v[i]);
@@ -531,7 +584,7 @@ string to_string(bitset<N> v) {
 }
 
 template <typename A>
-typename enable_if<is_iterable_v<A>, string>::type to_string(A v) {
+typename enable_if<is_iterable_v<A>, string>::type tsdbg(A v) {
     bool first = true;
     string res = "{";
     for (const auto &x : v) {
@@ -539,7 +592,7 @@ typename enable_if<is_iterable_v<A>, string>::type to_string(A v) {
             res += ", ";
         }
         first = false;
-        res += to_string(x);
+        res += tsdbg(x);
     }
     res += "}";
     return res;
@@ -554,20 +607,22 @@ V<T> pqueue_to_iterable(priority_queue<T> PQ) { // PASS BY VALUE!
 }
 
 template <typename T>
-string to_string(priority_queue<T>&& PQ) {
-    return to_string(pqueue_to_iterable(PQ));
+string tsdbg(priority_queue<T>&& PQ) {
+    return tsdbg(pqueue_to_iterable(PQ));
 }
 
 template <typename A, typename B>
-string to_string(pair<A, B> p) {
-    return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
+string tsdbg(pair<A, B> p) {
+    return "(" + tsdbg(p.first) + ", " + tsdbg(p.second) + ")";
 }
 
-template<class ...Ts> string to_string(const tuple<Ts...>& t) {
+template<class ...Ts> string tsdbg(const tuple<Ts...>& t) {
     string out = "(";
-    apply([&](const Ts& ...args) {((out += to_string(args) + ", "), ...);}, t);
+    apply([&](const Ts& ...args) {((out += tsdbg(args) + ", "), ...);}, t);
     out.pop_back(); out.pop_back(); out.push_back(')'); return out;
 }
+
+// template<class T> string tsdbg(const T&& x) {return to_string(x);}
 
 
 // helpers for debugging complicated objects
@@ -579,15 +634,15 @@ string print_details_helper_general(T&& q, S f, ll MAX) {
     for ( auto&& x : q ) {
         if (ctr == MAX) {trimmed = true; break;}
         out.push_back('\t');
-        out += to_string(ctr) + ":\t" + to_string(f(x)) + "\n";
+        out += tsdbg(ctr) + ":\t" + tsdbg(f(x)) + "\n";
         ++ctr;
     }
-    // string prefix = "\tlen " + to_string(q.size());
+    // string prefix = "\tlen " + tsdbg(q.size());
     string prefix = "";
     if (trimmed) {
-        // prefix += ", trimmed to " + to_string(MAX);
+        // prefix += ", trimmed to " + tsdbg(MAX);
         out.pop_back();
-        out = prefix + "\n" + out + "\n\t... (full length " + to_string(q.size()) + ")";
+        out = prefix + "\n" + out + "\n\t... (full length " + tsdbg(q.size()) + ")";
         out.push_back('\n');
     } else {
         out = prefix + "\n" + out;
@@ -595,7 +650,7 @@ string print_details_helper_general(T&& q, S f, ll MAX) {
     return out;
 }
 
-#define PDH_DEFAULT_MAX 10'000
+#define PDH_DEFAULT_MAX 100'000
 template<class T>
 string print_details_helper(T&& q, ll MAX=PDH_DEFAULT_MAX) {
     return print_details_helper_general(q, [&](auto x) {return x;}, MAX);
@@ -635,7 +690,7 @@ string print_tsv_helper(T&& q) {
             if ( !first ) {
                 out += '\t';
             }
-            out += to_string(v);
+            out += tsdbg(v);
             first = false;
         }
         out += '\n';
@@ -650,9 +705,9 @@ void debug_out() {}
 template <typename Head, typename... Tail>
 void debug_out(Head H, Tail... T) {
     // mostly no difference unless there's a background color.
-    // std::cerr << to_string(H) << "   ";
+    // std::cerr << tsdbg(H) << "   ";
     // debug_out(T...);
-    std::cerr << ' ' << to_string(H) << ' ';
+    std::cerr << ' ' << tsdbg(H) << ' ';
     if (sizeof...(T)) {
         std::cerr << " ";
         debug_out(T...);
@@ -666,6 +721,7 @@ void debug_out(Head H, Tail... T) {
 #define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" "m"
 #define OUT_CYAN        "\033[36" BOLD_MAYBE "m"
+#define OUT_DEFAULT OUT_CYAN
 // #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" "m"
 #define OUT_BLUE        "\033[34" BOLD_MAYBE "m"
@@ -690,6 +746,8 @@ void debug_out(Head H, Tail... T) {
 #define dbgcB(...) ;
 #define dbgW(...) ;
 #define dbgcW(...) ;
+#define dbgGeneral(...) ;
+#define dbgcGeneral(...) ;
 #define dbg_only(...) ;
 #define local_run (false)
 #ifdef DCCLYDE_LOCAL
@@ -739,6 +797,11 @@ void debug_out(Head H, Tail... T) {
     #define dbgW(...) dbgcbase(OUT_GREEN, OUT_WHITE, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcW
     #define dbgcW(MSG, ...) dbgcbase(OUT_GREEN, OUT_WHITE, MSG, #__VA_ARGS__, __VA_ARGS__)
+
+    #undef dbgGeneral
+    #define dbgGeneral(COLOR, ...) dbgcbase(OUT_GREEN, COLOR, "", #__VA_ARGS__, __VA_ARGS__)
+    #undef dbgcGeneral
+    #define dbgcGeneral(COLOR, MSG, ...) dbgcbase(OUT_GREEN, COLOR, MSG, #__VA_ARGS__, __VA_ARGS__)
 
     #undef dbg_only
     #define dbg_only(...) __VA_ARGS__;
@@ -828,7 +891,10 @@ int main() {
         dbgBold(num_procs, max_threads);
         omp_set_num_threads(num_procs - 4);
     #endif
+    setIO();
+
     solve();
+
     dbgR(TIME());
     return 0;
 }
