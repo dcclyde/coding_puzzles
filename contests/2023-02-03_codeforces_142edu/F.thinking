@@ -1,0 +1,58 @@
+
+DP?
+
+I want a solution for N+1.
+
+Cases:
+* For N, all edges had some color.
+* I had a valid solution for N
+
+! CASE 1:
+Assume the N graph is all red.
+What could I do at this next step?
+Need at least one blue and at least one red.
+If I pick a subset that doesn't include N+1, we'll be fine.
+
+If my subset includes a red edge from N+1, we're fine.
+
+We think it's always fine as long as we have 1 <= num red <= N-1.
+
+
+! CASE 2:
+Again, if we don't pick N+1 there're no problems.
+Let our test subset be T.
+Assume T \ {N+1} is red connected.
+Then we need
+
+If the new edges are all same color, we're fine.
+Otherwise, we'll definitely still be red connected. Are we blue connected?
+
+
+-----
+
+Even with just 3 vertices, we'll have a "dominant" color
+using which the whole graph is connected.
+
+Let's say we're blue-dominant.
+There are some number of red connected components.
+
+For each pair of red connected components, *every* connecting edge is blue.
+
+If N+1 joins onto multiple red connected compoennts,
+then ALL edges into those components must be red.
+
+So we have cases.
+
+
+--------------------------------------------
+! 1 day after reading their solution...
+
+I only need to prevent connected-both-ways subsets.
+
+To build a blue-dominant solution:
+    If N+1 has a red connected component of size K,
+        then I need a valid solution of size K that's red-dominant,
+        plus *any* valid solution of size N-K.
+
+
+.

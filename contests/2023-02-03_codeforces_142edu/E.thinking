@@ -1,0 +1,44 @@
+
+I know the list of all divisors.
+
+I want:
+For each d, what's the biggest x <= N that's a divisor of d?
+
+Try backward:
+For each divisor x, which d's will use this x?
+
+
+d = mx for some x.
+
+If x is the biggest divisor <= N, then
+
+
+---
+
+Which divisors will appear in the table somewhere?
+For each divisor, I can immediately say how many total children it has.
+
+---
+
+Given a column c, which rows r will be useful?
+Definitely we only care about r <= c. Then r*c = d.
+
+* r <= c
+* r * c | M
+* (smallest divisor of r) * c <= N
+
+
+
+Can I do some kinda sieve thing?
+
+-----------------------
+! (1 day after looking at their explanation)
+
+For each d, the correct x can be dp[d].
+Then we'll have dp[d] = dp[d/p] for some prime p dividing d.
+Should be plenty fast enough to just iterate over those.
+
+
+
+
+.

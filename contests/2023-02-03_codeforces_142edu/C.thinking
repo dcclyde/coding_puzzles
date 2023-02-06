@@ -1,0 +1,10 @@
+
+5 2 4 1 6 3
+
+Last thing I bring to front should be 1.
+Last thing to back should be 6.
+
+Basically, what's the largest "middle subsequence" that's already sorted?
+
+
+.
