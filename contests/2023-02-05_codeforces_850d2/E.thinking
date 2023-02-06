@@ -1,0 +1,46 @@
+
+Say I have 8, 8.
+I was planning to make 1, 2 costing 7 + 6 = 13.
+
+Now I add 5.
+I can now make 1, 2, 3 costing 4 + 6 + 5 = 15.
+
+---
+
+Say I have 4, 4, 4, 4.
+Now I add 3.
+Before I was making 1, 2, 3, 4.
+Now I'll make 1, 2, 3, 4, 4.
+
+
+If I have 1, 2, 3, 3, 3, 3, 3, 3, 3, 20
+
+* dat[k] becomes min(dat[k], seen[k-1] + 1).
+* seen[k] = number of new peaks among dat[0 .. k-1].
+    aka number of distinct smaller values represented?
+    no...
+    if I add a value that's bigger than the current "seen" in that position,
+        I should add 1 to seen there.
+
+
+
+
+* Feels like I should use a segtree with node per dat VALUE.
+
+-----
+
+If I add a new value x, then I think some range of final states will get incremented.
+    (aka their move sizes get decremented.)
+Everything up till the first guy who already wasn't planning to move.
+
+
+-----
+
+Can I just run my same algorithm from before?
+I guess I could track an "array" of what seen will equal at each point.
+
+Insert a new value...
+
+
+
+.

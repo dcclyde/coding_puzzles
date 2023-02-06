@@ -1,0 +1,79 @@
+Each person has AAA, AAB, or ABC (up to renaming).
+Lower bound: AAA needs 2 swaps, AAB needs 1 swap.
+Is that always achievable?
+In other words - can I always find a useful swap?
+
+If I still have AAAs, grab one of those. Then grab someone who needs this.
+
+---
+
+If I have an AAA, then there's someone with no As.
+Those two can make a mutually beneficial trade.
+
+
+Now suppose I only have stuff like AAB.
+I'd like to find someone with BCC.
+There's definitely someone with CC.
+What if all CCs have ACC?
+
+aab
+aab
+acc
+acc
+bbc
+bbc
+
+I can't make a mutually beneficial trade I think?
+
+aab, bbc -> abb, abc
+abb, acc ->
+
+
+---
+
+aab
+bcc
+
+! Strategy:
+? Phase 1: Swap all AAAs. These can be mutually beneficial.
+? Phase 2: Finish all ABB + ACC. These are mutually beneficial.
+? Phase 3: Remaining stuff is in groups of 3. It'll take me 3 swaps per group.
+
+Can I do better? Maybe by swapping my AAAs more carefully?
+
+aaa x2
+bbb x2
+ccc x2
+
+->
+aab aab
+abb abb
+ccc ccc
+
+->
+
+
+
+
+---
+
+Can I keep track of who needs
+
+
+wii
+wnn
+www
+
+wii, www ->
+
+
+
+wii
+nni
+www
+
+www, nni -> wwn, win
+
+
+
+.

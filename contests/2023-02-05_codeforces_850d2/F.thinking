@@ -1,0 +1,25 @@
+
+Basically: How many descending chains starting with k?
+Well...
+
+It's not so trivial to count the setups
+that create chain 1 5 10 13 14.
+
+Maybe some kinda DP that depends on how many items in that subtree will be > vs <
+    some other thing?
+
+
+10 won a group of size 2. 4 choices.
+
+5 won a group of size 4.
+    (16-5 - 4) choose 3 ways to pick the suckers.
+    2 ways to order them.
+
+1 won a group of size 8.
+    (16-1 - 8) choose 7 ways to choose the suckers
+    Maybe it's easiest to view the ordering as 7!?
+        Not sure when I want to account for "tournament isomorphisms".
+
+
+
+.
