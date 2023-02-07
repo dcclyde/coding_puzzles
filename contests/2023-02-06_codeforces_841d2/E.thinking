@@ -1,0 +1,43 @@
+
+N <= 1e6.
+
+For each w, how many ordered pairs have gcd(a, b) = w?
+I care about 1 <= w <= N.
+
+There are Nc2 pairs available total.
+
+How many pairs have gcd = 1?
+That should just be phi(2) + phi(3) + ... + phi(N).
+
+How many have gcd = 2?
+That should be phi(2) + ... + phi(N / 2).
+
+OK, let's assume I can do this part.
+
+-----
+
+Now it seems like.... some DP?
+Pay K+1 for K edges. So it seems generally good to add larger batches.
+How far can I get by just trying everything?
+
+dp[n][e] = cheapest cost to get e total edges after using group sizes up to n.
+
+dp[e] = current cheapest cost to get e total edges.
+Update: with group size n, I could use up to phisum[n+1] / n groups.
+    Each group costs me n+1 dollars.
+
+* Total cost will be E + num groups we used.
+
+OK, so I have c[k] coins of value v[k].
+The sum of c[k] is bounded by N^2. Probably I could find better bounds though.
+
+I want to make value TARG using smallest possible number of coins.
+
+
+I bet I need to use the problem structure some more.
+
+
+
+Can I do some kinda square root decomposition trick?
+
+.
