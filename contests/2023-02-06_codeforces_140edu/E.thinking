@@ -1,0 +1,15 @@
+
+This smells like some standard graph theory thing to me.
+I basically can't allow any consecutive unavailable platforms.
+So the data amounts to a long list like:
+    we need at least one of (j, k)
+
+N doesn't matter at all.
+We have a graph with 40 vertices and at most 780 edges.
+
+Pick some vertices such that our set touches every edge.
+
+Conversely, pick vertices to *exclude* such that we don't cover any edges.
+
+
+.

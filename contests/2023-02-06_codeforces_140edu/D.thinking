@@ -1,0 +1,9 @@
+
+Say we end with 4 1s.
+Then I need 2^4 - 1 teams that I can beat.
+
+... 00 1111
+each of those teams above needs 2^2 - 1 = 3 stronger friends.
+
+
+.

@@ -1,0 +1,6 @@
+I want num with no bad intervals.
+    num total
+        - sum_j (num with bad stuff in interval j)
+        + sum_j,k (num with bad stuff in both j and k)
+
+
