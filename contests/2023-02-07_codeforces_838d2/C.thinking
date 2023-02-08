@@ -1,0 +1,18 @@
+
+Given 1 0 1.
+How many extensions?
+
+1 ? 0 ? 1
+the first 3 need more than half 0s.
+The first 5 need more than half 1s.
+
+
+
+1 ? 0 ? 0 ? 0 ? 0 ? 1 ? 1
+  0
+
+
+Answer should basically be 2 ^ length of the last chunk?
+    Well, I guess 2 ^ (l-1).
+
+.

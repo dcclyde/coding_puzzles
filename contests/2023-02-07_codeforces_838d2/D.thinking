@@ -1,0 +1,53 @@
+
+If I query p[0] against everyone, I could probably learn what that value is.
+    I'd also know which are the multiples of p[0].
+
+Seems not too useful. If I started with 1 then I don't learn about anything else.
+
+
+
+How far could I get if I ignore everything except the powers of 2?
+If a is odd then gcd(a,b) will always be odd.
+
+
+
+Try stuff at random for a bit at first?
+Otherwise I could go a long time without finding anything except 1s.
+
+Try stuff, eventually find (a,b) = g > 1.
+
+Chance of finding 2|g is 1/4 ish.
+
+Find something divisible by 2.
+Then test him against EVERYONE?
+Now I know everyone who's divisible by 2. Throw others in the trash.
+I kind of almost could just repeat this...
+
+
+Suppose I have a solution for N (in 2N steps)
+and I want to have a solution for 2N (in 4N steps).
+It would be OK to spend 2N time reducing to size N.
+
+
+
+
+---
+
+n = 15
+say I randomly hit 4, 8.
+Then what?
+
+
+
+
+What about n = 2?
+Just answer right away.
+
+N = 3?
+q(0, 1) = 2
+
+N = 6?
+
+
+
+.

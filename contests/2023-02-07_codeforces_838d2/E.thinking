@@ -1,0 +1,17 @@
+
+For all possible "good" trees and edge colorings,
+I need sum of the path from 1 to n.
+
+"good" means every vertex has an odd number of blacks.
+
+I could think of this as two distinct graphs.
+The black graph needs to have odd degree at every vertex.
+    (this already means we need N even.)
+Also it can't have any loops. It's fine to be multiple connected components though.
+
+Then the white graph needs to turn the black graph into a tree.
+
+Given a black graph, can I figure out the sum over all scores?
+
+
+.
