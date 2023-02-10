@@ -1,0 +1,102 @@
+
+Let maxlen[k] = max length of a nonneg segment ending at k.
+    (I could compute these in O(N) using 2ptrs approach.)
+
+dp[k] = answer to the subproblem with 0..k.
+
+Then dp[k] = max(dp[k-1], maxlen[k] + dp[k-maxlen[k]]).
+
+
+
+Wait is that really right?
+    I don't automatically need to use the biggest possible length.
+
+
+10   -100  90   5
+
+
+95  -100    3   3   -5  10
+
+
+0   0   0   -100    100     -100    0   0
+
+I wish I had max_j of j + dp[k-j]
+    over j satisfying sum(j..k) >= 0.
+
+Maybe this is standard range queries stuff?
+I'd like to have some structure that only stores dp
+
+Store f[k] = dp[k] - k?
+Then I want max of j + f(k-j) + k-j = f(k-j) + k.
+
+OK, so I just need max of f(k-j) over valid j.
+
+
+Maybe I could track my running total, and then do a range query that only covers
+    the parts
+
+I could track my running total, and have some kinda segtree that organizes entries
+    by what the running total was at that point.
+    Then I keep querying (-infinity, curr_total].
+
+Once I compute dp[k], I do ckmax(segtree(running_total), dp[k]).
+
+-----
+
+! Let's try to rewrite this more carefully.
+dp[k] = best score on 0, ..., k.
+f[k] = dp[k] - k
+
+f[running] = best f for a segment with this running total.
+
+What is dp[k]?
+    Option 1: dp[k-1], plus 1 if dat[k] >= 0.
+    Option 2: dp[k-j] + j for some j with running(k) >= running(k-j).
+        i.e. f[k-j] + k
+
+        That would mean f[k] = f[k-j].
+
+
+3, -3, -2, 5, -4
+
+dp needs to be: 1, 2, 2, 4, 4
+ f needs to be: 1, 1, 0, 1, 0
+
+k = 0, running = 3
+previous best with running <= 3 is 1, at running = 0.
+So, f[0] = 1. dp[0] = 1.
+
+k = 1, running = 0
+prev best with running <= 0 is 1, at running = 0.
+    f[1] = 1, dp[1] = 2
+
+k = 2, running = -2
+prev best with running <= -2 is 0, at running = -infinity.
+    f[2] = 0, dp[2] = 2
+
+
+k = 3, running = 3
+lookup finds 1, at running = 0
+    f[3] = 1
+
+
+How do base cases work?
+
+-----
+
+-3, -5, -8
+
+k = 0, running = -3
+prev best with running <= 3 is -inf
+    f = 0, dp = 0
+
+k = 1, running = -8
+prev best is -inf
+    f = -1, dp = 0
+
+k = 2, running = -8
+prev best is -inf
+    f = -2, dp = 0
+
+
+.

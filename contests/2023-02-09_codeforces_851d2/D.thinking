@@ -1,0 +1,28 @@
+
+1, 3, 5 --> 2, 4 -> 2
+
+Output = number of dots that initially move right?
+
+Maybe I could do something like - for each dot, how many subsets will make him move right?
+
+* Remember I can afford N^2.
+
+If cid = 0: All other dots can do anything they want.
+    ! I do need this dot to exist!
+
+If cid = 1:
+    If dat[0] is missing, no problem.
+    Otherwise I need to check how far we need to move.
+
+-----
+
+Wait I don't think that works.
+If the dots move R R R R R R L then there's only one final point.
+
+I think the actual contribution is min(num Rs, num Ls).
+
+Alternatively, it should equal the number of (R, L) consecutive pairs.
+    Maybe this is more computable?
+
+
+.
