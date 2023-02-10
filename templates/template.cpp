@@ -450,17 +450,19 @@ inline namespace ToString {
 }
 
 inline namespace Output {
-    template<class... Ts> string tsish(const tuple<Ts...>& t) {
-        string out = "";
-        apply([&](const Ts& ...args) {((out += ts(args), out.push_back(' ')), ...);}, t);
-        out.pop_back();
-        return out;
-    }
+    string tsish(char c) {return string(1, c);}
     string tsish(const char* s) {return s;}
     string tsish(double x) {return ToString::ts(x);}
     string tsish(long double x) {return ToString::ts(x);}
     string tsish(const string& x) {return x;}
     string tsish(const auto& t) {return to_string(t);}
+    template<typename A, typename B> string tsish(const pair<A,B>& t) {
+        return tsish(t.f) + " " + tsish(t.s);}
+    template<class... Ts> string tsish(const tuple<Ts...>& t) {
+        string out = "";
+        apply([&](const Ts& ...args) {((out += ts(args), out.push_back(' ')), ...);}, t);
+        out.pop_back();
+        return out;}
 
     template<class T> void pr_sep(ostream& os, str, const T& t) { os << tsish(t); }
     template<class T, class... U> void pr_sep(ostream& os, str sep, const T& t, const U&... u) {
@@ -541,6 +543,7 @@ string tsdbg(char c) {
     return "'" + string(1, c) + "'";
 }
 
+string tsdbg(long x) {return to_string(x);}
 string tsdbg(ll x) {return to_string(x);}
 string tsdbg(int x) {return to_string(x);}
 string tsdbg(size_t x) {return to_string(x);}
@@ -818,15 +821,19 @@ void debug_out(Head H, Tail... T) {
 
 #define YES ps("YES");
 #define NO ps("NO");
+#define YESNO(x) ps((x) ? ("YES") : ("NO"));
 #define Yes ps("Yes");
 #define No ps("No");
+#define YesNo(x) ps((x) ? ("Yes") : ("No"));
 #define IMPOSSIBLE ps("IMPOSSIBLE");
+#define Impossible ps("Impossible");
+#define POSSIBLE ps("POSSIBLE");
+#define Possible ps("Possible");
 
-const ll INF_ll = ll(2e18) + 1;
-const int INF_i = int(2e9) + 1;
 
-// const int MOD = 1'000'000'007;
-// const int MOD = 998'244'353;
+
+const ll INF_ll = 2'000'000'000'000'000'001;  // 2e18 + 1
+const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 #pragma endregion
 
@@ -845,7 +852,6 @@ void solve() {
     el;
 
     // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
-
 
 
     return;

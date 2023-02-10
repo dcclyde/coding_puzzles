@@ -3,6 +3,11 @@ import sys
 sys.path.append("/home/dcclyde/puzzles/code/templates")
 from template import *
 #endregion
+#region  block all buffering (don't want this in submittable solutions!)
+import functools
+print = functools.partial(print, flush=True)  # including this in debug_only section of template.py could cause server-only bugs.
+ps = functools.partial(ps, flush=True)  # including this in debug_only section of template.py could cause server-only bugs.
+#endregion
 #region  ri, rv
 def ri(q, b=None):
     if isinstance(b, int):
@@ -101,15 +106,49 @@ def rtree_rooted_v2(nr, mute=False):
 #endregion
 
 
-N_RANGE = (1, 5)
-V_RANGE = (1, 5)
+N_RANGE = (6, 10)
 
-def gen_test():
+def gcd(a, b):
+    if b == 0: return a
+    return gcd(b, a % b)
+
+def interact():
+    ps(1)
+
     N = ri(N_RANGE)
-    dat = rv(V_RANGE, N)
-    # ps(1)  # ! uncomment for multi-case
+    dat = list(range(N))
+    random.shuffle(dat)
+    for k in range(N):
+        if dat[k] == 0: answer = k
+
+    dbgR(answer, dat)
     ps(N)
-    pv(dat)
+
+    queries_allowed = 2*N
+    while True:
+        raw = input().split()
+        # dbgP(raw)
+        qtype = raw[0]
+        a = int(raw[1]) - 1
+        b = int(raw[2]) - 1
+        if qtype == '!':
+            if answer == a or answer == b:
+                dbgc("! good", a, b, answer)
+                ps(1)
+                print(1)
+                sys.exit(0)
+            else:
+                dbgcR("! bad", a, b, answer)
+                ps(-1)
+                print(-1)
+                sys.exit(1)
+        else:
+            queries_allowed -= 1
+            if queries_allowed < 0:
+                dbgcR("too many queries", query)
+                sys.exit(1)
+            else:
+                ps(gcd(dat[a], dat[b]))
 
 
 # ! IF RANDOM TESTS PASS:
@@ -122,4 +161,4 @@ def gen_test():
 # * Uninitialized variable
 # * I used INF = 1e9 but answer could be bigger
 #endregion
-gen_test()
+interact()
