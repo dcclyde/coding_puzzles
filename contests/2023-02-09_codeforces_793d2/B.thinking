@@ -1,0 +1,7 @@
+
+Array is nums 0 through N-1.
+
+I can only move values that contain all of X's bits.
+I could start by & together everything that's misplaced?
+
+.
