@@ -1,0 +1,14 @@
+! I just read their solution pretty quickly here. Now writing notes based on that.
+
+The key here is the updates for block-level answers when we set the whole block to x.
+
+For each block, we'll precompute update(x) for all possible values x.
+Remember I need min value of lcm(x,b) / gcd(x,b).
+
+For each g, I'm interested in smallest b that's a multiple of g.
+OK, so I could iterate over multiples of g and proceed to get the A*log(A) result.
+
+What about log(log(A)) version?
+
+
+.

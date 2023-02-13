@@ -1,0 +1,82 @@
+
+2e5 queries
+values up to 1e18
+
+---
+
+small first?
+
+Naive approach:
+Spend T time inserting multiples of 10.
+Query 10: takes T time
+20: T/2 time
+30: T/3 time
+...
+10*T: T/T time
+
+T * (1/2 + 1/3 + 1/4 + ...) ~ T * log(T)
+
+So if T = N/2 then my cost is like N*log(N)
+
+I think memoizing solves small but not large, since removing breaks the memoization.
+When I load from memo, I should check whether this is still missing from the set.
+    If not, do more work and then update memo.
+
+---
+
+If I remove x, I'd like to iterate over memoized divisors of x.
+Then I need to do a certain update for each of those.
+1) Can I find the memoized divisors easily?
+2) How many are there?
+
+x has <= 100k divisors total.
+So I should NOT iterate over all memoized divisors.
+    Otherwise they could spend 100k time inserting divisors
+    and then the rest of the time inserting+removing 897612484786617600.
+
+In that simple memoization approach, we'll end up checking a bunch of divisors
+    without updating them.
+    Think: we add 120. Now we check 10, 20, 30, 40.
+    But maybe memo[10] = 50 so it wasn't actually so useful to check there.
+
+---
+
+Maybe - for each n, track which x tried and failed to use this n?
+
+We do know the full list of queries from the start.
+
+If we have a memoized value for 10 then that bounds where we should look for 20.
+
+
+-----
+! (looking at their answer)
+
+For each k s.t. we've computed memo(k):
+We also compute + maintain
+    rem(k) = {nums we've removed that are <= memo[k] and multiples of k}
+
+I should also track reminv[x] = {set of k such that rem[k] contains x}.
+This will be helpful when I insert x.
+
+What if I remove x?
+We're supposed to update rem(k) for some k values.
+Those will be k values that considered x when calculating memo(k).
+So, I could have tracked helper[x] = list of k values that considered x?
+
+---
+
+For optimization, we could precheck the full list of items that will ever get removed
+and don't bother updating some data structures if we add something that will stay.
+
+-----
+! (after writing code myself but getting TLE and also my code is quite complicated and bad)
+
+Add an element: Nothing special?
+Remove an element: Need to use a log of
+
+Make helper[x] big: Add 1, 2, 3, 4, ..., B.
+Then query 1, 2, ... B once each just so we are tracking all of them.
+Then remove and add 1 over and over.
+
+
+.

@@ -1,0 +1,44 @@
+
+N up to 1e5.
+
+The thing we're maximizing will do best by picking the whole interval.
+We need to break ties by choosing min possible length.
+
+Interval sum is 110101100
+
+On one side I have 110101100. If I take that away I can only take 0s from now on.
+On other side I have 100000000, 1000000, etc.
+
+
+There are only 30 reasonable cutoffs to try on each side of the interval.
+    (Each time we would cut out an additional bit)
+    How can I find where those are?
+    Just compress out the 0s at the start.
+
+From here I could win by just trying all 900 combinations.
+Alternatively, some kinda 2 pointers stuff should work.
+
+---------
+! (after some coding)
+What about dat = [1, 1, 2] and query = all?
+The point is really - we need to keep all the bits that can cancel
+    with another copy of that same bit.
+It's NOT enough to just think about whether they get cancelled in the big sum.
+
+I guess just: For each bit, I should find the first and last places where it appears
+    in the query interval.
+    If it appears an odd number of times, it's OK to lose one copy.
+    Otherwise I can't lose any.
+
+? What does that mean in terms of an algorithm?
+For bits that show up an even number of times, this is easy.
+We just directly get bounds on how far we can adjust each edge.
+
+For bits that show up an odd number of times...
+I think I should do some 2 pointers stuff again :/
+
+I guess I have 2 kinds of constraints.
+Hard constraint: Comes from an even-count bit, or an odd-count bit that already got adjusted.
+Soft constraint: I can violate this and put in a certain hard constraint instead.
+
+.
