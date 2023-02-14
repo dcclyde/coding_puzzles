@@ -349,11 +349,16 @@ inline namespace Helpers {
     tcT> constexpr bool is_printable_v = is_printable<T>::value;
 
 
+    template <class... Ts> void increment_one(tuple<Ts...>& t, int inc);
+    template <class A, class B> void increment_one(pair<A,B>& t, int inc);
     tcT> typename enable_if<!is_iterable_v<T>, void>::type increment_one(T& x, int inc) {x += inc;}
     tcT> typename enable_if<is_iterable_v<T>, void>::type increment_one(T& t, int inc) { for(auto&& x : t) {increment_one(x, inc);} }
 
     template <class... Ts> void increment_one(tuple<Ts...>& t, int inc) {
         apply([&](Ts& ...args) {(increment_one(args, inc), ...);}, t);
+    }
+    template <class A, class B> void increment_one(pair<A,B>& t, int inc) {
+        t.f += inc; t.s += inc;
     }
 
     void increment(auto& ...args) {(increment_one(args, +1), ...);} // add one to each, for output.  BE CAREFUL TO UNDO MODIFICATIONS

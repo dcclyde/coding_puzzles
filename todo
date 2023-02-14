@@ -7,28 +7,10 @@ TODO:
 
 --------------
 
+Rename tsdbg and tsish to repr and to_string in some order?
+
+
 Maybe learn about jupyter server?
-
-* ps(pair) is not working?
-See commented output line:
-    /home/dcclyde/puzzles/code/contests/2023-02-07_codeforces_838d2/B.cpp
-
-
-
-
-Look at /home/dcclyde/puzzles/code/contests/2023-02-06_codeforces_841d2/C.cpp
-pragmas at the top make it barrreeeellly pass.
-Test which ones actually help here. Like is unroll-loops helping or hurting?
-See also: https://codeforces.com/blog/entry/96344
-
-
-
-
-
-Make mi::inv handle non-prime moduli?
-I could do this by having commented code for making a static "tot" member
-    which holds totient(mod).
-    Or just make that a second template argument and by default it's MOD-1.
 
 Make a version of mi that uses lls?
 
@@ -37,10 +19,6 @@ Mayyybe also some weird intermediate version that uses ints but correctly handle
     Or just don't bother and use the ll version?
     I should time some of this stuff and decide whether ints give any value.
 
-I think I get into trouble sometimes with tsdbg vs ts?
-Can I find an example --> fix it?
-    I notice that mi has tsdbg defined now...
-    I should make things default to ts better.
 
 
 -----
