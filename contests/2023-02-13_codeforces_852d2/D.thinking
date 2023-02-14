@@ -1,0 +1,12 @@
+
+How does MEX(p[l..r]) work?
+If 1 is not included, MEX is 1.
+So, all intervals that skip both 1s are good.
+
+Otherwise, we need both 1s.
+
+I keep answering questions like:
+We're required to include interval [a, b].
+How many options are there if we also want to skip c and d?
+
+.

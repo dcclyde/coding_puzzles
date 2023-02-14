@@ -1,0 +1,32 @@
+! (from their solution)
+
+Use dp[k] = min difference of k with elements to the right that have been considered so far.
+Sort the queries and then add elements on the right edge one at a time.
+
+-----
+
+I'll need range min queries to get the actual answers.
+So dp[] should actually be a segtree type thing.
+
+How can I update dp?
+Insert new position n.
+now I wish to know: which k < n want to actually use n?
+
+I guess it needs to be positions such that dat[n] is closer to dat[k]
+    than any previous stuff was.
+
+Well....
+* Really I'd like positions k s.t. dat[n] is closer to dat[k]
+    than any dat[j] with k < j < n.
+    That's harder...
+
+Can this be some kinda situation where I maintain an increasing list and a decreasing list
+    and pop stuff off as needed to keep em nice?
+
+Looking back from n, I need the most recent time k with dat[k] > dat[n].
+Then further, I need the first time j before that with dat[j] in between and closer to dat[n].
+I could use another segtree?
+st.query(dat[n]+1, mid) = largest index we'e seen with such a value?
+
+
+.

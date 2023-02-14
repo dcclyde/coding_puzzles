@@ -1,0 +1,63 @@
+
+1 2 2 2 2
+3 books: everyone's happy. 1, 2, 2.
+4 books:
+
+Binary search?
+Say I want to make P people happy.
+Obviously I'll use the ones with lower requirements.
+So, N-P people can read books by themselves.
+
+I need to solve for all numbers of books though....
+
+* f(k) >= f(k+1) - 1.
+
+With 1 book: easy.
+2 books:
+
+-----
+! (from their solution)
+Use dp[k] = max num groups I could break first k people into while keeping everyone happy.
+
+-----
+dp[k] = ?
+* A[k] > k: infinity
+* A[k] <=
+
+To make k happy, I should give him A[k] group size.
+Then I'd need to make remaining k-A[k] people happy using 1 fewer group.
+So refer back to dp[k-A[k]].
+
+Now, how do I get answers?
+Say I need G groups.
+
+Binary search?
+
+How many groups does it take to get X happy people?
+I need some k s.t. st[k] + N-k >= q and k >= X.
+
+---
+
+Hmm, I'm still missing some idea here.
+With requirements [2 3 3] and query 2, I could make 1 person happy.
+Is it possible to use my st and/or dp to figure that out?
+
+"can I make 1 person happy?"
+Well, grab the first K (1) people.
+If they aren't happy even as 1 group, then add till they are happy.
+Is this allowed?
+
+---
+
+OK, that worked.
+Try to think this through one more time.
+I want to binary search, i.e. find how many groups I can make
+    while keeping the first X people happy.
+
+If they need a group size >= X, make that group and then all 1s.
+If they can be multiple happy groups, do that then all 1s.
+
+How many happy groups can I make out of people 0 through X-1?
+
+
+.
