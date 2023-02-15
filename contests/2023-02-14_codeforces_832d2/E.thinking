@@ -1,0 +1,77 @@
+
+N, M <= 5e6.
+
+A weakly increasing from 0 to N
+B weakly increasing from 0 to M
+
+both same length
+I'm not allowed to have both arrays "stay equal" on the same step.
+
+---
+
+Total amount of upward steps we'll take is M+N. So K <= M+N.
+
+Num solutions with K = M+N is just binomial(M+N, M).
+! Note I'm actually miscounting the length by 1.
+
+---
+
+Maybe there a slow dp available?
+
+num[x][y] = number of paths ending at (x, y).
+
+dp[x][y] = sum over last step (r, s):
+    dp[x-r][y-s] + num[x-r][y-s]
+
+n(x, y) = sum over (r, s):
+    n(x-r, y-s)
+
+
+n(0, 0) = 1
+f(0, 0) = 1
+
+n(1, 0) = 1
+f(1, 0) = 2
+
+f(1, 1) = sum over last step.
+    1, 0  :  3
+    0, 1  :  3
+    1, 1  :  2
+
+
+
+OK, can I find a pattern?
+
+OEIS has a generating function for N(x,y): http://oeis.org/A059576
+
+---
+
+D[x,y] = dp[x][y] - dp[x-1][y] - dp[x][y-1] + dp[x-1][y-1] = ???
+    If the previous position was valid for all 4, then it doesn't contribute.
+    I should consider previous positions that are valid for only some of the 4.
+    (x-1, y-1): works for first 3
+    (x, t) only works for 2 of my terms
+    (x, y-1) only works for 1
+    (and reflect)
+
+D[x,y] =
+    -dp[x-1][y-1] + dp[x][y-1] + dp[x-1][y]
+
+dp[x][y] = 2 * dp[x-1][y] + 2 * dp[x][y-1] - 2 * dp[x-1][y-1]
+
+? Maybe I'm missing some N terms there?
+
+dp[x][y] = 2*dp[x-1, y] + 2*dp[x, y-1] - 2*dp[x-1, y-1]
+    + 2*N[x-1, y] + ...
+
+---
+
+Let's say I already know N[t, y-1] for all t.
+* Ignore the 2s, those will just come out as a 2^something.
+To update to N[t,y], I should add the delta from just below:
+    N[t-1, y] - N[t-1, y-1].
+
+Call that DN[t-1, y].
+
+
+.

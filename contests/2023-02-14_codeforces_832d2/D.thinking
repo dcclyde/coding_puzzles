@@ -1,0 +1,18 @@
+
+If len <= 2, do it by hand.
+
+We obviously need xor of this whole chunk to be 0. Check that using prefix xors.
+
+If chunk length is odd, we're done.
+If one end is zero, we're done.
+(remember to check if the whole chunk is 0s)
+    Maybe need a whole separate little dp array that stores f[k] = longest stretch of consecutive 0s ending at position k?
+        f[k] = 0 if dat[k] != 0
+        f[k] = f[k-1] + 1 if dat[k] == 0
+
+Track: For each value that occurs among prefix xors, what are the positions where it occured?
+    Use that for: What's the most recent time where we saw prefix_xor[R]?
+    If it's within our interval then we win in 2 steps. Otherwise we're doomed.
+
+
+.
