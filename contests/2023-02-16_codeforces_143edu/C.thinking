@@ -1,0 +1,34 @@
+
+I need the total amount drunk by person k.
+
+Type j starts with A[j].
+Then I subtract B[j], B[j-1], B[j-2], etc.
+
+I think there's some terrible segtreeish way. But how can I solve without that?
+
+
+
+Seems dp-ish and I solve from back to front.
+
+out[N-1] = min(A[N-1], B[N-1])
+
+running = leftover
+
+
+---
+
+Maybe:
+running += A[k]
+
+
+-----
+
+Maybe:
+For each tea, I can compute how much will be left over at the very end.
+I know how much guy N-1 drank from pile
+
+For each tea, I can decide where it will run out.
+Then some big range gets updated by each getting 1 extra chug.
+Only the very last guy needs any adjustment.
+
+.
