@@ -1,0 +1,31 @@
+
+Solve separate subproblems for black vs white squares?
+Maybe like some min cost flow stuff?
+
+Hm wait I think MCF stuff costs too much.
+Really I'd like this to be some shortest path stuff instead?
+
+I can definitely write it as shortest path.
+For white squares I say:
+    source connects to all white squares on left edge.
+    existing white #s create edges with cost 0
+    black #s make the nearby vertices unusable
+
+How do I avoid having a vertex for every white square?
+
+Oh wait that's just not a problem. R*C <= 4e5.
+
+I can take up to ~ 2e5 steps total.
+
+-----
+
+Can I clearly state when I should be adding edges?
+
+I pay a cost when I *arrive* in a certain square, not when I leave.
+
+If there are two #s connected diagonally, that's an edge with cost 0.
+
+
+
+
+.

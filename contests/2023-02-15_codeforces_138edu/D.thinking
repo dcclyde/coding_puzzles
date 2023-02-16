@@ -1,0 +1,32 @@
+
+I want length N and elements up to B.
+* N <= 3e5
+* B <= 1e12
+! NO, I actually want length *up to* N.
+
+[1, 1, 1, ...] is always a RS.
+To make an UN-ambiguous array:
+
+A[2] should be divisible by 2
+A[3] should be non-coprime with 2, 3
+A[4] with 2, 3, 4
+etc
+
+The number of coprime options will only update when we step to a new prime.
+There are 26K primes total in this range.
+
+Say B is 1e12 ish.
+Num with no 2s: B - B/2
+Num with also no 3s:
+
+Wait no this is easy, I just need things that are non coprime with everything.
+
+-----
+
+"ambiguous" means there's at least one position that's missing a divisor.
+"unambiguous" means every position has all the relevant divisors.
+
+How many with all positions divisible by primorial?
+
+
+.
