@@ -1,0 +1,7 @@
+
+binary search for the answer?
+Each vertex has some subtree(s) that no other special vertex sees.
+If one of those is big enough, done.
+Otherwise, we have some number of specials trying to share a region.
+
+.
