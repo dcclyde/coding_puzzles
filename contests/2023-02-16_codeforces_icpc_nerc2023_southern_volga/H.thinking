@@ -1,0 +1,15 @@
+
+I think we can find a valid config by:
+    Basically use topological sort to choose the last person, then 2nd last, then etc
+    At each step, make sure to select a person with p[j] >= curr slot.
+        It would be fine to just always choose the biggest p[j].
+
+I think we can get 1 person's subanswer by doing basically the same thing
+    except banning selection of this particular guy.
+    We'll eventually reach a point where it's impossible to fill the next slot,
+        and that's this guy's answer.
+
+This strategy should cost N * E * log(N) I think.
+Seems fast enough.
+
+.

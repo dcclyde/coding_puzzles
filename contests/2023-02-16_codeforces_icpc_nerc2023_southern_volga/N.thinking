@@ -1,0 +1,13 @@
+
+To choose the first digit:
+We want to choose from the first k+1 digits, OR up till just before the first 0.
+
+I need:
+    What is the smallest digit in [L, R]?
+    What is the first 0 starting from L?
+
+
+30000121320114
+
+
+.
