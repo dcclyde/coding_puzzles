@@ -890,12 +890,14 @@ void solve() {
     ckmin(K, seen.size());
 
     ll out = 0;
-    FOR(mask, 0, (1<<seen.size())) {
+    do {
+    // FOR(mask, 0, (1<<seen.size())) {
         uset<char> allowed;
-        FOR(b, 0, seen.size()) {
-            if ((mask>>b) & 1) {allowed.insert(seen[b]);}
-        }
-        if (allowed.size() != K) {continue;}
+        // FOR(b, 0, seen.size()) {
+        //     if ((mask>>b) & 1) {allowed.insert(seen[b]);}
+        // }
+        // if (allowed.size() != K) {continue;}
+        FOR(k, 0, K) {allowed.insert(seen[k]);}
 
         ll local = 0;
         ll curr = 0;
@@ -909,7 +911,8 @@ void solve() {
         }
         local += (curr * (curr+1)) / 2;
         ckmax(out, local);
-    }
+    // }
+    } while (next_combination(seen.begin(), seen.begin() + K, seen.end()));
 
     return ps(out);
 }

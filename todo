@@ -10,6 +10,13 @@ TODO:
 Rename tsdbg and tsish to repr and to_string in some order?
 
 
+Quick functions for max/min of a container? Similar to sumv?
+    (Does this already exist?)
+    (Yeah it definitely does... go remember how?)
+    Yeah, it's just *max_element(all(dat)).
+
+
+
 Maybe learn about jupyter server?
 
 Make a version of mi that uses lls?

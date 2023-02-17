@@ -954,10 +954,10 @@ tcT> struct SegTree { // cmb(ID,b) = b
     }
 };
 template<class T>
-string to_string(SegTree<T> st) {
+string tsdbg(SegTree<T> st) {
     vector<T> out;
     FOR(k, st.n, st.n + st.orig_n) { out.push_back( st.seg[k] ); }
-    return to_string( out );
+    return tsdbg( out );
 }
 
 void solve() {
@@ -998,6 +998,7 @@ void solve() {
             FOR(j, 0, psz) {helper.push_back(st.seg[st.n+j]);}
             dbgR(helper);
         );
+        dbg(st);
         // st.detailed_printouts();
         running += dat[k];
         /**
