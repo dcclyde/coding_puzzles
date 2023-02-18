@@ -4,4 +4,16 @@ Each vertex has some subtree(s) that no other special vertex sees.
 If one of those is big enough, done.
 Otherwise, we have some number of specials trying to share a region.
 
+-----
+
+!(after reading tutorial)
+
+ok so at each vertex I need to store:
+    how many more steps are needed from here?
+    what's the best I could do by running downward from here?
+    visited?
+
+
+then also use a priority queue to decide what to work on next.
+
 .
