@@ -1,0 +1,4 @@
+Either two gaps of >= 120 minutes or one gap of >= 240 minutes?
+
+Maybe want to manually insert 0 and 1440 at start/end to avoid special cases?
+

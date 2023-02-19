@@ -1,0 +1,11 @@
+World size <= 5000
+N < 100.
+
+I should always choose intervals from biggest to smallest.
+
+dp[n] = min size world that could accomodate blocks [0, n)
+
+
+
+
+.

@@ -1,0 +1,43 @@
+N <= 100
+K <= 100
+
+Each vertex in the original graph becomes a k-cube after k iterations.
+
+To walk someplace in k-space:
+    Walk to correct corner of my starting k-cube
+    Then take some walk on the original graph.
+
+Maybe each step where we change colors means we jump to the exact opposite corner
+    of the new cube?
+
+-----
+
+Maybe I want some all pairs shortest path stuff.
+I'd like to know the shortest path that uses an even number of special edges
+    AND the shortest path using an odd number.
+
+Say I can get there in 4 steps (even) or 9 steps (odd).
+Say K = 20.
+Choose a target that's 12 steps into a traversal across the target cube
+    assuming I used an even stepcount.
+
+If I use even: it takes 4 + 12 = 16 steps
+If I use odd: it takes 9 + (20-12) = 17 steps
+so diameter >= 16.
+
+In general, say even cost is A and odd cost is B.
+I want A + C == B + (K-C)
+2*C = K + B - A
+
+
+
+-----
+
+! OK, how do I solve those subproblems?
+
+Dijsktra can tell me single source shortest paths in like O(E log(E))
+Make a graph that has 2N vertices like (v, parity).
+Then run Dijsktra here.
+Repeat for all possible sources?
+
+.

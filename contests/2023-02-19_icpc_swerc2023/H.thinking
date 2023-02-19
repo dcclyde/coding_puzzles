@@ -1,0 +1,13 @@
+Given permutations A, B of 1..n
+B was created from A by repeatedly moving one number to the top.
+What's the min number of steps that must have been used?
+
+---
+
+The second permutation must look like
+(some stuff involving people who got bumped) (some stuff that's in same order as before)
+We just want to make the second chunk as long as possible.
+
+Two pointers stuff should work.
+
+.

@@ -1,0 +1,48 @@
+N <= 300
+
+Cubic should be OK.
+
+Each brick should staircase directly R or L.
+So there are only 2^N strategies we could ever consider.
+
+
+
+
+.
+
+Let's say goal blocks at height 0 and then build upward.
+We need the final block at height H.
+
+f(j, h) = cost to handle first i blocks and have a block at (x_j, h).
+exists (x_i, j) for j in 0,h
+
+
+
+
+DP left to right.  Cost to add a block at hight h under the ith goal block.
+
+
+
+
+---
+
+g(l, r) = position where [l, r) could be united?
+    need to know the height cost but also the horizontal position.
+
+Update:
+    Break [l, r) into 2 chunks: [l, m) and [m, r)
+    Use subanswers for the chunks and decide where we could unite those two endpoints.
+    Pick the best result?
+
+For a given interval, there should be only one plausible "unite point".
+(The outside edges should always run directly to each other).
+
+! Careful: I think there's some parity issue.
+If the distance between endpoints is odd, then there'll be 2 options
+    for where to place the bottom.
+    Keep track of which intervals had this situation.
+    Then when we use those as subproblems, we should just make sure we choose
+    the rightmost base for the first (left) subinterval
+    and leftmost base for the 2nd (right) subinterval.
+
+.

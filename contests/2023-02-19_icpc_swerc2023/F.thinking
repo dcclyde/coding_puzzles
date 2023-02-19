@@ -1,0 +1,40 @@
+Given some graph.
+
+N <= 50. *sum* of N is up to 5000.
+E has no special bound.
+
+Our cost is like (5000 / 50) * (num edges in a complete graph with 50 vertices)
+
+N is at least 3
+
+Maybe just 2 companies?
+A controls all routes involving city 1, B controls all other routes?
+
+---
+
+! If we have anything besides a complete graph:
+    Find some city that has degree < N-1.
+    Use the solution above, where that city is the special one
+        that's fully operated by A.
+
+
+Otherwise...
+
+Maybe we can assign a couple routes to C and then use the solution above for A, B?
+
+Maybe C gets one edge that originates in the root, say 1 to 2
+A gets all other edges from the root
+B gets everything not involving root?
+    C can't travel 2 to 3
+    A can't travel 2 to 3
+    B can't travel 1 to 2
+    (A, C) get all edges from root
+
+
+
+
+Christine suggests:
+    A gets city 1, *except* 1 <--> 2
+    B gets city 2, *except* 2 <--> 3
+    C gets everything else
+

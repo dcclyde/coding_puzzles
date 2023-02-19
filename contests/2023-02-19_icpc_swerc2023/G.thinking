@@ -1,0 +1,80 @@
+N <= 1e6
+time limit 0.5 seconds!
+
+*****
+
+N people, 2N-1 bottles.
+
+Each person needs to be assigned a distinct interval.
+Each interval has at least N items total
+Each interval has exactly X Ws
+
+
+
+If we want to feed everybody 3 white wines and N is 4
+and we have some substring like R R R R W W W R R R R
+then we could satisfy several people by choosing those Ws and different size
+    prefix/suffix.
+
+Given x, we can compute how many critics can be satsified.
+
+This should immediately give a N^2 solution.
+
+D would try:
+    Look at the formulas that show up during the N^2 solution.
+    Any chance we can "change order of summation" and get some result
+        by summing something over the chunks of Rs?
+
+    Find all [L, R] minimal spans containing X white wines.
+    Suppose we have A, B red wines on left, right respectively.
+    Then the number of critics satisfied here is like
+        (A+1) * (B+1) - (num intervals)
+    There will be nW - X + 1 such sources to consider.
+
+N people.
+If there's 1 white wine then this is easy.
+
+
+Only W: need X = N.
+One R and the rest W:
+
+How does num satisfied critics change as a function of x?
+    If we have only white wines: need X = N.
+
+
+
+******************************************
+
+For each starting point, consider the interval of size N starting here.
+Track: number of whites, and number of extra trailing reds we could add if we want.
+
+Now try a bunch of X values.
+
+For a given X:
+    Add stuff from intervals we've already considered.
+
+
+****************
+
+Proposed subproblem:
+How many intervals are there that contain X whites and have size < N?
+    Well, how many are there that end at R?
+
+
+**********
+
+First step: handle intervals with size < N.
+
+For each W:
+    What's the first W after me with distance > N?
+    Insert an event: When I have X = (that wine) then I should start including
+        the slack factor to my left.
+
+
+
+
+
+
+
+
+.

@@ -1,0 +1,35 @@
+N <= 2e5
+Q <= 1e5
+
++/- sequence doesn't matter, just count of each symbol.
+We can always ignore one + and one - if we want.
+
+Need to decide:
+    How many times do I use number A vs B?
+    How many + do I use with A?
+
+
+---
+
+A = 14
+B = 20
+
+20 +
+15 -
+
+One of A, B will receive a positive multiple X and other will receive negative -Y.
+
+X - Y = 5 (= 20 - 15)
+
+If I assume A gets multiplied by X:
+    X = 5, Y = 0: I get 5*A = 70
+    Adding 1 to both X and Y: add 14-20 = -6
+    so to win I would need to add 70 / 6 to both X and Y.
+    Need to check:
+        Is that an integer?
+        Is that within the bounds that come from the number of +s and -s?
+
+* Need to remember to also do the same assuming B gets multiplied by X instead.
+(or maybe that turns out to be trivially already handled... exercise for the coder?)
+
+.
