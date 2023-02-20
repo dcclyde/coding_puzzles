@@ -844,199 +844,121 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
-void learn(string& dat) {
-    el; el; el;
-    assert(dat.size() % 2 == 1);
-    ll N = dat.size() / 2;
-    dbgcBold("learn", N, dat);
-    el;
 
-    V<ll> W;
-    FOR(k, 0, dat.size()) {if (dat[k] == 'W') {W.push_back(k);}}
-    ll nW = W.size();
-    // dbg(nW, W);
 
-    V<V<pll>> results(nW+1);
-    FOR(l, 0, dat.size()) {
-        FOR(r, l+N-1, dat.size()) {
-            ll white_here = 0;
-            FOR(k, l, r+1) {white_here += (dat[k] == 'W');}
-            // dbgP(l, r, white_here);
-            results[white_here].emplace_back(l, r);
-        }
-    }
 
-    FOR(k, 0, results.size()) {
-        dbg(k, results[k].size(), results[k]);
-    }
 
-    assert(results[N].size() >= N);
-
-    // // try asserting that the sequence will always be increasing then decreasing?
-    // bool going_up = true;
-    // FOR(k, 0, results.size() - 1) {
-    //     if (results[k].size() > results[k+1].size() && going_up) {going_up = false;}
-    //     if (results[k].size() < results[k+1].size() && !going_up) {assert(false);}
-    // }
-
-    // assert(false);
-    return;
-}
-
-void metalearn() {
-    string source = "RW";
-    ll BITS = 11;
-    string dat(BITS, 'R');
-
-    // FOR(mask, 0, 1<<BITS) {
-    //     FOR(b, 0, BITS) {
-    //         dat[b] = source[(mask>>b) & 1];
-    //     }
-    //     dbgBold(dat);
-    //     learn(dat);
-    // }
-
-    FOR(nR, 0, BITS+1) {
-        ll nW = BITS - nR;
-        dat = string(nR, 'R') + string(nW, 'W');
-        sort(all(dat));
-        do {
-            learn(dat);
-        } while (next_permutation(all(dat)));
-    }
-
-    exit(0);
-}
-
-ll count_intervals_brute(ll n, ll p, ll l, ll r, ll q) {
-    ll out = 0;
-    FOR(first, p, l+1) FOR(last, r, q+1) {
-        ll len = last - first + 1;
-        if (len < n) {continue;}
-        ++out;
-    }
-    return out;
-}
-
-ll count_intervals(ll n, ll p, ll l, ll r, ll q) {
-    ll out;
-    if (q-p+1 < n) {
-        out = 0;
-    } else if (r-l+1 >= n) {
-        // reds_left * reds right. No fancy restrictions.
-        out = (l-p+1) * (q-r+1);
-    } else {
-        out = 0;
-        if (l+n < 1+q) {
-            ll t = l+n-q-1;
-            out += -t*(t-1) / 2;
-        }
-        if (n+p >= 1+r) {
-            ll t = n+p-q-2;
-            out += t*(t-1) / 2;
-        } else {
-            out += -(-4 + 2*n + 2*p - q - r) * (1 + q - r) / 2;
-        }
-    }
-    return out;
-}
-
-ll ri(ll a, ll b) {return rng() % (b-a+1) + a;}
-
-void test_count_intervals() {
-    const ll NUM_TESTS = 100'000;
-    pll N_RANGE = {1, 10};
-    pll V_RANGE = {0, 100};
-    V<ll> dat(4);
-    FOR(tid, 0, NUM_TESTS) {
-        ll n = ri(N_RANGE.f, N_RANGE.s);
-        FOR(k, 0, 4) {dat[k] = ri(V_RANGE.f, V_RANGE.s);}
-        sort(all(dat));
-        ll p = dat[0]; ll l = dat[1]; ll r = dat[2]; ll q = dat[3];
-        ll br = count_intervals_brute(n, dat[0], dat[1], dat[2], dat[3]);
-        ll so = count_intervals(n, dat[0], dat[1], dat[2], dat[3]);
-        dbgY(n, MP(l,r), MP(p,q), "", br, so);
-        assert(br == so);
-    }
-}
 
 void solve() {
     lls(N);
-    strings(dat);
-    dbgR(N, dat);
+    ll E = N-1;
+    V<V<ll>> G(N);
+    FOR(k, 0, E) {
+        ll1(a, b);
+        G[a].emplace_back(b);
+        G[b].emplace_back(a);
+    }
+    dbgR(N, pdh(G));
     el;
 
-    ll S = 2*N - 1;
+    V<ll> deg(N), num_exposable(N);
+    V<bool> color(N);
+    auto leaves = ndvec<ll>(2, 0, 0LL);
+    uset<ll> black_leaves;  auto& bl = black_leaves;
+    uset<ll> white_leaves_dont_expose;  auto& wlde = white_leaves_dont_expose;
+    uset<ll> white_leaves_exposing_black;  auto& wleb = white_leaves_exposing_black;
+    V<bool> used(N);
 
-    // pc[n] = num Ws in [0, n)
-    // num Ws strictly left of n.
-    V<ll> prefix_count(S+1);
-    auto& pc = prefix_count;
-    V<ll> W_positions;
-    V<ll> R_positions;
-    W_positions.push_back(-1);
-    R_positions.push_back(-1);
-    FOR(k, 0, S) {
-        pc[k+1] = pc[k];
-        if (dat[k] == 'W') {
-            ++pc[k+1];
-            W_positions.push_back(k);
-        }
-    }
-    W_positions.push_back(S);
-    R_positions.push_back(S);
-
-    auto white_in_interval = [&](ll l, ll r) {return pc[r+1] - pc[l];};
-    auto red_in_interval = [&](ll l, ll r) {return l-r+1 - white_in_interval(l,r);};
-
-    ll attempts = 0;
-    uset<ll> seen;
-    while (true) {
-        // random interval [L, R]
-        ll L = 0; ll R = 0;
-        while (R - L + 1 < N) {
-            L = rng() % S;
-            R = rng() % S;
-            if (L > R) {swap(L, R);}
-        }
-
-        ll X = white_in_interval(L, R);
-        if (seen.empty()) {X = N; ckmin(X, W_positions.size() - 2);}
-        if (seen.find(X) != seen.end()) {continue;}
-        seen.insert(X);
-
-        // now check if this works.
-        ll score = 0;
-        if (X == 0) {
-            FOR(k, 0, W_positions.size() - 1) {
-                ll reds_here = W_positions[k+1] - W_positions[k] - 1;
-                if (reds_here < N) {continue;}
-                // If reds_here = 7 and N = 2:
-                // Start at 0: I have 6 options.
-                // I guess I want 1 + 2 + ... + (reds_here - N + 1).
-                ll t = reds_here - N + 1;
-                ll local = t * (t+1) / 2;
-                score += local;
-            }
-        } else {
-            FOR(ws, 1, W_positions.size()) {
-                ll we = ws + X - 1;
-                if (we >= W_positions.size() - 1) {break;}
-
-                ll l = W_positions[ws]; ll r = W_positions[we];
-                ll p = W_positions[ws-1] + 1; ll q = W_positions[we+1] - 1;
-
-                ll local = count_intervals(N, p, l, r, q);
-
-                score += local;
+    // can we achieve score >= S?
+    auto binsearch_helper = [&](ll S) -> bool {
+        dbgcBold("binsearch", S);
+        bl.clear(); wleb.clear(); wlde.clear();
+        num_exposable.assign(N, 0);
+        used.assign(N, false);
+        FOR(k, 0, N) {
+            color[k] = (k >= S);
+            deg[k] = G[k].size();
+            if (color[k] == 1 && deg[k] == 2) {
+                for(auto& j : G[k]) {++num_exposable[j];}
             }
         }
-        if (score >= N) {return ps(X);}
-        ++attempts;
-        dbgR(attempts, X, score);
-    }
+        FOR(k, 0, N) {
+            if (deg[k] != 1) {continue;}
+            if (color[k] == 1) {black_leaves.insert(k);}
+            else if (num_exposable[k] == 0) {white_leaves_dont_expose.insert(k);}
+            else {white_leaves_exposing_black.insert(k);}
+        }
 
-    return;
+        // ok, now start playing.
+        FOR(turn, 0, N-2) {
+            el; dbgY(turn, bl, wlde, wleb);
+            dbgR(deg, num_exposable);
+            ll K = -1;
+            if (!black_leaves.empty()) {
+                if (turn % 2 == 0) {return true;}
+                K = *black_leaves.begin();
+                black_leaves.erase(K);
+            } else if (!white_leaves_dont_expose.empty()) {
+                K = *white_leaves_dont_expose.begin();
+                white_leaves_dont_expose.erase(K);
+            } else {
+                K = *white_leaves_exposing_black.begin();
+                white_leaves_exposing_black.erase(K);
+            }
+            dbg(K);
+
+            used[K] = true;
+            for(auto& j : G[K]) {
+                if (used[j]) {continue;}
+                // K was a leaf, so there's only one J left.
+                --deg[j];
+                /**
+                    What updates do we need here?
+                    * If deg[j] is now 1, need to add J to one of the leaf piles. Figure out which.
+                    * If J is now black and deg 2, then its neighbors could expose it.
+                    * If J was previously black and deg 2, then its neighbors can't expose it anymore.
+                 */
+                if (deg[j] == 1) {
+                    // which leaf pile?
+                    if (color[j]) {
+                        black_leaves.insert(j);
+                        for(auto& o : G[j]) {
+                            if (used[o]) {continue;}
+                            --num_exposable[o];
+                            if (num_exposable[o] == 0 && color[o] == 0 && deg[o] == 1) {
+                                assert(white_leaves_exposing_black.find(o) != white_leaves_exposing_black.end());
+                                white_leaves_exposing_black.erase(o);
+                                white_leaves_dont_expose.insert(o);
+                            }
+                        }
+                    }
+                    else if (num_exposable[j] > 0) {white_leaves_exposing_black.insert(j);}
+                    else {white_leaves_dont_expose.insert(j);}
+                } else if (deg[j] == 2 && color[j]) {
+                    for(auto& o : G[j]) {
+                        if (used[o]) {continue;}
+                        ++num_exposable[o];
+                        if (num_exposable[o] == 1 && color[o] == 0 && deg[o] == 1) {
+                            assert(white_leaves_dont_expose.find(o) != white_leaves_dont_expose.end());
+                            white_leaves_dont_expose.erase(o);
+                            white_leaves_exposing_black.insert(o);
+                        }
+                    }
+                }
+            }
+        }
+
+        // handle the last 2 turns specially because they leave this awkward 1 by himself.
+        {
+            ll turn = N-2;
+            if (turn % 2 == 0 && black_leaves.size() > 0) {return true;}
+            if (black_leaves.size() == 2) {return true;}
+            return false;
+        }
+    };
+
+    ll out = lstTrue(0, N-1, binsearch_helper);
+    return ps1(out);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
@@ -1049,12 +971,6 @@ void solve() {
 #if PROBLEM_STYLE == CF || PROBLEM_STYLE == GCJ
 int main() {
     setIO();
-
-    dbg_only(
-        // learn("RWWRRRWWW");
-        // metalearn();
-        // test_count_intervals();
-    );
 
     int T = 1;
     #ifndef SINGLE_CASE
