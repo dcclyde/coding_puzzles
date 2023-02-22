@@ -45,4 +45,37 @@ If the distance between endpoints is odd, then there'll be 2 options
     the rightmost base for the first (left) subinterval
     and leftmost base for the 2nd (right) subinterval.
 
+-------------------------------------
+
+! David setting up to re-code this for practice:
+
+Say I have blocks at 4 and 10.
+Next layer at 5 and 9
+6, 8
+7
+7 blocks total. End halfway in between.
+
+Now say it's 4 and 9.
+5, 8
+5, 7 OR 6, 8
+6 OR 7
+
+
+If I'm trying to join two things, can I assume I need to go at least 1 level lower?
+5 8     10
+6 8     9
+7       (8)
+    8
+
+
+10, 14 --> need 3 more blocks
+
+* The key subroutine I need to write is:
+Given blocks at (ax, ay) and (bx, by), what's the range of valid bottoms
+    and how much will it cost to arrive there?
+
+Maybe it's just:
+
+
+
 .

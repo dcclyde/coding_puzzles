@@ -844,246 +844,119 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
+ll N, H;
+ll DAT[100000];
+umap<pl, ll> MEMO;
 
-void brute() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
-    }
-    dbgR(N, pdh(G));
-    el;
+#if 0
+void dcclyde() {
+    V<ll> subtree_size(N);
+    auto& ss = subtree_size;
+    auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
+        // work on parent
+        subtree_size[curr] = 1;
+        // todo
 
-    V<bool> color(N);
-    auto binsearch_helper = [&](ll S) -> bool {
-        el; dbgcBold("binsearch", S);
-        FOR(k, 0, N) {color[k] = (k >= S);}
+        for (auto& o : G[curr]) {
+            if (o == parent) {continue;}
+            self(o, curr, self);
 
-        ll MASK_MAX = 1<<N;
-        V<ll> dp(MASK_MAX);
-        FOR(mask, 1, MASK_MAX) {
-            auto isset = [&](ll b) {return ((mask>>b) & 1) == 1;};
-            V<ll> bits;
-            ll nB = 0;
-            FOR(b, 0, N) {if (isset(b)) {nB += color[b]; bits.push_back(b);}}
-            V<ll> subdeg(N);
-            FOR(a, 0, N) {
-                if (!isset(a)) {continue;}
-                for(auto& b : G[a]) {
-                    if (!isset(b)) {continue;}
-                    ++subdeg[a];
-                }
-            }
-            dbg(subdeg);
-            ll best = -1;
-            for(auto& x : bits) {
-                // Am I allowed to choose x?
-                if (subdeg[x] != 1 && bits.size() > 1) {continue;}
-                // what happens if I choose x?
-                ll future_score = dp[mask ^ (1<<x)];
-                ll cur = nB - future_score;
-                if (ckmax(dp[mask], cur)) {best = x;}
-            }
-            dbgY(mask, bitset<7>(mask), dp[mask], best); el;
+            // update parent per child
+            subtree_size[curr] += subtree_size[o];
+            // todo
+
         }
-        ll final_score = dp[MASK_MAX-1];
-        return (final_score > 0);
-    };
+        // update parent after all children
+        // todo
 
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
+        // dbgP(curr, parent, subtree_size[curr]);
+    };
+    dfs(ROOT, -1, dfs);
+
+}
+#endif
+
+// Cost to join an interval, also returns x,y location of join point.
+ll solve_interval(ll leftmost, ll rightmost){
+
+    if(MEMO.find(mp(leftmost, rightmost)) != MEMO.end()){
+        return MEMO[mp(leftmost, rightmost)];
+    }
+
+    if(leftmost == rightmost){
+        ///dbg(leftmost, rightmost)
+        return 0;
+    }
+    ll best = INF_ll;
+    FOR(i, leftmost, rightmost){
+        // el; dbgY(i);
+
+        /// left join is leftmost to i
+        /// right join is i+1 to rightmost
+
+        ll leftjoin_height = minll(H, (DAT[i] - DAT[leftmost]+1) / 2);
+        ll rightjoin_height = minll(H, (DAT[rightmost] - DAT[i+1]+1) / 2);
+
+        ll joinheight = minll(H, (DAT[rightmost] - DAT[leftmost] + 1)/2);
+
+        ll joincost = maxll(-1,joinheight - leftjoin_height + joinheight - rightjoin_height - 1);
+
+
+        if(H < (DAT[rightmost] - DAT[leftmost]+ 1)/2){
+            joincost+=1;
+        }
+
+
+
+        ll cur_total_cost = joincost + solve_interval(leftmost, i) +
+                    solve_interval(i+1, rightmost);
+
+        if(rightmost - leftmost == 3){
+            dbgY(leftjoin_height, rightjoin_height, joinheight, joincost)
+            dbgY(cur_total_cost);
+        }
+
+        best = minll(best, cur_total_cost);
+    }
+
+
+    dbg(leftmost, rightmost, best);
+    MEMO[mp(leftmost, rightmost)] = best;
+    return best;
 }
 
 
-// ! Actual solution.
+
+
 void solve() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
+    cin >> N >> H;
+
+    FOR(i,0,N){
+        cin >> DAT[i];
     }
-    dbgR(N, pdh(G));
+
+
+    dbgR(N, H);
+
     el;
 
-    V<bool> color(N);
+    ll full_join_cost = solve_interval(0,N-1);
+    dbg(full_join_cost);
+    ll full_join_height = minll(H, (DAT[N-1] - DAT[0] + 1)/2);
+    dbg(full_join_height)
+    ps(full_join_cost + H - full_join_height);
 
-    // can we achieve score >= S?
-    auto binsearch_helper = [&](ll S) -> bool {
-        el; el; el; dbgcBold("binsearch", S);
 
-        // if N is even, we (player 1) can just choose vertex N.
-        if (N % 2 == 0) {return true;}
 
-        // If a black vertex is immediately available, we win.
-        FOR(k, 0, N) {
-            color[k] = (k >= S);
-            if (color[k] && G[k].size() == 1) {return true;}
-        }
 
-        V<pll> provide(N);
-        bool win = false;
-        ll ROOT = N-1;  // this will always be black.
-        auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
-            if (win) {return;}  // pointless optimization
-            // work on parent
-            tuple<ll,ll,ll> children_provide = {0, 0, 0};
-            auto& [children_providing_even, children_providing_odd, children_providing_both] = children_provide;
-            auto& cpe = children_providing_even;
-            auto& cpo = children_providing_odd;
-            auto& cpb = children_providing_both;
-            for (auto& o : G[curr]) {
-                if (o == parent) {continue;}
-                self(o, curr, self);
 
-                // update parent per child
-                bool pe = (provide[o].f >= 1);
-                bool po = (provide[o].s >= 1);
-                cpe += pe;
-                cpo += po;
-                cpb += (pe && po);
 
-                dbgB(curr, o, MP(pe,po), children_provide);
-            }
-            // update parent after all children
-            provide[curr].f = cpo + color[curr];
-            provide[curr].s = cpe + (cpo >= 2);
 
-            if (
-                cpb >= 2  // 2 children that could each provide even OR odd
-                || (cpe >= 1 && cpo - cpb >= 1)  // 1 even + 1 (odd or both)
-                || (cpo >= 1 && cpe - cpb >= 1)  // 1 odd + 1 (even or both)
-                || (cpo >= 3)  // 3 odds also works
-                || (cpe >= 1 && color[curr])  // I can use curr as a near-endpoint in this case
-            ) {win = true;}
-            dbgP(curr, parent, provide[curr], children_provide, win); el;
-        };
-        dfs(ROOT, -1, dfs);
-        dbgR(win);
-        return win;
-    };
+    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
 
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
+
+    return;
 }
-
-// ! First attempt, using a greedy algorithm. Doesn't work.
-void solve_greedy() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
-    }
-    dbgR(N, pdh(G));
-    el;
-
-    V<ll> deg(N);
-    V<bool> color(N);
-    V<ll> black_leaves;  auto& bl = black_leaves;
-    V<ll> white_leaves_dont_expose;  auto& wlde = white_leaves_dont_expose;
-    V<ll> white_leaves_exposing_black;  auto& wleb = white_leaves_exposing_black;
-    V<bool> used(N);
-
-    // can we achieve score >= S?
-    auto binsearch_helper = [&](ll S) -> bool {
-        dbgcBold("binsearch", S);
-        bl.clear(); wleb.clear(); wlde.clear();
-        used.assign(N, false);
-        FOR(k, 0, N) {
-            color[k] = (k >= S);
-            deg[k] = G[k].size();
-        }
-        FOR(k, 0, N) {
-            if (deg[k] != 1) {continue;}
-            if (color[k] == 1) {black_leaves.push_back(k);}
-            else {
-                ll o = *G[k].begin();
-                if (color[o] && deg[o] == 2) {wleb.pb(k);}
-                else {wlde.pb(k);}
-            }
-        }
-
-        // ok, now start playing.
-        FOR(turn, 0, N-2) {
-            el; dbgY(turn, bl, wlde, wleb);
-            // dbgR(deg, num_exposable);
-            dbgR(deg);
-            ll K = -1;
-            if (!black_leaves.empty()) {
-                if (turn % 2 == 0) {return true;}
-                K = black_leaves.back();
-                black_leaves.pop_back();
-            } else {
-                // we can't trust the "wlde" items. They could expose something now.
-                while (K == -1 && !white_leaves_dont_expose.empty()) {
-                    K = white_leaves_dont_expose.back();
-                    white_leaves_dont_expose.pop_back();
-                    // will this expose a black now?
-                    for(auto& j : G[K]) {
-                        if (used[j]) {continue;}
-                        if (color[j] && deg[j] == 2) {
-                            white_leaves_exposing_black.push_back(K);
-                            K = -1;
-                        }
-                        break;
-                    }
-                }
-                if (K == -1) {
-                    K = white_leaves_exposing_black.back();
-                    white_leaves_exposing_black.pop_back();
-                }
-            }
-
-            dbg(K);
-
-            used[K] = true;
-            for(auto& j : G[K]) {
-                if (used[j]) {continue;}
-                // G[j].erase(K);
-                // K was a leaf, so there's only one J left.
-                --deg[j];
-                /**
-                    What updates do we need here?
-                    If deg[j] is now 1, need to add J to one of the leaf piles. Figure out which.
-                 */
-
-                if (deg[j] == 1) {
-                    if (color[j]) {black_leaves.push_back(j);}
-                    else {
-                        // ll o = *G[j].begin();
-                        for(auto& o : G[j]) {
-                            if (used[o]) {continue;}
-                            if (color[o] && deg[o] == 2) {wleb.pb(j);}
-                            else {wlde.pb(j);}
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // handle the last 2 turns specially because they leave this awkward 1 by himself.
-        {
-            ll turn = N-2;
-            el; dbgY(turn, bl, wlde, wleb);
-            if (turn % 2 == 0 && black_leaves.size() > 0) {return true;}
-            if (black_leaves.size() == 2) {return true;}
-            return false;
-        }
-    };
-
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
-}
-
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?

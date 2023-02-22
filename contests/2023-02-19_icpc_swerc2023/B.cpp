@@ -844,118 +844,96 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
-ll N, H;
-ll DAT[100000];
-umap<pl, ll> MEMO;
-
-#if 0
-void dcclyde() {
-    V<ll> subtree_size(N);
-    auto& ss = subtree_size;
-    auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
-        // work on parent
-        subtree_size[curr] = 1;
-        // todo
-
-        for (auto& o : G[curr]) {
-            if (o == parent) {continue;}
-            self(o, curr, self);
-
-            // update parent per child
-            subtree_size[curr] += subtree_size[o];
-            // todo
-
-        }
-        // update parent after all children
-        // todo
-
-        // dbgP(curr, parent, subtree_size[curr]);
-    };
-    dfs(ROOT, -1, dfs);
-
-}
-#endif
-
-// Cost to join an interval, also returns x,y location of join point.
-ll solve_interval(ll leftmost, ll rightmost){
-
-    if(MEMO.find(mp(leftmost, rightmost)) != MEMO.end()){
-        return MEMO[mp(leftmost, rightmost)];
-    }
-
-    if(leftmost == rightmost){
-        ///dbg(leftmost, rightmost)
-        return 0;
-    }
-    ll best = INF_ll;
-    FOR(i, leftmost, rightmost){
-        // el; dbgY(i);
-
-        /// left join is leftmost to i
-        /// right join is i+1 to rightmost
-
-        ll leftjoin_height = minll(H, (DAT[i] - DAT[leftmost]+1) / 2);
-        ll rightjoin_height = minll(H, (DAT[rightmost] - DAT[i+1]+1) / 2);
-
-        ll joinheight = minll(H, (DAT[rightmost] - DAT[leftmost] + 1)/2);
-
-        ll joincost = maxll(-1,joinheight - leftjoin_height + joinheight - rightjoin_height - 1);
-
-
-        if(H < (DAT[rightmost] - DAT[leftmost]+ 1)/2){
-            joincost+=1;
-        }
-
-
-
-        ll cur_total_cost = joincost + solve_interval(leftmost, i) +
-                    solve_interval(i+1, rightmost);
-
-        if(rightmost - leftmost == 3){
-            dbgY(leftjoin_height, rightjoin_height, joinheight, joincost)
-            dbgY(cur_total_cost);
-        }
-
-        best = minll(best, cur_total_cost);
-    }
-
-
-    dbg(leftmost, rightmost, best);
-    MEMO[mp(leftmost, rightmost)] = best;
-    return best;
-}
 
 
 
 
 void solve() {
-    cin >> N >> H;
-
-    FOR(i,0,N){
-        cin >> DAT[i];
-    }
-
-
-    dbgR(N, H);
-
+    lls(N, H);
+    V<ll> dat;
+    rv(N, dat);
+    dbgR(N, H, dat);
     el;
 
-    ll full_join_cost = solve_interval(0,N-1);
-    dbg(full_join_cost);
-    ll full_join_height = minll(H, (DAT[N-1] - DAT[0] + 1)/2);
-    dbg(full_join_height)
-    ps(full_join_cost + H - full_join_height);
+    using subout = tuple<pll,ll,ll>;
+    auto find_cost = [&](pll a, pll b) -> subout {
+        auto& [ax, ay] = a;
+        auto& [bx, by] = b;
 
+        if (a == b) { return MT(MP(ax, ax), ay, 0); }
 
+        // make the heights match.
+        ll cost_phase1 = abs(by - ay);
+        ll y = min(ay, by);
+        if (ay <= by) {bx -= cost_phase1;}
+        else {ax += cost_phase1;}
+        if (ax > bx) {
+            assert(y == 0);
+            // Maybe just say that they each need their own tower?
+            return MT(MP(-1,-1), -1, max(ay, by));
+        }
 
+        bool parity = (bx - ax) % 2;
+        ll cost_phase2 = bx - ax + 1 - 2 + parity;
+        ll levels_phase2 = cost_phase2 / 2 + 1;
+        dbg(a, b, parity, cost_phase2, levels_phase2);
+        subout out;
+        auto& [ox, oy, ocost] = out;
+        auto& [oxl, oxr] = ox;
+        if (y - levels_phase2 < 0) {
+            cost_phase2 = y * 2;
+            oy = 0;
+            oxl = ax - y;
+            oxr = bx + y;
+            dbgcB("hi");
+        } else {
+            oy = y - levels_phase2;
+            oxl = (ax + bx) / 2;
+            oxr = oxl + parity;
+        }
+        ocost = cost_phase1 + cost_phase2;
+        dbgcP("find_cost", a, b, levels_phase2, cost_phase1, cost_phase2);
+        return out;
+    };
 
+    // F(l, r) = cost of subproblem [l, r].
+    auto F = ndvec<ll>(N, N, 0LL);
+    FOR(len, 2, N+1) {  // subproblem length can be up to N.
+        ll delta = len - 1;
+        FOR(l, 0, N) {
+            ll r = l + delta;
+            if (r >= N) {break;}
 
+            // solve for F[l, r].
+            auto& ans = F[l][r];
+            ans = INF_ll;
+            // idea is to split into two sides. Solve each side separately then combine.
+            // Split into [l, mid] and (mid, r].
+            FOR(mid, l, r) {
+                ll cost_left = F[l][mid];
+                ll cost_right = F[mid+1][r];
 
+                auto lout = find_cost(MP(dat[l], H), MP(dat[mid], H));
+                auto [lxrange, ly, lcost] = lout;
+                auto rout = find_cost(MP(dat[mid+1], H), MP(dat[r], H));
+                auto [rxrange, ry, rcost] = rout;
+                auto combout = find_cost(
+                    MP(lxrange.s, ly), MP(rxrange.f, ry)
+                );
+                auto [combxrange, comby, combcost] = combout;
+                ll cur = cost_left + cost_right + combcost;
+                ckmin(ans, cur);
+                dbgR(mid, cur, lout, rout, "", combout);
+            }
+            dbgY(MP(l,r), MP(dat[l], dat[r]), F[l][r]); el;
+        }
+    }
 
-    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
-
-
-    return;
+    // Now I basically want F[0][N-1]. But what if those meet above y=0...
+    ll out = F[0][N-1];
+    auto [xrange, y, cost] = find_cost(MP(dat[0], H), MP(dat[N-1], H));
+    out += y;
+    return ps(out);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

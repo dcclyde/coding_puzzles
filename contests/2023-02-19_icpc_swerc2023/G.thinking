@@ -71,10 +71,62 @@ For each W:
         the slack factor to my left.
 
 
+*****
+
+How many intervals are available total?
+Choosing from 2N-1 objects and needing to be length >= N
+    is basically the same as choosing from N objects and needing length >= 1.
+Something like N^2 / 2.
+I need to find N of these with the same number of Ws.
+
+
+****
+
+Simple random strategy:
+Choose two Rs at random. They need to be distance at least N apart.
+Ask how many Ws in between and try that value as X.
+Repeat until it works.
+Details:
+    * If there is no R, then just output N.
+    * If there is exactly one R:
 
 
 
+Edge cases to think about:
+? All Ws (very restrictive)
+? Small N (may be restrictive)
+? 0-2 of one color and the rest are the other color?
 
 
+---
+
+Suppose [L, R] has size 6
+[P, Q] has size 11
+    If N <= 6: no worries.
+    If N > 11: score is 0.
+    In between:
+
+Say N = 8.
+Start at far left: get 4 options.
+
+
+Start at L: Need length between N and Q-L+1.
+    There are Q - L - N options.
+
+Start at k:
+    Need length >= reaching R.
+        * len >= R - k + 1
+    Need length >= N
+        * len >= N
+    Need length not to stick out past Q.
+        * len <= Q-k+1
+
+I'd like to sum this over k from P up through L.
+
+------------
+
+I think my current random approach is actually normally quite fast,
+but can be defeated by certain tricky inputs.
+Example: 1e6 Rs, then 1e6-1 Ws.
 
 .

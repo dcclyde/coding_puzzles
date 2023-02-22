@@ -960,7 +960,54 @@ void test_count_intervals() {
     }
 }
 
+void solve_christine() {
+    lls(N);
+    strings(dat);
+    dbgR("christine", N, dat);
+    el;
+
+    ll S = 2*N - 1;
+
+    // pc[n] = num Ws in [0, n)
+    // num Ws strictly left of n.
+    V<ll> prefix_count(S+1);
+    auto& pc = prefix_count;
+    // V<ll> W_positions;
+    // V<ll> R_positions;
+    // W_positions.push_back(-1);
+    // R_positions.push_back(-1);
+    FOR(k, 0, S) {
+        pc[k+1] = pc[k];
+        if (dat[k] == 'W') {
+            ++pc[k+1];
+            // W_positions.push_back(k);
+        }
+    }
+    // W_positions.push_back(S);
+    // R_positions.push_back(S);
+
+    auto white_in_interval = [&](ll l, ll r) {return pc[r+1] - pc[l];};
+    // auto red_in_interval = [&](ll l, ll r) {return l-r+1 - white_in_interval(l,r);};
+
+    // umap<ll,ll> seen;
+    ll out = 0;
+    FOR(L, 0, S) {
+        ll R = L + N - 1;
+        if (R >= S) {break;}
+        ll num_seen = white_in_interval(L, R);
+        ckmax(out, num_seen);
+        // ++seen[num_seen];
+        // dbg(MP(L, R), num_seen);
+    }
+    // dbgY(seen);
+    // ll best = 0;
+    // ll out = -1;
+    // for(auto& [k, v] : seen) {if (ckmax(best, v)) {out = k;}}
+    return ps(out);
+}
+
 void solve() {
+    assert(false);
     lls(N);
     strings(dat);
     dbgR(N, dat);
@@ -988,6 +1035,14 @@ void solve() {
 
     auto white_in_interval = [&](ll l, ll r) {return pc[r+1] - pc[l];};
     auto red_in_interval = [&](ll l, ll r) {return l-r+1 - white_in_interval(l,r);};
+    V<ll> R_weights(R_positions.size());
+    V<ll> cumweights(R_positions.size());
+    FOR(k, 1, R_positions.size() - 1) {
+        R_weights[k] = red_in_interval(R_positions[k] + N - 1, S-1);
+        cumweights[k] = cumweights[k-1] + R_weights[k];
+    }
+    cumweights[cumweights.size() - 1] = cumweights[cumweights.size() - 2];
+    dbgY(cumweights);
 
     ll attempts = 0;
     uset<ll> seen;
@@ -1067,7 +1122,8 @@ int main() {
         el;
         #ifndef DCCLYDE_BRUTEFORCE
             dbgcBold("CASE" , CASE );
-            solve();
+            // solve();
+            solve_christine();
         #else
             dbgcBold("brute force" , CASE );
             brute();
@@ -1087,7 +1143,7 @@ int main() {
     #endif
     setIO();
 
-    solve();
+    solve_christine();
 
     dbgR(TIME());
     return 0;

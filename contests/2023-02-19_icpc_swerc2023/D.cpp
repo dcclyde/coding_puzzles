@@ -844,246 +844,204 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
-
 void brute() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
-    }
-    dbgR(N, pdh(G));
+    lls(B, C, D, N);
+    dbgR(N, MT(B,C,D));
     el;
 
-    V<bool> color(N);
-    auto binsearch_helper = [&](ll S) -> bool {
-        el; dbgcBold("binsearch", S);
-        FOR(k, 0, N) {color[k] = (k >= S);}
+    if (N == 0) {return ps(0);}
 
-        ll MASK_MAX = 1<<N;
-        V<ll> dp(MASK_MAX);
-        FOR(mask, 1, MASK_MAX) {
-            auto isset = [&](ll b) {return ((mask>>b) & 1) == 1;};
-            V<ll> bits;
-            ll nB = 0;
-            FOR(b, 0, N) {if (isset(b)) {nB += color[b]; bits.push_back(b);}}
-            V<ll> subdeg(N);
-            FOR(a, 0, N) {
-                if (!isset(a)) {continue;}
-                for(auto& b : G[a]) {
-                    if (!isset(b)) {continue;}
-                    ++subdeg[a];
-                }
+    V<ll> dat = {0, 0, B, C, D};
+    ll out = 0;
+    ll curr = 0;
+    V<ll> busy(N);
+
+    auto rec = [&](auto&& self, ll pos) -> void {
+        if (pos == 0) {return;}
+        if (busy[pos] < 3) {
+            ROF(plen, 2, 5) {
+                if (dat[plen] == 0 || pos-plen+1 < 0) {continue;}
+                FOR(k, 0, plen) {++busy[pos-k];}
+                --dat[plen];
+                ++curr;
+                ckmax(out, curr);
+                self(self, pos-1);
+                FOR(k, 0, plen) {--busy[pos-k];}
+                ++dat[plen];
+                --curr;
             }
-            dbg(subdeg);
-            ll best = -1;
-            for(auto& x : bits) {
-                // Am I allowed to choose x?
-                if (subdeg[x] != 1 && bits.size() > 1) {continue;}
-                // what happens if I choose x?
-                ll future_score = dp[mask ^ (1<<x)];
-                ll cur = nB - future_score;
-                if (ckmax(dp[mask], cur)) {best = x;}
-            }
-            dbgY(mask, bitset<7>(mask), dp[mask], best); el;
         }
-        ll final_score = dp[MASK_MAX-1];
-        return (final_score > 0);
-    };
 
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
+        self(self, pos-1);
+        return;
+    };
+    rec(rec, N-1);
+    dbgcY("br", out);
+    ps(out);
 }
 
+void solve_christine() {
+    lls(B, C, D, N);
+    dbgR(N, MT(B,C,D));
+    el;
 
-// ! Actual solution.
+    V<ll> dat = {0, 0, B, C, D};
+    V<ll> busy_until(3, 0);
+    // V<bool> computer_used(N, false);
+
+    // (end time, problem length, who solves it)
+    using t3 = tuple<ll,ll,ll>;
+    V<t3> out;
+
+
+    FOR(T, 1, N) {
+        /**
+            Make use of the computer in this slot if possible.
+            If we have a free person and a usable problem, do it.
+            Use the longest possible problem.
+         */
+        ROF(problem_length, 2, 5) {
+            // can I solve a problem of this length ending at time T?
+            if (dat[problem_length] == 0) {continue;}  // no such problems available.
+            ll start = T - problem_length + 1;
+            if (*min_element(all(busy_until)) > start) {continue;}  // nobody free to solve it.
+
+            ll solver = -1;
+            FOR(prop, 0, 3) {
+                if (busy_until[prop] > start) {continue;}
+                if (solver == -1) {solver = prop; continue;}
+                if (busy_until[prop] > busy_until[solver]) {solver = prop;}
+            }
+            // ll solver = min_element(all(busy_until)) - busy_until.begin();
+            out.emplace_back(T, problem_length, solver);
+            busy_until[solver] = T+1;
+            --dat[problem_length];
+            break;
+        }
+    }
+
+    sort(all(out));
+    dbgY(pdh(out));
+    ps(out.size());
+    for(auto& [endtime, duration, player] : out) {
+        ps(player+1, endtime - duration + 1, endtime + 1);
+    }
+    return;
+}
+
 void solve() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
-    }
-    dbgR(N, pdh(G));
+    return solve_christine();
+    lls(B, C, D, N);
+    dbgR(N, MT(B,C,D));
     el;
 
-    V<bool> color(N);
+    ll BB = B; ll CC = C; ll DD = D;
 
-    // can we achieve score >= S?
-    auto binsearch_helper = [&](ll S) -> bool {
-        el; el; el; dbgcBold("binsearch", S);
+    if (B + C + D == 0) {return ps(0);}
 
-        // if N is even, we (player 1) can just choose vertex N.
-        if (N % 2 == 0) {return true;}
+    V<ll> plan;
+    auto use = [&](ll sz) -> void {
+        plan.push_back(sz);
+        if (sz == 2) {--B;}
+        else if (sz == 3) {--C;}
+        else if (sz == 4) {--D;}
+        return;
+    };
 
-        // If a black vertex is immediately available, we win.
-        FOR(k, 0, N) {
-            color[k] = (k >= S);
-            if (color[k] && G[k].size() == 1) {return true;}
-        }
+    if (B > 0) {use(2);}
+    if (C > 0) {use(3);}
+    if (D > 0) {use(4);}
+    while (C > 0) {use(3);}
+    if (CC == 0) {
+        rep(minll(B, 2)) {use(2);}
+    } else {
+        while (B >= 2 && D >= 2) {use(4); use(2); use(4); use(2);}
+    }
+    if (D > 0) {use(4);}
+    if (B > 0) {use(2);}
+    while (D > 0) {use(4);}
+    while (B > 0) {use(2);}
 
-        V<pll> provide(N);
-        bool win = false;
-        ll ROOT = N-1;  // this will always be black.
-        auto dfs = [&](ll curr, ll parent, auto&& self) -> void {
-            if (win) {return;}  // pointless optimization
-            // work on parent
-            tuple<ll,ll,ll> children_provide = {0, 0, 0};
-            auto& [children_providing_even, children_providing_odd, children_providing_both] = children_provide;
-            auto& cpe = children_providing_even;
-            auto& cpo = children_providing_odd;
-            auto& cpb = children_providing_both;
-            for (auto& o : G[curr]) {
-                if (o == parent) {continue;}
-                self(o, curr, self);
+    // now turn that into a list of who will do what.
+    // (end time, problem length, who solves it)
+    using t3 = tuple<ll,ll,ll>;
+    V<t3> out;
+    V<ll> busy_until(3, 0);
+    ll T = 0;
+    V<bool> computer_used(N, false);
+    ll pidx = 0;
+    V<ll> problems = {0, 0, BB, CC, DD};
 
-                // update parent per child
-                bool pe = (provide[o].f >= 1);
-                bool po = (provide[o].s >= 1);
-                cpe += pe;
-                cpo += po;
-                cpb += (pe && po);
-
-                dbgB(curr, o, MP(pe,po), children_provide);
-            }
-            // update parent after all children
-            provide[curr].f = cpo + color[curr];
-            provide[curr].s = cpe + (cpo >= 2);
-
+    while (true) {
+        FOR(k, 0, 3) {
             if (
-                cpb >= 2  // 2 children that could each provide even OR odd
-                || (cpe >= 1 && cpo - cpb >= 1)  // 1 even + 1 (odd or both)
-                || (cpo >= 1 && cpe - cpb >= 1)  // 1 odd + 1 (even or both)
-                || (cpo >= 3)  // 3 odds also works
-                || (cpe >= 1 && color[curr])  // I can use curr as a near-endpoint in this case
-            ) {win = true;}
-            dbgP(curr, parent, provide[curr], children_provide, win); el;
-        };
-        dfs(ROOT, -1, dfs);
-        dbgR(win);
-        return win;
-    };
-
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
-}
-
-// ! First attempt, using a greedy algorithm. Doesn't work.
-void solve_greedy() {
-    lls(N);
-    ll E = N-1;
-    V<V<ll>> G(N);
-    FOR(k, 0, E) {
-        ll1(a, b);
-        G[a].emplace_back(b);
-        G[b].emplace_back(a);
+                busy_until[k] <= T
+                && T + plan[pidx] - 1 < N
+                && !computer_used[T + plan[pidx] - 1]
+            ) {
+                out.emplace_back(T+plan[pidx]-1, plan[pidx], k);
+                computer_used[T + plan[pidx] - 1] = true;
+                busy_until[k] = T + plan[pidx];
+                --problems[plan[pidx]];
+                ++pidx;
+                if (pidx == plan.size()) {break;}
+            }
+        }
+        ++T;
+        if (pidx == plan.size()) {break;}
+        if (T >= N-1) {break;}
     }
-    dbgR(N, pdh(G));
-    el;
+    dbgY(problems, pdh(out));
 
-    V<ll> deg(N);
-    V<bool> color(N);
-    V<ll> black_leaves;  auto& bl = black_leaves;
-    V<ll> white_leaves_dont_expose;  auto& wlde = white_leaves_dont_expose;
-    V<ll> white_leaves_exposing_black;  auto& wleb = white_leaves_exposing_black;
-    V<bool> used(N);
-
-    // can we achieve score >= S?
-    auto binsearch_helper = [&](ll S) -> bool {
-        dbgcBold("binsearch", S);
-        bl.clear(); wleb.clear(); wlde.clear();
-        used.assign(N, false);
-        FOR(k, 0, N) {
-            color[k] = (k >= S);
-            deg[k] = G[k].size();
-        }
-        FOR(k, 0, N) {
-            if (deg[k] != 1) {continue;}
-            if (color[k] == 1) {black_leaves.push_back(k);}
-            else {
-                ll o = *G[k].begin();
-                if (color[o] && deg[o] == 2) {wleb.pb(k);}
-                else {wlde.pb(k);}
+    // Can I sneak in a last minute 2 or 3?
+    {
+        bool done = false;
+        while (!done) {
+            done = true;
+            FOR(t, maxll(N-5,0), N) {
+                if (computer_used[t]) {continue;}
+                ll first_available = *min_element(all(busy_until));
+                ROF(problem_size, 2, 5) {
+                    if (problems[problem_size] == 0) {continue;}
+                    if (first_available + problem_size - 1 > t) {continue;}
+                    done = false;
+                    ll player = min_element(all(busy_until)) - busy_until.begin();
+                    out.emplace_back(t, problem_size, player);
+                    busy_until[player] = t+1;
+                    --problems[problem_size];
+                    computer_used[t] = true;
+                    break;
+                }
+                if (!done) {break;}
             }
         }
+    }
 
-        // ok, now start playing.
-        FOR(turn, 0, N-2) {
-            el; dbgY(turn, bl, wlde, wleb);
-            // dbgR(deg, num_exposable);
-            dbgR(deg);
-            ll K = -1;
-            if (!black_leaves.empty()) {
-                if (turn % 2 == 0) {return true;}
-                K = black_leaves.back();
-                black_leaves.pop_back();
-            } else {
-                // we can't trust the "wlde" items. They could expose something now.
-                while (K == -1 && !white_leaves_dont_expose.empty()) {
-                    K = white_leaves_dont_expose.back();
-                    white_leaves_dont_expose.pop_back();
-                    // will this expose a black now?
-                    for(auto& j : G[K]) {
-                        if (used[j]) {continue;}
-                        if (color[j] && deg[j] == 2) {
-                            white_leaves_exposing_black.push_back(K);
-                            K = -1;
-                        }
-                        break;
-                    }
-                }
-                if (K == -1) {
-                    K = white_leaves_exposing_black.back();
-                    white_leaves_exposing_black.pop_back();
-                }
-            }
-
-            dbg(K);
-
-            used[K] = true;
-            for(auto& j : G[K]) {
-                if (used[j]) {continue;}
-                // G[j].erase(K);
-                // K was a leaf, so there's only one J left.
-                --deg[j];
-                /**
-                    What updates do we need here?
-                    If deg[j] is now 1, need to add J to one of the leaf piles. Figure out which.
-                 */
-
-                if (deg[j] == 1) {
-                    if (color[j]) {black_leaves.push_back(j);}
-                    else {
-                        // ll o = *G[j].begin();
-                        for(auto& o : G[j]) {
-                            if (used[o]) {continue;}
-                            if (color[o] && deg[o] == 2) {wleb.pb(j);}
-                            else {wlde.pb(j);}
-                            break;
-                        }
-                    }
+    {
+        bool done = false;
+        while (!done && problems[2] >= 2) {
+            done = true;
+            FOR(oi, maxll(0, out.size()-5), out.size()) {
+                auto& [endtime, duration, player] = out[oi];
+                if (duration == 4 && endtime - 2 >= 0 && !computer_used[endtime-2]) {
+                    duration = 2;
+                    out.emplace_back(endtime-2, 2, player);
+                    ++problems[4];
+                    problems[2] -= 2;
+                    done = false;
+                    break;
                 }
             }
         }
+    }
 
-        // handle the last 2 turns specially because they leave this awkward 1 by himself.
-        {
-            ll turn = N-2;
-            el; dbgY(turn, bl, wlde, wleb);
-            if (turn % 2 == 0 && black_leaves.size() > 0) {return true;}
-            if (black_leaves.size() == 2) {return true;}
-            return false;
-        }
-    };
-
-    ll out = lstTrue(0, N-1, binsearch_helper);
-    return ps1(out);
+    sort(all(out));
+    ps(out.size());
+    // for(auto& [endtime, duration, player] : out) {
+    //     ps(player+1, endtime - duration + 1, endtime + 1);
+    // }
+    return;
 }
-
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?

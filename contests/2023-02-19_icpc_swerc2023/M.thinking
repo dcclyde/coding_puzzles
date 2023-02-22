@@ -1,0 +1,142 @@
+
+Binary search probably?
+That way the game reduces to nodes with 2 colors.
+How can I decide whether it's possible to keep player A
+    from ever accessing a black leaf?
+
+Maybe just play the game greedily?
+Strategy for both sides:
+    * Pick a black leaf if possible.
+    * If not, pick a white leaf that doesn't expose any black leaf.
+    * If not, pick a white leaf that does expose a black leaf.
+
+Questions:
+1) Can I break that strategy?
+2) How can I implement that strategy?
+
+! Implementing:
+Similar to topological sort?
+Track everyone's degree.
+Stuff with degree 1 is in separate lists for white vs black.
+How do I tell between white verts that will vs won't expose a black?
+If any black has deg 2 then both his friends should get marked as able to expose a black.
+
+-----
+OK, the idea above is not enough.
+I can find some counterexamples where A needs to work hard toward exposing
+    a certain black vertex.
+
+Thinking more:
+* If there are 2 neighboring black vertices, A wins.
+In general, if there are 2 black vertices with an even number of vertices "in between"
+    then A wins.
+Proof:
+A never exposes either unless he needs to.
+If he needs to, then at that moment we must see W - B1 - ??? - B2 - W.
+
+
+* Does A always win if N is even?
+Pick your favorite black vertex. Never expose it unless forced.
+If you're forced to expose it, that means it has deg 2 and all remaining leaves touch it.
+In other words, we're down to W-B-W.
+In other words, it won't happen to us if N was even.
+
+! OK, so assume N is odd.
+
+Say I have B1 with subtree size 5 and B2 with subtree size 8.
+If B1 is in B2's subtree: the number "outside" is 4 + (N-8) = odd, so A wins.
+If B1 is not in B2's subtree: the number "outside" is 4 + 7, so A wins again.
+
+If N even: A wins.
+If there's an immediate black leaf: A wins.
+If Bs have different subtree parity; A wins.
+    * No, this part isn't quite right.
+Otherwise B wins?
+
+
+How do I implement "are there an even number of verts 'between' B1 and B2"?
+I want to know - which of x's neighbors points "toward" y?
+I could accomplish this with some LCA stuff, but that's not good enough
+    because in real life I can't iterate over all B1 and B2.
+
+Is it OK if I just fix one black vertex and check everyone's parity relative to him?
+Suppose the root is one of the vertices.
+Suppose there are black vertices B1, B2 != root with even count in between.
+If B1 is between B2 and root: they'll have different parity from root.
+If they're on different paths from root:
+    (stuff outside B1) + (stuff outside B2) is odd.
+    I think this works out too.
+
+---
+
+Actually I'm changing my mind.
+If nobody wants to expose B1 and B2, then the length of the path between them
+    is what matters.
+    Even path =
+
+
+Use biggest vertex as root.
+If a black vertex has odd depth: that's an even number of verts between v and ROOT. We win.
+If 2 things with even depth, I still win?
+
+-----
+
+I've covered some cases already.
+* N even
+* if there's any odd-depth black vertex in my rooted tree
+
+Basically, if there's any subgraph with barely-protected black leaves and parity != N
+    then I win.
+In other words I want even parity, since I'm only interested in cases with N odd.
+
+How do I decide this?
+Maybe another DFS?
+For each vertex, I want to know:
+    Do I have a solution within my subtree?
+    What parity(ies) could I have for a partial solution that's exposed at my top?
+
+If I'm black and I have a black child that's odd depth relative to me then I win.
+That's just already covered by "if any odd depth then win" though.
+
+
+Probably I can figure it out if I just know how many blacks are in each subtree?
+Suppose I'm at LCA of a potential beautiful cluster.
+If this is white, cluster size is child chunks + parent.
+If this is black, cluster size is child chunks + parent + 1.
+
+Child chunks:
+    Need to include at least 2 black total.
+    If I have an even
+
+
+If I have a child providing E and a child providing O then I win.
+One child could offer both options but can't make me win by itself.
+
+A child with E provides O.
+A child with O provides E.
+A child with O, O provides O.
+If I'm black then any child can provide O, but this only works once.
+    Priorities:
+    Use it on a child providing nothing if possible.
+    Otherwise use it on a child providing only E.
+    Otherwise don't use it.
+
+-----
+
+I need to think about structures where any deletion will expose a black vertex.
+If the LCA of my structure is v, what can I say in terms of children's properties?
+All branches must end with B - W.
+
+Using v as a branch end is a special case kinda thing.
+    Check whether that lets us win right now,
+    but if not then forget about it again.
+
+
+If I'm black and there's a spare vertex lying around for me to attach,
+    then that can be one end.
+    I guess it counts as an odd thing sticking out.
+
+If I have a black child, it can always provide E.
+
+
+.
