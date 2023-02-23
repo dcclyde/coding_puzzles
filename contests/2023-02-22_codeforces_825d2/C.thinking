@@ -1,0 +1,37 @@
+
+Is it helpful if I instead store b[k] = a[k] - k?
+Then a segment [l, r] is good iff min(b) >= -l on that segment.
+
+That should let me solve small no problem.
+What about large?
+
+I'd like to quickly answer:
+How many good segments use position k?
+
+I'd like smallest L such that
+
+
+I could store C[l] = the corresponding r that got used during the 2 pointers version.
+Answer is sum of c[L] - L.
+
+If I'm updating dat[k] I want to know:
+
+! If dat[k] got smaller, our score will decrease.
+What's the first L such that c[L] > k?
+    Anything in [L, k] with c[j] > k may need to be reduced to k.
+    Need b[k] >= -j, i.e. j <= -b[k].
+
+    So, do a "range assign". upd(L, -b[k], k).
+
+! If dat[k] got bigger, our score can increase.
+What about things that're further left? They could extend past k now?
+
+
+
+
+-----
+
+Basically, position J will block intervals starting from L if b[J] < -L
+    L < -b[J]
+
+.

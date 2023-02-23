@@ -1,0 +1,20 @@
+
+"N" <= 2e5.
+
+Rotate some subseq to the RIGHT.
+Then I need to partition into two matching subseqs.
+
+-----
+
+To partition:
+Maintain a queue of stuff that's in the first subseq but not the 2nd.
+
+OK, I guess the todo list will only have one type of digit at a time.
+
+1 0 0 0 0 0
+
+First guy takes a 1
+Now first guy needs to take all 0s until the next 1.
+
+
+.

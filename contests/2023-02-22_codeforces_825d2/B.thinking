@@ -1,0 +1,12 @@
+
+dat is x, y, z.
+
+gcd(a, b) = x
+gcd(b, c) = y
+gcd(c, d) = z
+
+b is a multiple of lcm(x, y)
+
+just make b as small as possible and go from there?
+
+.
