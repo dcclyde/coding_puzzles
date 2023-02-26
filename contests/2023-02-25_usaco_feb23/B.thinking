@@ -1,0 +1,73 @@
+N <= 2e5.
+
+I think min time required is always 2*N - 2.
+
+This looks like a tree DP.
+ROOT = 1.
+a[v] = cost for the subproblem rooted at v
+b[v] = extra cost per second we wait before arriving at v
+
+b[v] is just sum of Q over that subtree?
+
+
+a[leaf] = 0
+b[leaf] = q[leaf]
+
+a[v]?
+Do I need to sort my list of subproblem sizes and costs?
+For a certain ordering a0, a1, a2 and b0, b1, b2...
+I'll pay:
+    a[0]
+    + a[1] + 2*(s[0]-1)*b[1]
+    + a[2] + 2*(s[0]-1 + s[1]-1)*b[2]
+
+So now I need to worry about what's the best way to order my children.
+
+t0, t1, t2 and b0, b1, b2.
+
+Basically I choose an ordering and then I'll sum up t_j b_k for all j < k.
+
+For any j != k, exactly one version of the term will be included.
+Will we get any cyclic dependencies if we try to set up greedily?
+
+I want j < k if Tj * Bk <= Tk * Bj.
+
+Suppose T_j * B_k <= T_k * B_j
+    and T_k * B_l <= T_l * B_k.
+
+    I'd love to show T_j * B_l <= T_l * B_j.
+    I think it's more or less true?
+    I think I wrote a proof except I didn't check carefully in subcases with some T_j = 0.
+
+
+Really what I need is like
+First subtree: I pay b0.
+Next subtree: I pay b1 * (time spent in b0) + 2 + 1
+Next subtree: I pay b2 * [(time spent in b1) + 2 + (time spent in b0) + 2 + 1].
+
+
+-----
+
+What about RULE_VERSION?
+If I end at root, I just do the above with no changes.
+If I end wherever I want, then to finish as soon as possible,
+    I should handle one of the max depth vertices last.
+
+Let's say for each child I can look up cost to solve finishing at its root
+    AND cost to solve finishing at bottom.
+I have multiple children with tied max depth.
+How do I order my children?
+I guess it's just:
+    Out of the children with tied max depth, choose the "max".
+    Then the other children in that category are back to getting normal treatment.
+
+
+-----
+
+For each node I guess I'd like to know
+* max depth for this subtree
+* cost to start here and solve this subproblem ending here
+* cost to start here and solve this subproblem ending at the bottom
+* subtree size?
+
+.

@@ -1,0 +1,41 @@
+
+N <= 300.
+
+------------
+
+I'd like to solve the small cases here.
+
+! Case 1: B < 100
+
+This comes down to a subproblem:
+Given that I have d_j copies of digit j, how many ways can I make number T?
+Subcases:
+* T has 1 digit
+* T has 2 digits, not the same
+* T has 2 digits and they're the same
+
+
+! Case 2: A = B and B < 1e18.
+
+Seems like some DP where state includes the part we've built so far?
+
+There are like 35 different substrings we could have built.
+f(l, r, a, b) = num ways to use interval [l, r] to produce output interval [a, b].
+
+
+If I need to build 353 and I see 3, 3, 5 then I'm doomed.
+
+Maybe I could use a segment tree that stores num ways to build each chunk.
+How much memory would that need?
+I guess there are 18^2 / 2 chunks and
+
+
+f(l, r, a, b) = ?
+    if dat[r] == digs[b], then we can add f[l, r-1, a, b-1].
+    if dat[r] == digs[a], then we can add f(l, r-1, a+1, b).
+
+    Need to know whether dat[l..r] is constant, so I can multiply by 2.
+
+    We can always add f[l, r-1, a, b].
+
+.

@@ -1,0 +1,60 @@
+
+N <= 500
+
+
+Sounds like some kinda DP.
+Cubic??
+
+! Brute force?
+For each pair of subarrays, if difference is D, then all elements in those subarrays
+    should use answer <= D.
+
+I could try:
+* iterate over all subarrays [l, r]
+* iterate over all "comparison start points" x
+* binary search to find y such that sum(x, y) ~ sum(l, r)
+* update my answer for everything in the range (l, r)
+
+This doesn't work because dat can have negative entries.
+
+
+I could build a std::set of all interval sums.
+Then for each [l, r] I can quickly look up the closest sum just below/above this one.
+
+-----
+
+This doesn't quite work because sometimes the nearest interval sum
+    also includes the item I'm focused on.
+    In that case, changing my item won't help close that gap.
+
+    Really I need the closest interval sum that DOESN'T contain my item.
+
+    Maybe I could do some sweeping approach...??
+
+
+If [l, r] and [a, b] overlap then it would be fine to delete the overlap from both?
+so it's safe to assume they don't overlap I think.
+
+
+I could try iterating over (l, r, a)?
+Then I'd want to maintain a sorted list of all interval sums that start at a.
+
+---------------
+
+OK this version still runs into trouble because sometimes I need [l, r] to overlap [a, b].
+In particular I might need [l, r] to fully contain [a, b].
+
+
+
+Think about iterating over all [a, b].
+I want to find ways to change a value outside that interval
+    such that I can achieve sum(a:b) in some other place too.
+
+
+*************
+
+I think I can do basically the same thing but N^2 * log instead of N^3 * log.
+
+I should say:
+
+.
