@@ -55,6 +55,10 @@ I want to find ways to change a value outside that interval
 
 I think I can do basically the same thing but N^2 * log instead of N^3 * log.
 
-I should say:
+I should compare [L, R] against all intervals starting at R+1 or more,
+    and against all intervals ending at L-1 or earlier.
+
+
+
 
 .

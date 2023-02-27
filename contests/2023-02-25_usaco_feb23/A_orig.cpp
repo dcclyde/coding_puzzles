@@ -961,63 +961,134 @@ string tsdbg(LazySeg<T, S> st) {
     return tsdbg(out);
 }
 
+void learn() {
+    LazySeg<ll,ll> st;
+    ll N = 5;
+    st.init(5);
+    FOR(k, 0, N) {st.seg[st.n + k] = k*k + 2;}
+    st.build();
+    FOR(k, 0, N) {dbg(st.query(k, k));}
+    dbgR(st);
+    el;
 
+    st.upd(2, 4, -3);
+    st.upd(1, 2, -5);
+    FOR(k, 0, N) {dbg(st.query(k, k));}
+    dbgR(st);
+    el;
+    assert(false);
+}
 
-
-void solve() {
+void brute() {
     lls(N);
     V<ll> dat;
     rv(N, dat);
     dbgR(N, dat);
     el;
 
+    V<ll> out(N, INF_ll);
+
+    FOR(a, 0, N) FOR(b, a, N) FOR(l, 0, N) FOR(r, l, N) {
+        ll s1 = 0;
+        FOR(k, a, b+1) {s1 += dat[k];}
+        ll s2 = 0;
+        FOR(k, l, r+1) {s2 += dat[k];}
+        ll del = abs(s2 - s1);
+
+        FOR(k, a, b+1) {
+            if (l <= k && k <= r) {continue;}
+            if (ckmin(out[k], del)) {
+                dbgP(k, del, "", MP(a,b), s1, MP(l,r), s2);
+            }
+        }
+    }
+    return pvn(out);
+}
+
+
+void solve() {
+    // learn();
+    lls(N);
+    V<ll> dat;
+    rv(N, dat);
+    dbgR(N, dat);
+    el;
+
+    // ps[n] = sum over [0, n).
+    V<ll> prefix_sums(N+1);
+    FOR(k, 0, N) {prefix_sums[k+1] = prefix_sums[k] + dat[k];}
+    dbg(prefix_sums);
+    auto isum = [&](ll a, ll b) {return prefix_sums[b+1] - prefix_sums[a];};
+
     LazySeg<ll,ll> st;
     st.init(N);
 
-    V<ll> prefix_sums(N+1);
-    FOR(k, 0, N) {prefix_sums[k+1] = prefix_sums[k] + dat[k];}
-    auto isum = [&](ll l, ll r) {return prefix_sums[r+1] - prefix_sums[l];};
-
-    // ! Make some interval sum to 0.
-    // ? N^2 log(N)
-    FOR(L, 0, N) {
-        FOR(R, L, N) {
-            if (L == 0 && R == N-1) {continue;}
-            ll s = isum(L, R);
-            st.upd(L, R, abs(s));
+    dbgcBold("1: make a 0");
+    FOR(l, 0, N) {
+        FOR(r, l, N) {
+            if (l == 0 && r == N-1) {continue;}
+            ll cur = isum(l, r);
+            st.upd(l, r, abs(cur));
         }
     }
 
-    set<ll> intervals;
-    auto delta = [&](ll x) {
+    set<ll> interval_sums;
+    auto nearest_delta = [&](ll x) {
         ll out = INF_ll;
-        auto it = intervals.upper_bound(x);
-        if (it != intervals.end()) {ckmin(out, *it);}
-        if (it != intervals.begin()) {--it; ckmin(out, *it);}
-        return abs(x - out);
+        auto it = interval_sums.upper_bound(x);
+        if (it != interval_sums.end()) {ckmin(out, *it - x);}
+        if (it != interval_sums.begin()) {--it; ckmin(out, x - *it);}
+        return out;
     };
+    // auto& nd = nearest_delta;
 
-    // ! Make [L, R] have same sum as another interval to the right.
-    ROF(a, 0, N) {
-        FOR(b, a, N) { intervals.insert(isum(a, b)); }
-        FOR(L, 0, a) {
-            FOR(R, L, a) {
-                ll x = isum(L, R);
-                ll del = delta(x);
-                st.upd(L, R, del);
-            }
-            FOR(R, L, a-1) {
-                ll x = isum(L, R);
-                ll del = delta(-x);
-                st.upd(L, R, del);
+    dbgcBold("2: other on RIGHT");
+    // other interval is to the right of [l, r]
+    FOR(a, 0, N) {
+        interval_sums.clear();
+        FOR(b, a, N) {interval_sums.insert(isum(a, b));}
+        el; dbgY(a, interval_sums);
+        FOR(l, 0, a) {
+            FOR(r, l, a) {
+                ll cur = isum(l, r);
+                ll del = nearest_delta(cur);
+                st.upd(l, r, del);
+                dbg(MP(l,r), cur, del);
+                if (r < a-1) {
+                    del = nearest_delta(-cur);
+                    st.upd(l, r, del);
+                    dbgc("neg", MP(l,r), cur, del);
+                }
             }
         }
     }
 
-    // ! Now do the same but on the left.
+    dbgcBold("3: other on LEFT");
+    // other interval is to the LEFT of [l, r]
+    FOR(b, 0, N) {
+        interval_sums.clear();
+        FOR(a, 0, b+1) {interval_sums.insert(isum(a, b));}
+        el; dbgY(b, interval_sums);
+        FOR(l, b+1, N) {
+            FOR(r, l, N) {
+                ll cur = isum(l, r);
+                ll del = nearest_delta(cur);
+                st.upd(l, r, del);
+                dbg(MP(l,r), cur, del);
+                if (l > b+1) {
+                    del = nearest_delta(-cur);
+                    st.upd(l, r, del);
+                    dbgcP("neg", MP(l,r), cur, del);
+                }
+            }
+        }
+    }
 
 
-    return;
+    V<ll> out(N);
+    FOR(k, 0, N) {out[k] = st.query(k, k);}
+
+    return pvn(out);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
