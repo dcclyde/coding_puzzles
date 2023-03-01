@@ -1,0 +1,24 @@
+
+This sounds like some flow stuff to me?
+I need to "cut" all the
+
+
+R, C <= 50.
+N <= 2500. So N^2 is okay.
+
+
+Do I want cases based on whether the cities can see each other horiz or vert?
+
+-------
+
+Things I'm not sure about but might just get away with:
+
+* Say I intervalify horizontally, then vertically.
+*    Can I prove I don't need to do horiz again?
+*    Does it matter if I did "horiz then vert" vs "vert then horiz"?
+
+* Given my two connected components, what's the cheapest way to connect everything
+*    to the appropriate corner?
+
+
+.

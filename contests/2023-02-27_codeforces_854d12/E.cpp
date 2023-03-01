@@ -550,8 +550,11 @@ string tsdbg(char c) {
 
 string tsdbg(long x) {return to_string(x);}
 string tsdbg(ll x) {return to_string(x);}
+// I think size_t will always be one of these?
+string tsdbg(unsigned int x) {return to_string(x);}
+string tsdbg(unsigned long x) {return to_string(x);}
 string tsdbg(int x) {return to_string(x);}
-string tsdbg(size_t x) {return to_string(x);}
+// string tsdbg(size_t x) {return to_string(x);}
 string tsdbg(__int128_t x) {
     if (x == 0) {return "0";}
     string out;
@@ -844,85 +847,133 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
+/**
+ * Description: Disjoint Set Union with path compression
+ 	* and union by size. Add edges and test connectivity.
+ 	* Use for Kruskal's or Boruvka's minimum spanning tree.
+ * Time: O(\alpha(N))
+ * Source: CSAcademy, KACTL
+ * Verification: *
+ */
+
+struct DSU {
+	vi e; void init(int N) { e = vi(N,-1); }
+	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	bool sameSet(int a, int b) { return get(a) == get(b); }
+	int size(int x) { return -e[get(x)]; }
+	bool unite(int x, int y) { // union by size
+		x = get(x), y = get(y); if (x == y) return 0;
+		if (e[x] > e[y]) swap(x,y);
+		e[x] += e[y]; e[y] = x; return 1;
+	}
+};
+
+/**tcT> T kruskal(int N, vector<pair<T,pi>> ed) {
+	sort(all(ed));
+	T ans = 0; DSU D; D.init(N); // edges that unite are in MST
+	each(a,ed) if (D.unite(a.s.f,a.s.s)) ans += a.f;
+    // FOR(k, 0, N) {if (!D.sameSet(0, k)) {return -1;}}  // confirm that the graph is connected
+	return ans;
+}*/
 
 
 
 
 
 void solve() {
-    strings(dat);
-    ll N = dat.size();
-    sort(all(dat));
-    dbgR(N, dat);
+    lls(R, C);
+    ll N = R * C;
+    V<string> dat(R);
+    FOR(r, 0, R) {cin >> dat[r];}
+    dbgR(N, MP(R,C), pdh(dat));
     el;
 
-    V<pair<char, ll>> comp = {{dat[0], 0}};
-    for(auto& c : dat) {
-        if (comp.back().f != c) {comp.emplace_back(c, 0);}
-        comp.back().s += 1;
-    }
-
-    if (comp.size() == 1) {return ps(dat);}
-    string out(N, '.');
-    ll pos = 0; ll L = 0; ll R = N-1;
-    while (pos+1 < N && dat[pos] == dat[pos+1]) {
-        out[L++] = dat[pos++];
-        out[R--] = dat[pos++];
-    }
-    dbgY(pos, MP(L,R), out);
-    // dat[pos] doesn't have a match.
-
-    if (pos == N) {return ps(out);}
-    ll ci = lstTrue(0, comp.size()-1, [&](ll K) {return comp[K].f <= dat[pos];});
-    if (ci == comp.size()-1) {
-        FOR(k, L, R+1) {out[k] = dat[pos];}
-        return ps(out);
-    } else if (ci == comp.size()-2) {
-        // We have 1 cool item and then some trash.
-        // Put the cool item "just right of center".
-        FOR(k, L, R+1) {out[k] = comp.back().f;}
-        out[N/2] = dat[pos];
-        return ps(out);
-    } else {
-        // We have 1 cool item and then multiple different kinds of trash.
-        out[R--] = dat[pos++];
-        FOR(k, L, R+1) {out[k] = dat[pos++];}
-        return ps(out);
-    }
-
-
-#if 0
-    string out(N, '.');
-    string extra;
-    char after_extra = '.';
-    ll pos = 0;
-    ll L = 0; ll R = N-1;
-
-    while (true) {
-        if (pos+1 >= N) {break;}  // TODO deal with ending later.
-        if (dat[pos] == dat[pos+1] && (extra.size() == 0 || dat[pos] == after_extra)) {
-            // add this to start and end.
-            out[L++] = dat[pos];
-            out[R--] = dat[pos];
-            pos += 2; continue;
+    // make intervals out of each row and column.
+    auto intervalify = [&]() -> void {
+        dbgcY("intervalify start", pdh(dat));
+        FOR(r, 0, R) {
+            ll cs = -1;
+            ll ce = -1;
+            FOR(c, 0, C) {
+                if (dat[r][c] == '#') {
+                    if (cs == -1) {cs = c;}
+                    ce = c;
+                }
+            }
+            dbg(r, MP(cs,ce));
+            FOR(c, cs+1, ce) {dat[r][c] = '#';}
         }
-        extra.push_back(dat[pos++]);
-        after_extra = dat[pos];
-        if (extra.size() >= 2) {break;}
+        FOR(c, 0, C) {
+            ll rs = -1;
+            ll re = -1;
+            FOR(r, 0, R) {
+                if (dat[r][c] == '#') {
+                    if (rs == -1) {rs = r;}
+                    re = r;
+                }
+            }
+            dbg(c, MP(rs,re));
+            FOR(r, rs+1, re) {dat[r][c] = '#';}
+        }
+        dbgcB("intervalify end", pdh(dat)); el;
+    };
+    intervalify();
+
+    auto flat = [&](ll r, ll c) -> ll {return C*r + c;};
+    auto unflat = [&](ll f) -> pll {return {f%C, f/C};};
+    DSU dsu; dsu.init(N);
+    FOR(r, 0, R) {
+        FOR(c, 0, C) {
+            if (r+1 < R && dat[r][c] == '#' && dat[r+1][c] == '#') {
+                dsu.unite(flat(r,c), flat(r+1,c));
+            }
+            if (c+1 < C && dat[r][c] == '#' && dat[r][c+1] == '#') {
+                dsu.unite(flat(r,c), flat(r,c+1));
+            }
+        }
     }
 
-    if (extra.size() >= 2) {
-        assert(extra.size() == 2);
-        out[R--] = extra[0];
-        out[L++] = extra[1];
-        while (L <= R) {out[L++] = dat[pos++];}
-    } else {
-        if (pos == N-1) {extra.push_back(dat[pos]);}
-        ROF(k, 0, extra.size()) {out[L++] = extra[k];}
+    map<ll, pair<pll,pll>> head_to_bounds;
+    FOR(r, 0, R) FOR(c, 0, C) {
+        if (dat[r][c] == '.') {continue;}
+        ll head = dsu.get(flat(r,c));
+        if (head_to_bounds.find(head) == head_to_bounds.end()) {
+            head_to_bounds[head] = MP(MP(INF_ll, -INF_ll), MP(INF_ll, -INF_ll));
+        }
+        auto& [rr, cc] = head_to_bounds[head];
+        auto& [rmin, rmax] = rr; ckmin(rmin, r); ckmax(rmax, r);
+        auto& [cmin, cmax] = cc; ckmin(cmin, c); ckmax(cmax, c);
     }
 
-    return ps(out);
-#endif
+    dbgP(pdh(head_to_bounds));
+    // if (head_to_bounds.size() == 1) {return pvn(dat);}  // * no, might need intervalify.
+
+    if (head_to_bounds.size() > 1) {
+        auto it = head_to_bounds.begin();
+        auto [arr, acc] = it->second;
+        auto [armin, armax] = arr;
+        auto [acmin, acmax] = acc;
+        ++it;
+        auto [brr, bcc] = it->second;
+        auto [brmin, brmax] = brr;
+        auto [bcmin, bcmax] = bcc;
+
+        // which directions should I travel to get from a to b?
+        V<ll> rvals = {armin, armax, brmin, brmax};
+        V<ll> cvals = {acmin, acmax, bcmin, bcmax};
+        sort(all(rvals)); sort(all(cvals));
+        dbgR(rvals, cvals);
+        if ((armin < brmin && acmin < bcmin) || (armin > brmin && acmin > bcmin)) {
+            dat[rvals[1]][cvals[2]] = '#';
+        } else {
+            dat[rvals[1]][cvals[1]] = '#';
+        }
+    }
+
+    intervalify();
+    intervalify();
+
+    return pvn(dat);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

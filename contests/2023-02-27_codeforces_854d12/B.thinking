@@ -1,0 +1,12 @@
+
+A_k = ceil(A_k / A_j)
+
+
+3 3 4 4
+
+Always choose big / small.
+
+Choose biggest / second-biggest?
+
+
+.

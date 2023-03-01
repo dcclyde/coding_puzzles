@@ -96,10 +96,13 @@ ll cdiv(ll a, ll b) { return a/b+((a^b)>0&&a%b); } // divide a by b rounded up
 ll fdiv(auto a, auto b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded down
 
 ll powll(ll b, ll e) {
+    if (e == 0) {return 1;}
     ll out = 1;
-    while (e) {
+    while (true) {
         if (e&1) {out *= b;}
-        b *= b; e >>= 1;
+        e >>= 1;
+        if (!e) {break;}
+        b *= b;
     }
     return out;
 }
@@ -844,85 +847,241 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
+#pragma region  // LazySeg
+/**
+ * Description: 1D range increment and sum query.
+ * Source: USACO Counting Haybales
+ * Verification: SPOJ Horrible
+ */
 
+ll INF = powll(10, 16);
+tcT, class S> struct LazySeg {
+	const T idT{INF}; const S idS{};  // ! identity
+	int n; V<T> seg; V<S> lazy; int orig_n; int SZ;
+	T cmb(T a, T b) {  // ! seg * seg
+		// return a+b;
+        return min(a,b);
+	}
+	void init(int _n) {
+		orig_n = _n; for (n = 1; n < _n; ) n *= 2;
+		SZ = n; seg.assign(2*n,idT); lazy.assign(2*n, idS);  // ! initialize
+	}
+	void push(int ind, int L, int R) { /// modify values for current node
+		// seg[ind] += (R-L+1)*lazy[ind]; // ! lazy * seg
+		seg[ind] += lazy[ind]; // ! lazy * seg
+		if (L != R) F0R(i,2) lazy[2*ind+i] += lazy[ind]; // ! lazy * lazy
+		lazy[ind] = idS;
+	} // recalc values for current node
+	void pull(int ind){seg[ind]=cmb(seg[2*ind],seg[2*ind+1]);}
+	void build() { ROF(i,1,SZ) pull(i); }
+    void push_all(int ind=1, int L=0, int R=-1) {
+        if ( R == -1 ) {R = SZ-1;} push(ind, L, R);
+        if (L < R) {int M = (L+R)/2; push_all(2*ind, L, M); push_all(2*ind+1, M+1, R);}
+    }
+	void upd(int lo,int hi,S inc,int ind=1,int L=0, int R=-1) {
+        if ( R == -1 ) {R = SZ-1;}
+		push(ind,L,R); if (hi < L || R < lo) return;
+		if (lo <= L && R <= hi) {
+			lazy[ind] = inc; push(ind,L,R); return; }
+		int M = (L+R)/2; upd(lo,hi,inc,2*ind,L,M);
+		upd(lo,hi,inc,2*ind+1,M+1,R); pull(ind);
+	}
+	T query(int lo, int hi, int ind=1, int L=0, int R=-1) {
+        if ( R == -1 ) {R = SZ-1;}
+		push(ind,L,R); if (lo > R || L > hi) return idT;
+		if (lo <= L && R <= hi) return seg[ind];
+		int M = (L+R)/2; return cmb(query(lo,hi,2*ind,L,M),
+			query(lo,hi,2*ind+1,M+1,R));
+	}
+    #pragma region  // first_satisfying
+    // // return smallest x s.t. query(base, x) satisfies some criterion
+	// int first_satisfying_R(int base, int val, int ind=1, int l=0, int r=-1) {
+	// 	if (r == -1) {r = n-1;}
+    //     // ! is there a good idx in [l, r]?
+    //     bool ok = (query(l,r,ind,l,r) >= val);
+	// 	if (r < base || !ok) return -1;
+	// 	if (l == r) return l;
+	// 	int m = (l+r)/2;
+	// 	int res = first_satisfying_R(base,val,2*ind,l,m); if (res != -1) return res;
+    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
+	// 	return first_satisfying_R(base,val,2*ind+1,m+1,r);
+	// }
+    // // return largest x s.t. query(x, base) satisfies some criterion
+	// int first_satisfying_L(int base, int val, int ind=1, int l=0, int r=-1) {
+	// 	if (r == -1) {r = n-1;}
+    //     // ! is there a good idx in [l, r]?
+    //     bool ok = (query(l,r,ind,l,r) >= val);
+	// 	if (l > base || !ok) return -1;
+	// 	if (l == r) return l;
+	// 	int m = (l+r)/2;
+	// 	int res = first_satisfying_L(base,val,2*ind+1,m+1,r); if (res != -1) return res;
+    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
+	// 	return first_satisfying_L(base,val,2*ind,l,m);
+	// }
+    #pragma endregion  // first_satisfying
+    void detailed_printouts() {
+        #pragma region
+        dbg_only(
+        int ST_SIZE = n;
+        int ST_PRINT_SIZE = orig_n;
+        // ST_PRINT_SIZE = ST_SIZE;  // toggle whether to print irrelevant suffix
+        el;
+        dbgc("LazySeg DETAILS");
+        FOR(k, 1, ST_SIZE + ST_PRINT_SIZE) {
+            if ( k >= ST_SIZE) {
+                int p = k - ST_SIZE;
+                dbgP(k, p, seg[k], lazy[k]);
+            } else {
+                vector<int> binary_digits;
+                int temp = k;
+                while ( temp > 0 ) {
+                    binary_digits.push_back( temp % 2 );
+                    temp /= 2;
+                }
+                reverse(all(binary_digits));
+                int L = 0; int R = ST_SIZE-1;
+                FOR(didx, 1, binary_digits.size()) {
+                    int M = (L+R) / 2;
+                    if ( binary_digits[didx] == 1 ) {
+                        L = M+1;
+                    } else {
+                        R = M;
+                    }
+                }
+                if ( L < ST_PRINT_SIZE ) {
+                    dbgY(k, MP(L,R), seg[k], lazy[k]);
+                }
+            }
+        }
+        el;
+        );  // end dbg_only
+        #pragma endregion
+    }
+};
+
+template<class T, class S>
+string tsdbg(LazySeg<T, S> st) {
+    st.push_all(); vector<T> out;
+    FOR(k, st.n, st.n + st.orig_n) { out.push_back(st.seg[k]); }
+    return tsdbg(out);
+}
+#pragma endregion  // LazySeg
+
+
+void brute() {
+    lls(N, P);
+    V<ll> dat;
+    rv1(N, dat);
+    V<ll> cold, hot;
+    rv(P, cold, hot);
+    dbgR(N, dat);
+    dbgB(P, cold, hot);
+    ++P;
+    el; el;
+
+    auto dp = ndvec<ll>(N+1, P, INF);
+    dp[0][P-1] = cold[dat[0]];  // pay full price for program 0, with useless backup.
+#if 0
+    FOR(n, 1, N) {
+        FOR(p, 0, P) {
+            FOR(q, 0, P) {
+
+                /**
+                    Say I'm coming from dp[n-1][q].
+                    If dat[n-1] == dat[n]: I could just pay discount price. Backup stays same.
+
+                    If q == dat[n]: I could pay discount price. Backup is dat[n-1].
+
+                    Otherwise, I'm definitely paying full price. Backup is dat[n-1] or q.
+                */
+                if (dat[n-1] == dat[n]) {ckmin(dp[n][p], dp[n-1][p] + hot[dat[n]]);}
+                if (p == dat[n-1]) {ckmin(dp[n][dat[n-1]], hot[dat[n]] + dp[n-1][dat[n]]);}
+
+                ckmin(dp[n][p], cold[dat[n]] + )
+
+                // option 1: p was already my backup.
+                ckmin(cur, dp[n-1][p] + hot[p]);
+
+                // option 2: Just pay full price.
+                FOR(q, 0, P) {ckmin(cur, dp[n-1][q] + cold[p]);}
+            }
+        }
+    }
+#endif
+    // push version.
+    FOR(n, 0, N-1) {
+        FOR(q, 0, P) {
+            // try using the main slot.
+            ckmin(dp[n+1][q], dp[n][q] + ((dat[n] == dat[n+1]) ? hot[dat[n+1]] : cold[dat[n+1]]));
+
+            // try using the backup slot.
+            ckmin(dp[n+1][dat[n]], dp[n][q] + ((q == dat[n+1]) ? hot[dat[n+1]] : cold[dat[n+1]]));
+        }
+    }
+
+    ll out = INF;
+    FOR(q, 0, P) {ckmin(out, dp[N-1][q]);}
+    return ps(out);
+}
 
 
 
 
 void solve() {
-    strings(dat);
-    ll N = dat.size();
-    sort(all(dat));
+    lls(N, P);
+    V<ll> dat;
+    rv1(N, dat);
+    V<ll> cold, hot;
+    rv(P, cold, hot);
     dbgR(N, dat);
-    el;
+    dbgB(P, cold, hot);
+    el; el;
 
-    V<pair<char, ll>> comp = {{dat[0], 0}};
-    for(auto& c : dat) {
-        if (comp.back().f != c) {comp.emplace_back(c, 0);}
-        comp.back().s += 1;
-    }
+    ll sum_cold = 0;
+    FOR(k, 0, N) {sum_cold += cold[dat[k]];}
+    if (N == 1) {return ps(sum_cold);}
 
-    if (comp.size() == 1) {return ps(dat);}
-    string out(N, '.');
-    ll pos = 0; ll L = 0; ll R = N-1;
-    while (pos+1 < N && dat[pos] == dat[pos+1]) {
-        out[L++] = dat[pos++];
-        out[R--] = dat[pos++];
-    }
-    dbgY(pos, MP(L,R), out);
-    // dat[pos] doesn't have a match.
+    V<ll> cost(P);
+    FOR(k, 0, P) {cost[k] = hot[k] - cold[k];}  // always <= 0.
+    dbg(cost);
 
-    if (pos == N) {return ps(out);}
-    ll ci = lstTrue(0, comp.size()-1, [&](ll K) {return comp[K].f <= dat[pos];});
-    if (ci == comp.size()-1) {
-        FOR(k, L, R+1) {out[k] = dat[pos];}
-        return ps(out);
-    } else if (ci == comp.size()-2) {
-        // We have 1 cool item and then some trash.
-        // Put the cool item "just right of center".
-        FOR(k, L, R+1) {out[k] = comp.back().f;}
-        out[N/2] = dat[pos];
-        return ps(out);
-    } else {
-        // We have 1 cool item and then multiple different kinds of trash.
-        out[R--] = dat[pos++];
-        FOR(k, L, R+1) {out[k] = dat[pos++];}
-        return ps(out);
-    }
+    LazySeg<ll,ll> st; st.init(P);
 
+    // Setup
+    // Once we've seen 2 different programs, we can actually start thinking.
+    st.seg[st.n + dat[0]] = 0;
+    st.build();
+    ll N_START = 1;
+    while (N_START < N && dat[N_START] == dat[0]) {++N_START;}
+    // if N_START = 4, that means we ran the same program in slots 0, 1, 2, 3.
+    ll out_initial = (N_START - 1) * cost[dat[0]];
+    dbgY(st);
 
-#if 0
-    string out(N, '.');
-    string extra;
-    char after_extra = '.';
-    ll pos = 0;
-    ll L = 0; ll R = N-1;
+    // we should start running actual computations beginning with N_START+1.
+    ++N_START;
+    dbgB(N_START, out_initial);
 
-    while (true) {
-        if (pos+1 >= N) {break;}  // TODO deal with ending later.
-        if (dat[pos] == dat[pos+1] && (extra.size() == 0 || dat[pos] == after_extra)) {
-            // add this to start and end.
-            out[L++] = dat[pos];
-            out[R--] = dat[pos];
-            pos += 2; continue;
+    FOR(n, N_START, N) {
+        if (dat[n] == dat[n-1]) {
+            // just run this program on the same computer again. Pay hot[n].
+            st.upd(0, P-1, cost[dat[n]]);
+        } else {
+            ll small = st.query(0, P-1);
+            ll hot_setup = st.query(dat[n], dat[n]) + cost[dat[n]];
+            ll curr = st.query(dat[n-1], dat[n-1]);
+            st.upd(dat[n-1], dat[n-1], min(small, hot_setup)-curr);
+            dbgP(curr, small, hot_setup);
         }
-        extra.push_back(dat[pos++]);
-        after_extra = dat[pos];
-        if (extra.size() >= 2) {break;}
+        dbgY(n, st);
+        // dbg_only(st.detailed_printouts();)
+        el;
     }
 
-    if (extra.size() >= 2) {
-        assert(extra.size() == 2);
-        out[R--] = extra[0];
-        out[L++] = extra[1];
-        while (L <= R) {out[L++] = dat[pos++];}
-    } else {
-        if (pos == N-1) {extra.push_back(dat[pos]);}
-        ROF(k, 0, extra.size()) {out[L++] = extra[k];}
-    }
+    ll q = st.query(0, P-1);
+    ll out = sum_cold + out_initial + q;
+    dbgR(out, MT(sum_cold, out_initial, q));
 
     return ps(out);
-#endif
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

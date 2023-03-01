@@ -1,0 +1,97 @@
+
+N <= 3e5.
+
+DP version should be easy?
+
+f(n, a, b) = min cost to run programs [0, n] ending with most recent of a and b.
+    We can assume b is always just prog[n-1], so that dimension is not really needed.
+
+f(n, a) = min of...
+    If prog[n] == prog[n-1], then it's just f[n-1, a] + hot(prog[n]).
+    Otherwise?
+    min of f(n-1, a) + cold(P[n])
+    or f(n-1, P[n]) + hot(P[n])
+
+I can mutate f as I go. (Never need to refer to anything before n-1.)
+
+I'm making O(1) range queries / updates for each n and a.
+
+Do I really need to store all of f?
+I need:
+* min of f(n-1, a)
+*
+
+
+Say dat[n] = D.
+I could either:
+    pay hot.
+        Cost to get to previous D + cost to run all intervening progs on other machine?
+    pay cold
+        Cost to get to D-1
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+F(n, j) = min cost to run programs 1..n if computer 2 recently ran j.
+
+F(n, j) = ?
+    If dat[n] == dat[n-1]: it's just F[n-1, j] + hot[dat[n]].
+    Otherwise...
+
+    F(n, j) can be F[n-1, j] + cold[dat[n]]
+
+    F(n, dat[n-1]) can be F(n-1, dat[n]) + hot[dat[n]].
+    F(n, dat[n-1]) can be min F(n-1, ...) + cold(dat[n]).
+
+
+    I could pay: F(n-1, dat[n])
+
+    If dat[n] == dat[n-1]:
+        F(n, j) = F(n-1, j) + hot[dat[n]]
+
+    If dat[n] == j:
+        F(n, dat[n-1]) <= F(n-1, dat[n]) + hot[dat[n]]
+
+    Else:
+        F(n, dat[n-1]) <= min of F(n-1, j) + cold[dat[n]]
+        F(n, j) <= F(n-1, j) + cold(dat[n])
+
+I probably don't want to deal with updating by "+ cold".
+So, I could just compute sum of colds, and then update by hot-cold when needed.
+
+***************
+
+4 2
+1 2 1 2
+5 3
+2 1
+
+cost = {-3, -2}
+
+F(1, 1) = 0
+F(1, 2) = inf
+
+F(2, 1) = 0
+F(2, 2) = -3
+
+
+
+5 6
+1 6 1 4 1
+3 6 4 1 4 5
+1 1 1 1 4 1
+
+1:
+    F(1) = 0
+
+2:
+    F(1) = 0
+    F(6) = cost[1] = -2
+
+3:
+    F(1) = -2
+        had 1 as backup, paid normal price for 4: 0
+        had
+    F(6) = -2
+
+.

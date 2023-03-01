@@ -850,79 +850,43 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 
 void solve() {
-    strings(dat);
-    ll N = dat.size();
-    sort(all(dat));
+    lls(N);
+    V<ll> dat;
+    rv(N, dat);
     dbgR(N, dat);
     el;
 
-    V<pair<char, ll>> comp = {{dat[0], 0}};
-    for(auto& c : dat) {
-        if (comp.back().f != c) {comp.emplace_back(c, 0);}
-        comp.back().s += 1;
+    {
+        ll n1 = 0;
+        FOR(k, 0, N) {n1 += (dat[k] == 1);}
+        if (n1 == N) {return ps(0);}
+        if (n1 > 0 && n1 < N) {return ps(-1);}
     }
 
-    if (comp.size() == 1) {return ps(dat);}
-    string out(N, '.');
-    ll pos = 0; ll L = 0; ll R = N-1;
-    while (pos+1 < N && dat[pos] == dat[pos+1]) {
-        out[L++] = dat[pos++];
-        out[R--] = dat[pos++];
-    }
-    dbgY(pos, MP(L,R), out);
-    // dat[pos] doesn't have a match.
+    map<ll,V<ll>> work;
+    FOR(k, 0, N) {work[dat[k]].push_back(k);}
 
-    if (pos == N) {return ps(out);}
-    ll ci = lstTrue(0, comp.size()-1, [&](ll K) {return comp[K].f <= dat[pos];});
-    if (ci == comp.size()-1) {
-        FOR(k, L, R+1) {out[k] = dat[pos];}
-        return ps(out);
-    } else if (ci == comp.size()-2) {
-        // We have 1 cool item and then some trash.
-        // Put the cool item "just right of center".
-        FOR(k, L, R+1) {out[k] = comp.back().f;}
-        out[N/2] = dat[pos];
-        return ps(out);
-    } else {
-        // We have 1 cool item and then multiple different kinds of trash.
-        out[R--] = dat[pos++];
-        FOR(k, L, R+1) {out[k] = dat[pos++];}
-        return ps(out);
+    V<pll> out;
+    while (work.size() > 1) {
+        el; dbgY(work);
+        auto it2 = work.end(); --it2;
+        auto it = it2; --it;
+        auto& [a, Va] = *it;
+        auto& [b, Vb] = *it2;
+        ll x = Va.back(); ll y = Vb.back();
+        ll z = cdiv(b, a);
+
+        out.emplace_back(y, x);
+        work[z].push_back(y);
+        // Va.pop_back();
+        // if (Va.size() == 0) {work.erase(it);}
+        Vb.pop_back();
+        if (Vb.size() == 0) {work.erase(it2);}
+        dbg(work);
     }
 
-
-#if 0
-    string out(N, '.');
-    string extra;
-    char after_extra = '.';
-    ll pos = 0;
-    ll L = 0; ll R = N-1;
-
-    while (true) {
-        if (pos+1 >= N) {break;}  // TODO deal with ending later.
-        if (dat[pos] == dat[pos+1] && (extra.size() == 0 || dat[pos] == after_extra)) {
-            // add this to start and end.
-            out[L++] = dat[pos];
-            out[R--] = dat[pos];
-            pos += 2; continue;
-        }
-        extra.push_back(dat[pos++]);
-        after_extra = dat[pos];
-        if (extra.size() >= 2) {break;}
-    }
-
-    if (extra.size() >= 2) {
-        assert(extra.size() == 2);
-        out[R--] = extra[0];
-        out[L++] = extra[1];
-        while (L <= R) {out[L++] = dat[pos++];}
-    } else {
-        if (pos == N-1) {extra.push_back(dat[pos]);}
-        ROF(k, 0, extra.size()) {out[L++] = extra[k];}
-    }
-
-    return ps(out);
-#endif
+    ps(out.size());
+    return pvn1(out);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

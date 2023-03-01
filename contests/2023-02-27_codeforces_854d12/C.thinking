@@ -1,0 +1,33 @@
+N <= 1e5.
+
+Arrange my string so that "max" of str, str[::-1] is small.
+
+* While I have 2 copies of my cheapest letter: put one at each end.
+* Put my cheap letter at end of ???s. Put all other chars from start in order.
+
+
+OK not quite.
+If I have a bbb cc then I should put b at both ends, then a and b at opposite ends
+
+
+Say I have
+
+A  B.10  CCC
+
+BBBBBC      ABBBBB
+
+
+
+
+BBBBBBBBBB CCC A
+
+
+Go until I have something left over. Say A.
+Now, one end will get an A. The other end will get Bs and so on.
+I could put BBBBBBBB         A
+or I could put BBBB         ABBBB
+second one seems only good if there's nothing left after
+
+
+
+.
