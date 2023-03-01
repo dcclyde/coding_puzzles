@@ -1,0 +1,64 @@
+
+How many s_j can be written as p*f + q*c with f, c = floor, ceil of S/x?
+
+x * that number.
+
+
+* Try to reverse the order of summation?
+Fix t.
+Which x will let us write t in terms of floor(S/x) and ceil(S/x)?
+
+If x divides S: Only divisors of S/x will work.
+
+Otherwise: I'm trying to write stuff as combination of A and A+1.
+That will work if T % A <= T / A?
+
+A = 3, T = 14
+T % A = 2, so I need 2 bonuses
+I'm using 4 items, so it's fine.
+
+
+
+I could try using the ProjectEuler trick?
+There aren't too many distinct values of S/x.
+
+
+I can make a map from S/x to sum of corresponding x values.
+! Remember to handle actual divisors of S separately.
+
+
+---------------
+
+Given T, which A values would work?
+1: yep
+2: fails for
+
+T = 19:
+    0..18
+    21..37
+    41..
+
+
+-----------
+
+I guess other way around is better.
+
+For each of these values v = S/x, which T values would work?
+Well, which values will NOT work?
+    0 up to A-1
+    A+2 up to 2A-1
+
+-----------
+
+4
+1 2 7 9
+
+* x = 1
+    I can only write 9.
+
+-----------
+
+I think this
+
+
+.

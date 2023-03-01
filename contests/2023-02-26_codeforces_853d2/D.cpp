@@ -845,308 +845,81 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 // ! ---------------------------------------------------------------------------
 
 
-// const int MOD = 1'000'000'007;
-const int MOD = 998'244'353;
-// const int MOD = 1234567891;  // WATCH OUT, this is bigger than 2^31 / 2!
-#pragma region  // mint
-/**
- * Description: modular arithmetic operations
- * Source:
-	* KACTL
-	* https://codeforces.com/blog/entry/63903
-	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
-	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
-	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
- * Verification:
-	* https://open.kattis.com/problems/modulararithmetic
- */
-
-#ifndef BENQ_MODINT
-#define BENQ_MODINT
-
-template<int MOD, int MODPHI, int RT> struct mint {
-	static const int mod = MOD;
-	static const int modphi = MODPHI;
-	static constexpr mint rt() { return RT; } // primitive root for FFT
-	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
-	mint():v(0) {}
-	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
-		if (v < 0) v += MOD; }
-	bool operator==(const mint& o) const {
-		return v == o.v; }
-	friend bool operator!=(const mint& a, const mint& b) {
-		return !(a == b); }
-	friend bool operator<(const mint& a, const mint& b) {
-		return a.v < b.v; }
-	friend void re(mint& a) { ll x; re(x); a = mint(x); }
-	friend str ts(mint a) { return ts(a.v); }
-	friend str tsdbg(mint a) { return tsdbg(a.v); }
-
-	mint& operator+=(const mint& o) {
-		if ((v += o.v) >= MOD) v -= MOD;
-		return *this; }
-	mint& operator-=(const mint& o) {
-		if ((v -= o.v) < 0) v += MOD;
-		return *this; }
-	mint& operator*=(const mint& o) {
-		v = int((ll)v*o.v%MOD);
-		return *this; }
-	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
-	friend mint pow(mint a, ll p) {
-		mint ans = 1;
-        if (p < 0) {return pow(inv(a), -p);}
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
-		return ans; }
-	friend mint inv(const mint& a) { assert(a.v != 0);
-		return pow(a,modphi-1);
-		// if MOD isn't prime use second version instead.
-		// Alternatively, find totient of MOD and use pow(a, totient-1).
-		// return (1<a) ? (MOD - ll(inv(MOD%a,a))*MOD/a) : (1);
-	}
-	mint operator-() const { return mint(-v); }
-	mint& operator++() { return *this += 1; }
-	mint& operator--() { return *this -= 1; }
-	friend mint operator+(mint a, const mint& b) { return a += b; }
-	friend mint operator-(mint a, const mint& b) { return a -= b; }
-	friend mint operator*(mint a, const mint& b) { return a *= b; }
-	friend mint operator/(mint a, const mint& b) { return a /= b; }
-};
-
-using mi = mint<MOD,MOD-1,5>; // 5 is primitive root for both common mods
-using vmi = V<mi>;
-using pmi = pair<mi,mi>;
-using vpmi = V<pmi>;
-
-V<vmi> scmb; // small combinations
-void genComb(int SZ) {
-	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
-	FOR(i,1,SZ) F0R(j,i+1)
-		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
-}
-
-template <int MOD, int MODPHI, int RT>
-string to_string(mint<MOD, MODPHI, RT> modint) {
-    return to_string((int)modint);
-}
-
-#endif
-#pragma endregion  // mint
-
-
-/**
- * Description: 1D range increment and sum query.
- * Source: USACO Counting Haybales
- * Verification: SPOJ Horrible
- */
-
-tcT, class S> struct LazySeg {
-	const T idT{}; const S idS{};  // ! identity
-	int n; V<T> seg; V<S> lazy; int orig_n; int SZ;
-	T cmb(T a, T b) {  // ! seg * seg
-		return a+b;
-	}
-	void init(int _n) {
-		orig_n = _n; for (n = 1; n < _n; ) n *= 2;
-		SZ = n; seg.assign(2*n,idT); lazy.assign(2*n, idS);  // ! initialize
-	}
-	void push(int ind, int L, int R) { /// modify values for current node
-		seg[ind] += (R-L+1)*lazy[ind]; // ! lazy * seg
-		if (L != R) F0R(i,2) lazy[2*ind+i] += lazy[ind]; // ! lazy * lazy
-		lazy[ind] = idS;
-	} // recalc values for current node
-	void pull(int ind){seg[ind]=cmb(seg[2*ind],seg[2*ind+1]);}
-	void build() { ROF(i,1,SZ) pull(i); }
-    void push_all(int ind=1, int L=0, int R=-1) {
-        if ( R == -1 ) {R = SZ-1;} push(ind, L, R);
-        if (L < R) {int M = (L+R)/2; push_all(2*ind, L, M); push_all(2*ind+1, M+1, R);}
-    }
-	void upd(int lo,int hi,S inc,int ind=1,int L=0, int R=-1) {
-        if ( R == -1 ) {R = SZ-1;}
-		push(ind,L,R); if (hi < L || R < lo) return;
-		if (lo <= L && R <= hi) {
-			lazy[ind] = inc; push(ind,L,R); return; }
-		int M = (L+R)/2; upd(lo,hi,inc,2*ind,L,M);
-		upd(lo,hi,inc,2*ind+1,M+1,R); pull(ind);
-	}
-	T query(int lo, int hi, int ind=1, int L=0, int R=-1) {
-        if ( R == -1 ) {R = SZ-1;}
-		push(ind,L,R); if (lo > R || L > hi) return idT;
-		if (lo <= L && R <= hi) return seg[ind];
-		int M = (L+R)/2; return cmb(query(lo,hi,2*ind,L,M),
-			query(lo,hi,2*ind+1,M+1,R));
-	}
-    #pragma region  // first_satisfying
-    // // return smallest x s.t. query(base, x) satisfies some criterion
-	// int first_satisfying_R(int base, int val, int ind=1, int l=0, int r=-1) {
-	// 	if (r == -1) {r = n-1;}
-    //     // ! is there a good idx in [l, r]?
-    //     bool ok = (query(l,r,ind,l,r) >= val);
-	// 	if (r < base || !ok) return -1;
-	// 	if (l == r) return l;
-	// 	int m = (l+r)/2;
-	// 	int res = first_satisfying_R(base,val,2*ind,l,m); if (res != -1) return res;
-    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
-	// 	return first_satisfying_R(base,val,2*ind+1,m+1,r);
-	// }
-    // // return largest x s.t. query(x, base) satisfies some criterion
-	// int first_satisfying_L(int base, int val, int ind=1, int l=0, int r=-1) {
-	// 	if (r == -1) {r = n-1;}
-    //     // ! is there a good idx in [l, r]?
-    //     bool ok = (query(l,r,ind,l,r) >= val);
-	// 	if (l > base || !ok) return -1;
-	// 	if (l == r) return l;
-	// 	int m = (l+r)/2;
-	// 	int res = first_satisfying_L(base,val,2*ind+1,m+1,r); if (res != -1) return res;
-    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
-	// 	return first_satisfying_L(base,val,2*ind,l,m);
-	// }
-    #pragma endregion  // first_satisfying
-    void detailed_printouts() {
-        #pragma region
-        dbg_only(
-        int ST_SIZE = n;
-        int ST_PRINT_SIZE = orig_n;
-        // ST_PRINT_SIZE = ST_SIZE;  // toggle whether to print irrelevant suffix
-        el;
-        dbgc("LazySeg DETAILS");
-        FOR(k, 1, ST_SIZE + ST_PRINT_SIZE) {
-            if ( k >= ST_SIZE) {
-                int p = k - ST_SIZE;
-                dbgP(k, p, seg[k], lazy[k]);
-            } else {
-                vector<int> binary_digits;
-                int temp = k;
-                while ( temp > 0 ) {
-                    binary_digits.push_back( temp % 2 );
-                    temp /= 2;
-                }
-                reverse(all(binary_digits));
-                int L = 0; int R = ST_SIZE-1;
-                FOR(didx, 1, binary_digits.size()) {
-                    int M = (L+R) / 2;
-                    if ( binary_digits[didx] == 1 ) {
-                        L = M+1;
-                    } else {
-                        R = M;
-                    }
-                }
-                if ( L < ST_PRINT_SIZE ) {
-                    dbgY(k, MP(L,R), seg[k], lazy[k]);
-                }
-            }
-        }
-        el;
-        );  // end dbg_only
-        #pragma endregion
-    }
-};
-
-template<class T, class S>
-string tsdbg(LazySeg<T, S> st) {
-    st.push_all(); vector<T> out;
-    FOR(k, st.n, st.n + st.orig_n) { out.push_back(st.seg[k]); }
-    return tsdbg(out);
-}
-
-/**
- * Description: Does not allocate storage for nodes with no data
- * Source: USACO Mowing the Field
- * Verification: ~
- */
-
-// const int SZ = 1<<17;
-template<class T> struct node {
-	static ll SZ;
-    static const T ID = 0;  // ! identity
-    T cmb(T a, T b) { return a+b; }  // ! seg * seg
-	T val = ID;
-    node<T>* c[2];
-	node() { c[0] = c[1] = NULL; }
-	T query(int ind, int L = 0, int R = SZ-1) { // query value at point
-		if (L == ind && R == ind) { return val; }
-		int M = (L+R)/2;
-		if (ind <= M) {
-            if (!c[0]) {return val;}
-            return cmb(val, c[0]->query(ind,L,M));
-		} else {
-			if (!c[1]) {return val;}
-            return cmb(val, c[1]->query(ind,M+1,R));
-		}
-	}
-	void upd(int lo, int hi, T v, int L = 0, int R = SZ-1) { // update segment
-		if (hi < L || R < lo) return;
-		if (lo <= L && R <= hi) {val = cmb(val, v); return;}
-		int M = (L+R)/2;
-        if (lo <= M) {
-            if (!c[0]) c[0] = new node();
-            c[0]->upd(lo,hi,L,M);
-        }
-        if (M+1 <= hi) {
-            if (!c[1]) c[1] = new node();
-            c[1]->upd(lo,hi,M+1,R);
-        }
-	}
-};
-
 
 
 
 
 void solve() {
     lls(N);
-    V<ll> dat;
-    rv(N, dat);
-    ll S = dat.back();
-    dbgR(N, S, dat);
+    strings(A, B);
+    dbgR(N, A, B);
     el;
 
-    V<ll> A = {S};
-    V<ll> weight = {0};
-    V<ll> divisors;
-
-    dbgcR("1", TIME());
-    FOR(x, 1, S + 1) {
-        if (S % x == 0) {divisors.push_back(x); continue;}  // handle these separately?
-        ll curr = S / x;
-        if (A.back() != curr) {A.push_back(curr); weight.push_back(0);}
-        weight.back() += x;
+    // test for all 0s.
+    {
+        ll zA = 0; ll zB = 0;
+        FOR(k, 0, N) {
+            zA += (A[k] == '0');
+            zB += (B[k] == '0');
+        }
+        if (zA == N && zB == N) {return ps(0);}
+        if (zA == N || zB == N) {return ps(-1);}
     }
-    // dbg(A, weight); el;
 
-    dbgcR("2", TIME());
-    LazySeg<mi,ll> st; st.init(S+1);
-    dbgcR("2b", TIME());
+    // ok, get to work.
+    V<ll> out;
+    string helper;
+    auto apply = [&](ll s) -> void { // ! set A ^= (A << s)?
+        out.push_back(s);
+        helper = A;
+        FOR(k, 0, N) {
+            ll o = k + s;
+            if (0 <= o && o < N && A[o] == '1') {
+                helper[k] ^= 1;  // flip between 0 and 1?
+            }
+        }
+        dbgcP("apply", s, A, helper);
+        A = helper;
+        return;
+    };
 
-    for(auto& d : divisors) {
-        ll x = S / d;
-        // Any multiple of d is worth x points.
-        ll md = d;
-        while (md <= S) {
-            st.upd(md, md, x);
-            md += d;
+    // find a slot that's supposed to be 1.
+    ll BASE = 0;
+    while (B[BASE] != '1') {++BASE;}
+    dbgY(BASE);
+    if (A[BASE] == '0') {
+        ll source = 0;
+        while (A[source] == '0') {++source;}
+        // use source to repair base.
+        apply(source - BASE);
+    }
+    dbg(A, B);
+
+    // now repair everything else.
+    {
+        ll source = N-1;
+        while (A[source] == '0') {--source;}
+        el; el; dbgcY("fix start", source);
+        ROF(k, 0, BASE) {
+            if (A[k] == B[k]) {continue;}
+            apply(source - k);
         }
     }
-
-    dbgcR("3", TIME());
-    ll ctr = 0;
-    FOR(k, 0, A.size()) {
-        ll a = A[k]; ll w = weight[k];
-        st.upd(0, S, w);
-        ll L = 0; ll R = a-1;
-        while (L <= R && R <= S) {
-            st.upd(L, R, -w);
-            L += a+1; R += a;
-            ++ctr;
+    {
+        ll source = 0;
+        while (A[source] == '0') {++source;}
+        el; el; dbgcY("fix end", source);
+        FOR(k, BASE+1, N) {
+            if (A[k] == B[k]) {continue;}
+            apply(source - k);
         }
-        // dbgY(MP(a,w), st); el;
     }
-    dbg(ctr);
+    assert(out.size() <= N);
+    assert(A == B);
 
-    dbgcR("4", TIME());
-    mi out = 0;
-    for(auto& T : dat) {out += st.query(T, T);}
-    dbgcR("5", TIME());
-    return ps(out);
+    ps(out.size());
+    pv(out);
+    return;
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

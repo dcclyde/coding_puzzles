@@ -1,0 +1,7 @@
+
+What's the total contribution from a particular value x?
+1 point for each (j, k) pair that contains x.
+If x is in P pairs then we score (Nc2 - (N-P)c2) points?
+
+
+.

@@ -1,0 +1,87 @@
+
+N <= 2000.
+
+I can use up to N operations.
+
+1100 ^ 11000 = 10100
+
+1101101 ^
+
+
+If I have 1:
+
+Say I have 1000000000 with correct size.
+Then I can add the other bits I want one at a time.
+
+
+
+
+110111
+
+
+
+001000
+
+
+Can I just fix digit k in step k?
+Until I set up a 1: grab a 1 from anywhere except first slot, then use that.
+After I've set up a 1: I should be able to just use that...?
+
+Issues: what if there is no such 1 available?
+
+1000
+0100
+
+If the last 1 in A comes >= the first 1 in B, I'm okay?
+
+
+10110000
+00000110
+
+OK, I guess: work on building the part of B starting with that first 1.
+I can always murder other stuff later.
+
+
+
+
+
+10001
+11001
+
+
+
+01100
+
+
+I guess: pick a slot that's supposed to be 1 in the end.
+Make it be 1.
+Then use it to fix everyone else?
+No, that doesn't work.
+Well, it almost works. Instead, use the outermost 1 to fix each digit on opposite side.
+
+------
+
+* If A is all 0s:
+    return failure unless B is all 0s.
+
+
+* If B is all 0s...?
+    return failure unless A is all 0s?
+
+
+-------
+
+! coding apply()
+
+I want A ^= (A << S).
+out[k] = A[k] ^ A[k+S]
+
+
+--------------------
+
+00111
+00001
+00110
+
+
+.
