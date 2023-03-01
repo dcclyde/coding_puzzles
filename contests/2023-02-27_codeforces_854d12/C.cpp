@@ -548,9 +548,10 @@ string tsdbg(char c) {
     return "'" + string(1, c) + "'";
 }
 
-template<typename T>
-typename enable_if<is_integral<T>::value, string>::type tsdbg(T x) {return to_string(x);}
-
+string tsdbg(long x) {return to_string(x);}
+string tsdbg(ll x) {return to_string(x);}
+string tsdbg(int x) {return to_string(x);}
+string tsdbg(size_t x) {return to_string(x);}
 string tsdbg(__int128_t x) {
     if (x == 0) {return "0";}
     string out;
@@ -849,16 +850,42 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 
 void solve() {
-    lls(N);
-    V<ll> dat;
-    rv(N, dat);
+    strings(dat);
+    ll N = dat.size();
+    sort(all(dat));
     dbgR(N, dat);
     el;
 
-    // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
+    string out(N, '.');
+    string extra;
+    char after_extra = '.';
+    ll pos = 0;
+    ll L = 0; ll R = N-1;
 
+    while (true) {
+        if (pos+1 >= N) {break;}  // TODO deal with ending later.
+        if (dat[pos] == dat[pos+1] && (extra.size() == 0 || dat[pos] == after_extra)) {
+            // add this to start and end.
+            out[L++] = dat[pos];
+            out[R--] = dat[pos];
+            pos += 2; continue;
+        }
+        extra.push_back(dat[pos++]);
+        after_extra = dat[pos];
+        if (extra.size() >= 2) {break;}
+    }
 
-    return;
+    if (extra.size() >= 2) {
+        assert(extra.size() == 2);
+        out[R--] = extra[0];
+        out[L++] = extra[1];
+        while (L <= R) {out[L++] = dat[pos++];}
+    } else {
+        if (pos == N-1) {extra.push_back(dat[pos]);}
+        ROF(k, 0, extra.size()) {out[L++] = extra[k];}
+    }
+
+    return ps(out);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
