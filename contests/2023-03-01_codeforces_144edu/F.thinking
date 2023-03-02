@@ -1,0 +1,11 @@
+
+a in [La, Ra]
+b in [Lb, Rb]
+n in [Ln, Rn]
+
+I need (a * 10^pn + n) * b == (n * 10^pb + b) * a
+
+a*b*10^x + bn == a*n*10^y + ab
+
+
+.

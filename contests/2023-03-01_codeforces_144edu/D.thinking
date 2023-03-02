@@ -1,0 +1,33 @@
+
+N <= 2e5
+! K <= 20.
+
+I could just check subarrays of size <= 20 by hand.
+
+Then separately find the best subarray assuming I pay penalty X on every element.
+
+Well.....
+What if that best subarray has size 10?
+
+I'd like to compute (best sum in modified array) + 2*K*X
+
+-----
+
+I could do something using range max over the prefix sums?
+
+Starting from j, I could ask for the biggest prefix sum from
+
+I think I don't need "range max", just suffix max.
+
+
+--------------------
+
+OK that probably works but also apparently X can be negative.
+
+For X negative...??
+
+N-K items will get a positive boost.
+
+
+
+.

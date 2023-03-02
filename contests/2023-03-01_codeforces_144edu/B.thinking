@@ -1,0 +1,17 @@
+
+Should I be using the longest common subsequence?
+
+
+
+If they start with same letter, I could just submit a*
+Same from end.
+Otherwise, I need * on both ends.
+That means I need letters touching at some point.
+
+If there's a bigram that appears in both, I can submit *ab*
+
+That should be the whole story?
+
+
+
+.

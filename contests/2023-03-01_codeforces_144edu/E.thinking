@@ -1,0 +1,38 @@
+
+I get to pick any root.
+Each color is a connected component
+Each color is a single "strand"
+
+I want the smallest color to be fat.
+
+Go to leaves
+traverse upward coloring stuff the same color
+
+binary search?
+
+! I get to decide what root to use.
+
+-------------
+
+Their last sample shows that I need some special cases to handle the choice of root.
+
+It's possible for a subtree to have two branches contributing to same color
+if one of those branches has our root.
+
+The first time I hit a "problem", I can just make this the root direction.
+Later, I could either move up OR toward root.
+
+
+TODO: my current code says you could descend in any subtree, but this is not in general allowed
+    (except for the special cases surrounding root)
+
+Paths can only go up toward the root.
+If the root is itself a leaf, need to handle that separately!
+
+If I run into a contradiction, I can try fixing it by choosing a new root.
+    (one of the two leaves involved in that contradiction)
+
+then just start over using the new root I guess?
+
+
+.

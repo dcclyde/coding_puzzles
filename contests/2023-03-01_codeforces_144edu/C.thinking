@@ -1,0 +1,33 @@
+L, R <= 1e6.
+
+----------------
+
+Any beautiful set should be c * a set containing 1.
+So, I should focus on finding beautiful sets containing 1 with biggest element small?
+
+
+1, 2, 4, 8, 16
+
+
+1, 2, 6,
+
+
+Maybe I can do some dp?
+
+F(1) = 1
+G(1) = 1
+
+F(n) = 1 + max of F(d) over all divisors d<n
+G(n) = sum of G over all ties encountered while computing F
+
+
+----------------
+
+Say L = 4, R = 100.
+Start with 4: Give me the best sequence ending <= 25.
+Start with 5: Best sequence ending <= 20
+...
+As soon as my best seq length becomes smaller, I'm done.
+Remember to compress (jump to the next interesting position)
+
+.
