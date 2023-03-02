@@ -97,9 +97,11 @@ ll fdiv(auto a, auto b) { return a/b-((a^b)<0&&a%b); } // divide a by b rounded 
 
 ll powll(ll b, ll e) {
     ll out = 1;
-    while (e) {
+    while (true) {
         if (e&1) {out *= b;}
-        b *= b; e >>= 1;
+        e >>= 1;
+        if (e == 0) {break;}
+        b *= b;
     }
     return out;
 }
