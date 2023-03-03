@@ -1,0 +1,35 @@
+
+abcdebc
+
+Say deleting x, x+1 or y, y+1 give same results.
+
+
+
+Say deleting 3, 4 vs 8, 9 give same results.
+Then I need:
+    dat[3] == dat[5]
+    dat[4] == dat[6]
+    dat[5] == dat[7]
+    dat[6] == dat[8]
+    dat[7] == dat[9]
+
+What if they're really close together? Does that change anything?
+
+Delete 3, 4 vs 5, 6:
+    dat[3] == dat[5]
+    dat[4] == dat[6]
+
+Delete 3, 4 vs 4, 5:
+    dat[3] == dat[5]
+
+OK so I exactly need an interval like ABABABA.
+It's fine if A == B.
+
+
+What I have
+    a b a b a c a c a c
+
+Seems fine, that a can be used twice no problem.
+
+
+.

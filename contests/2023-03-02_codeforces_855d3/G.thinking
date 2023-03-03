@@ -1,0 +1,19 @@
+
+Maybe process nodes by depth from bottom to top?
+
+Bottom layer: Just need even number of nodes.
+
+In general, one layer can have a list like 5xA, 3xB, 4xC.
+I need to track which of those types are themselves symmetric.
+Then in next higher layer, two verts that have the "same" children go in same pile.
+
+I guess number of piles will always be <= sqrt(N)?
+
+What can I say about number of odd vs even piles?
+I guess: at each level I need everything to pair off nicely with up to 1 exception.
+
+How do I decide what type a certain subtree is?
+Say I have children of types A, A, C, D.
+
+
+.

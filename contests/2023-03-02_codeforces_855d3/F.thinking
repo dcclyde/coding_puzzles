@@ -1,0 +1,45 @@
+N <= 2e5
+
+Given a string S.
+How many previous strings T have I seen such that S+T satisfies:
+    exactly 25 distinct characters
+    each character show up odd number of times
+
+I'd like to do some kinda hash lookup.
+
+S has odd numbers of certain chars.
+If S has an even number of 'a' then I definitely need T to have odd number of 'a'.
+
+
+I basically have some requirements like:
+    T should have odd number of character x
+    T should have even number of character y
+
+
+
+2^26 is like 6e7.
+
+
+
+a*3 b*4 d*7:
+    Need even numbers of A, D and odd or 0 of everything else.
+    Definitely need odd number of bs.
+
+    Let's assume G is left out.
+    Then I need:
+        even A
+        odd B
+        odd C
+        even D
+        odd E
+        odd F
+        *zero G*
+        odd H
+        odd I
+        ...
+
+
+
+
+
+.
