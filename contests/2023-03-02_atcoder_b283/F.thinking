@@ -1,0 +1,23 @@
+
+N <= 2e5.
+
+For each k, I want smallest value difference, but with a penalty for how far I walk.
+
+Maybe think about
+Q[j] = P[j] + j
+R[j] = P[j] - j
+
+I'd like to "query only the positions with P[j] < P[k]".
+
+
+If walking to the left, I basically just pay
+
+
+
+Some kinda segtree where I run a query at time j and the future data isn't there yet?
+
+
+Among items on the right with bigger P, what's min of P[j] + j?
+
+
+,

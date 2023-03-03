@@ -1,0 +1,30 @@
+
+Operation: Flip one whole row at a time.
+
+How many ops needed to make there be no "isolated" elements?
+
+Think about a graph with vertices corresponding to our matrix rows.
+I want to color some vertices.
+
+Each row introduces some constraints.
+It could be:
+    * Always OK
+    * Need above to match
+    * Need above to be different
+    * Need below to match
+    * Need below to be different
+    * Need EITHER above to {match/not} OR below to {match/not}
+
+
+Maybe this will just be DP?
+
+F[n, b, s] = min cost to assign rows [0..n]
+    c[n] = b
+    if s is 3 then this row is satisfied.
+       s is 1: need a 0 in next row
+       s is 2: need a 1 in next row
+
+F[n, b] = ?
+
+
+.
