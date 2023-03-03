@@ -1,0 +1,31 @@
+
+Given x <= 1e9.
+
+I need to find c such that (x+c) ^ (x-c) = x.
+
+Say x = 1011.
+x+c and x-c are different in 0-bit.
+OK, it can only work if x is even?
+
+Their examples that work:
+2       10
+10      1010
+18      10010
+36      100100
+
+Their examples that don't work:
+6       110
+5       101
+
+
+8       1000
+6, 10?  0110, 1010
+
+x+c had better not reach the next power of 2.
+
+2       10      1,3     01, 11
+
+8       1000
+        1100, 0100
+
+.

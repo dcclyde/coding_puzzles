@@ -1,0 +1,6 @@
+
+Probably just iterate through, tracking how many sets are currently ongoing
+and how many we've already fully used.
+
+.
+
