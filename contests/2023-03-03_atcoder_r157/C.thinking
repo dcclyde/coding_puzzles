@@ -1,0 +1,22 @@
+R, C <= 2000.
+
+For any pair of adjacent YY in the grid, I should be able to use binomial coefficients
+to write down how much this will contribute to the final score.
+
+Wait no - I care about the sum of SQUARES.
+
+I could do that by the "PE trick":
+number of YYs is sum of "is there a YY in this specific position?".
+so, squaring that, I just need "are there YYs in these two particular positions?"
+
+I need sum over p1, p2 of num routes that include both.
+
+Probably it's possible to do some DP here.
+
+Iterate over p2:
+    How many routes contain p2 and some p1 from top-left?
+
+    I could have like dp[r][c] = score coming from top left.
+
+
+.

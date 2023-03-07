@@ -1,0 +1,32 @@
+N <= 2e5
+
+given a binary string
+I need to flip exactly K positions to maximize number of pairs of consec 1s.
+
+
+If K >= num zeros:
+    Turn everything to 1s, then screw up some part near one end?
+
+001111100, K = 5
+
+OK, it's not quite that easy.
+I need to think about contiguous block sizes of 1s in the original string.
+For each chunk I need to edit, I lose (num_edits + 1) score.
+Anyway it seems doable.
+
+------
+
+Now think about the case with K < num zeros.
+
+Either way, the final number of 1s is obvious.
+To get a good score, I want to minimize the number of connected components.
+So, in this case I should just track the connected block sizes of 0s
+    and fully eliminate as many as I can.
+
+
+------------
+
+If I disrupt an "end block" then it doesn't add a component.
+
+
+.
