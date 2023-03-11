@@ -1,0 +1,59 @@
+
+R, C from 4 to 200
+
+I need to produce an RxC matrix such that...
+for any 4x4 block, the top-left 2x2 and bottom-right 2x2 xor to 0.
+Same for top-right and bottom-left.
+
+I should use as many distinct numbers as possible.
+
+How many slots can I fill before the rest is determined?
+
+OOOO
+OOOO
+OOOO
+O.O.
+
+There are (R-3) x (C-3) submatrices to consider.
+2 * (R-3) * (C-3) conditions total.
+This feels like a linear algebra problem...
+
+How many of the conditions are linearly indepedent?
+In general, 2(R-3)(C-3) can often be bigger than R*C.
+
+All 2x2s with parity (0,0) must have same xor.
+Same for all 2x2s with parity (1,0), or (0,1), or (1,1).
+
+All 2x2s will be broken down by moduli: r % 4 and c % 2.
+
+Fill the first row and column with whatever
+Next 3 items determine the standard xors
+Everything else is just automatic?
+
+
+How many distinct things will I get?
+
+000000
+0abcd
+0efgh
+0
+
+
+
+
+
+I could do most of the solving for each bit separately.
+
+0..0.
+0.0.0
+000.0
+
+
+
+..a.a
+..a.a
+a.a..
+a.a..
+
+
+.

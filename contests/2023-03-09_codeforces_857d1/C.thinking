@@ -1,0 +1,21 @@
+
+Up to 200k songs total.
+
+I basically need to shuffle blocks (albums) around
+so that the longest increasing subsequence will be very long.
+
+I can assume each album is increasing.
+
+I could imagine some DP like
+F[n] = best score ending at value <= n
+
+then process albums in order by biggest entry.
+
+F[n] = max over...
+    If current album is [5, 10, 12]
+    F[12..infinity] can be F[11] + 1
+        or F[9] + 2
+        or F[4] + 3
+
+
+.

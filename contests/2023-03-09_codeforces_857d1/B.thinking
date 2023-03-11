@@ -1,0 +1,16 @@
+
+Sort the list of prices?
+
+Can I iterate over the most expensive gift I'll buy for person 1?
+
+Say I'll buy the most expensive one ever for A.
+B could use or discard any gift except the one we gave A.
+
+Now say A uses the 2nd-most-expensive gift.
+B MUST use the one opposite A's most expensive.
+B CAN'T use the one opposite what we're currently using.
+B MAY use any others.
+
+
+
+.
