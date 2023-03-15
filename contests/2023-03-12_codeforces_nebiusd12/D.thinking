@@ -1,0 +1,24 @@
+
+C % 4 is 0.
+
+Each floor is half doubles and half singles.
+
+What's the min and max number of apartments with at least one lit window?
+
+*******
+
+Score = num_1s - num_double_1s.
+Min: I should make lots of double 1s.
+    I like 00 and 11 doubles.
+
+Max: I should avoid lots of double 1s.
+    I like 01 doubles.
+
+Watch out: if I greedily fill in the doubles I like, it's probably possible
+    that I'll fill more than half the space?
+
+
+
+00010101
+
+.

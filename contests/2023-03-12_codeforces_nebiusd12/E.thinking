@@ -1,0 +1,17 @@
+N <= 20.
+
+Seems like I could juuuuust about try everything....
+
+How can I characterize good/bad assignments?
+
+Starting from v, I can follow the path a^n(v).
+This path needs to eventually neighbor every vertex.
+
+Any chance I literally just need a cycle that borders everybody?
+There's definitely at least a path that borders everyone.
+What happens if it's not a cycle?
+
+What happens when p[2] follows the path?
+Need to eventually border p[0].
+
+.

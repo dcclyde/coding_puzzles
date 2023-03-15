@@ -1,0 +1,14 @@
+
+I can use any triangle number up to P.
+I need to achieve N-X mod N.
+
+P might be really big.
+
+a * (a+1) = Y mod N
+a*a + a - Y = 0
+[-1 +/- sqrt(1 + 4Y) ] / 2
+
+
+! Wait.. I could just try all a <= min(P, N).
+
+.
