@@ -1,0 +1,29 @@
+
+Maintaining my ordered lists:
+
+! How do I know whether new insertion is obsolete?
+Lower cost is better.
+Higher performance value is better.
+So...
+Look at the performance value that's barely >= me.
+If it has cost <= mine, then I'm useless.
+
+
+! How do I find + delete any other newly-obsolete stuff?
+It would need to be < my performance value and >= my cost.
+
+
+---------
+
+* 1 > 2 > 4
+10 performances in 1, have 20 dollars
+travel to 2, have 0 dollars
+15 performances in 2, have 30 dollars
+travel to 4
+
+* 1 > 3 > 4
+15 performances in 1
+travel to 3, have $0
+9 performances in 3
+
+.
