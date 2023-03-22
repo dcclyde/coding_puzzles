@@ -1,0 +1,59 @@
+
+F[x] = expected score starting from x
+S[x] = strategy starting from x
+
+F[1] = 1.5
+F[1 + epsilon] = 0
+
+F[x] = max(
+    x + 1/2,
+    integral from 0 to 1 of F[x+y] dy
+)
+
+That's the same as integral from 0 to 1-x of F[x+y]dy.
+
+Probably there'll be some cutoff point C.
+If x >= C we jump.
+If x <= C we reroll.
+(If exactly on the cutoff it's probably even.)
+
+c + 1/2 = integral from 0 to 1-c of F[c+y] dy
+
+For big F, the max isn't important.
+
+For small F, only the integral part will matter.
+I could write down some differential equation here.
+F[x] = integral from 0 to 1-x of F[x+y]dy
+u = x+y
+du = dy
+integral from x to 1 of F[u]du
+
+F'[x] =
+
+If I'm right at C, then all larger values just use F[x] = x+1/2.
+
+C + 1/2 = integral from 0 to 1-C of C+y+1/2 dy
+    aka integral from C to 1 of u+1/2 du
+
+I get C = 1/2 * (sqrt(13) - 3).
+
+---------
+
+Now, what's P[score 0]?
+Call this G[x].
+If x >= C, G[x] = 0.
+If x < C, G[x] = x + int from x to 1 of G[y]
+            = x + int from x to C of G[y]
+
+Use antiderivative A.
+G[x] = x + A[c] - A[x]
+G'[x] = 1 - G[x]
+G[x] = 1 + d * e^(-x)
+
+I want G[c] = 0? or c?
+1 + d * e^(-c) == 0
+d = -e^c
+
+G[x] = 1 - e^(c-x)
+
+.
