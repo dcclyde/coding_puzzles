@@ -1,0 +1,84 @@
+
+! Problem setup
+You have 9 people playing 4v4 frisbee.
+One person sits out.
+Sub in every point in alphabetical order by first name.
+
+We didn't have a specific question in mind. More just like - what patterns can we find?
+
+*************************
+
+1345    2678
+3459    2678
+3459    1678
+2459    1678
+2359    1678
+2349    1678
+2349    1578
+2349    1568
+2349    1567
+2348    1567
+
+
+How about: There are some people already on the field.
+I show up late with my friend(s).
+What teams should we join so that we play together as much as possible?
+
+Start with just 1 friend.
+
+*************
+
+If I have 1 friend and we're adjacent:
+Our score per full cycle will be (PLAYERS - 2) * (num pairs of consecutive players who're on the same team).
+So to maximize score, I should look at the people immediately before/after us.
+For example, if I put our later person on the same team as the person just after us then I'll be optimal.
+    (This is a good heuristic: the person after us matters more than the person before in real life, since we won't play 72 points.)
+
+
+What if I have 1 friend and we're a little further apart?
+
+! Say we're K steps apart.
+!  We get PLAYERS-K-1 points per matching pair that's K steps apart,
+!     and K-1 points per matching pair that's K-1 steps apart.
+
+What can we say in terms of quick heuristics?
+Choose the direction that makes K pretty small.
+Then we mostly care about the number of K-step pairs.
+There are still just 2 people we could potentially pair with.
+Once again it makes sense to check the one after us.
+
+Example: If there's 1 person between us then we should make our later person play on same team as the person 2 steps after them.
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+What if I'm bringing more than 2 friends?
+
+Like . . 0 0 . 1 . 1 1 0 -1
+
+I guess - Make a list of the spans I care about and weights on each span.
+    span    weight
+    1       9
+
+    4       6
+    3       3
+
+    6       4
+    5       5
+
+    3       7
+    2       2
+
+    5       5
+    4       4
+
+    2       8
+    1       1
+
+Maybe I could run some DP?
+After filling the first N spots with O ones and N-O zeros, how many pairs can I have in the bank?
+It's a little tricky because I may wish to know exactly which spots have 1s so some other empty slot can pair up with them.
+
+
+.
