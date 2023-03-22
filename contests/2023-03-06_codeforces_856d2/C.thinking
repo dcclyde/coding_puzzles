@@ -1,0 +1,16 @@
+
+"score" = product of d terms / d!
+"cost" = max length that can tie for best score
+
+1 2 3:
+    1: best score is 1, best length is 1
+
+    1 2 3: best score is 3/1 *or* 2*3 / 2
+
+
+To get the best score: Take the biggest element, then keep adding element from back
+    and divisors from front until they pass each other.
+
+I need the largest k such that dat[N-1-k] >= k.
+
+.

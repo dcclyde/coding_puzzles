@@ -1,0 +1,31 @@
+
+N <= 2022
+but they give me 2N integers as input.
+
+There must be at least N distinct primes.
+I could pick any N distinct primes,
+    and then I get a contribution of (# distinct permutations of the remaining nums)
+
+First, compute # permutations of the whole list.
+Then...?
+
+If I remove the only P, then num permutations is divided by N?
+
+If I have 5 Ps and I remove one, what happens?
+    I used to start with binom(N, 5). Now I have binom(N-1, 4).
+    binom(N, 5) / binom(N-1, 4) = N / 5.
+
+
+I have "prime pile sizes" like 1, 1, 1, 3, 4, 8, 10
+I need to choose any 5 piles and add in the product of those pile sizes.
+
+I guess it's DP somehow?
+
+f[n, k] = sum over all products using k of the first n items.
+
+f[n, 0] = 1
+
+f[n, k] = f[n-1, k] + A[n] * f[n-1, k-1]
+
+
+.

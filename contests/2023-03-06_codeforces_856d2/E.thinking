@@ -1,0 +1,11 @@
+
+N <= 2e5
+
+I'm given N-1 numbers.
+I need to know how many roots make this list "match" the depth counts
+    (except that the last remaining depth could be anything)
+
+
+
+
+.

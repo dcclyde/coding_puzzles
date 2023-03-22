@@ -1,0 +1,38 @@
+
+Add up to 2N total.
+
+Not allowed to have A[j] | A[k] if j < k.
+
+1 2 3 4 5 6?
+
+2 3 5 7 11 13
+
+
+1 1 1 1 1
+
+-------
+
+ohhh, it's only disallowing *consecutive* elements from being factors.
+
+A[j] doesn't divide A[j+1].
+
+Dividing 2 but not 3: 2, 4
+Dividing 3 but not 2: 3
+
+1 1 1 1 1
+2 3 2 3 2
+
+
+5 5 5 5 5
+5 6 5 6 5
+
+--------
+
+Wait, why do I need to plan at all?
+Can't I just run like
+for k in [1, N]:
+    if A[k-1] divides A[k], then increment A[k]
+
+I guess I can use a pre-pass to increment everything so there aren't 1s lying around.
+
+.
