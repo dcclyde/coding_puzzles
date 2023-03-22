@@ -1,0 +1,18 @@
+
+I have some data structure that stores min over [k, end). Likewise for max.
+Adding a new data point --> one of these barely gets updated and the other gets updated more.
+Updating it isn't hard.
+Then I need to answer a question like:
+    How many values in hi[k:] are divisible by x?
+    or - How many values in lo[k:] are divisors of y?
+
+They did constrain inputs to be smallish values (up to 1e6).
+Probably suggests I should be factoring things or iterating over factors or something?
+
+-----
+
+Maybe I could use some pretty different approach, where I iterate over min values?
+For each k, what's the largest interval where dat[k] is the min?
+Within that interval,
+
+.
