@@ -1,0 +1,19 @@
+
+N up to 2e5.
+Elements also up to 2e5...??
+
+Array starts with just 1.
+
+Sort C.
+I want to know whether every element can be written as a sum of
+    some of the preceding elements.
+
+Can I maintain a data structure of all reachable stuff?
+Seems like no way.
+The first 30 items could just be like 1, 2, 4, 8, 16, 32, ...
+Well, the elements are only up to 2e5 though....
+
+Could I do some IntervalUnion type stuff?
+Not clear how many distinct intervals we could have.
+
+.
