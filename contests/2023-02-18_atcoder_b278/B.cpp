@@ -916,7 +916,7 @@ int main() {
         dbgBold(num_procs, max_threads);
         omp_set_num_threads(num_procs - 4);
     #endif
-    setIO();
+    setIO();qq
 
     solve();
 

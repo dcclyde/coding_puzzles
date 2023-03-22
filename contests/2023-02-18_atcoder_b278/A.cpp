@@ -854,7 +854,7 @@ void solve() {
     V<ll> dat;
     rv(N, dat);
     dbgR(N, dat);
-    el;
+    el; el;
 
     FOR(k, K, N) {cout << dat[k] << ' ';}
     FOR(k, 0, minll(K,N)) {cout << 0 << ' ';}
