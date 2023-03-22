@@ -2,6 +2,7 @@
 /*
     Similar to IntervalUnion, but now the underlying data is added when two intervals overlap.
     Basically a sparse dual-segtree with log(SZ) range updates and point queries.
+    ! Time complexity is Q * log(SZ).
 */
 
 #pragma region  // IntervalsOverlap (sparse segtree)

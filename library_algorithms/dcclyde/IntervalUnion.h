@@ -5,7 +5,7 @@
     Example usage: codeforces/2022-02-23/E_working_on_data_structure.cpp
 */
 
-template<class T, bool MERGE_ADJACENT = true>
+template<class T, bool MERGE_ADJACENT>
 struct IntervalUnion {
     set<pair<T, T>> x;
     // internal helper
