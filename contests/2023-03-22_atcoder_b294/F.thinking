@@ -1,0 +1,16 @@
+
+I should set up my binary search such that I can sort array B once
+    and binary search through it each time.
+
+Fix a target concentration C.
+I have a bunch of (salt, total) pairs like (s, t).
+Given a/b from first array, what does (s, t) need to satisfy?
+
+I need (a+s) / (b+t) >= C
+a+s >= Cb + Ct
+a - Cb >= Ct - s
+
+So, I should just sort the second array by Ct-s.
+
+
+.
