@@ -1,0 +1,28 @@
+
+1 2 3 4 4 4 4 5 5
+
+--> 3, 1, 0, 1
+
+maybe store as v[k] = position of kth object?
+
+f(board, sofar, biggest_allowed)
+
+
+If I have [2000] (i.e. 2000 items appearing once each)
+then I don't want to store it as
+
+
+Maybe I should store state like:
+(num 1s, num 2s, num 3s, ..., num Bs) plus (list of indices for bigger stuff).
+
+Smaller stuff costs B.
+Larger stuff costs <= MAX/B.
+so I guess I'd want B ~ sqrt(MAX) ~ 45.
+
+
+Looking up whether I've already seen a certain state costs B time though?
+
+
+
+
+.
