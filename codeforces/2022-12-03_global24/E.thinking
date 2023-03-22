@@ -1,0 +1,60 @@
+
+moves like (a, b).
+
+I have a current state c.
+
+In one turn:
+I'm always allowed to pick a.
+If s <= a has been picked, then I could pick up to s + b.
+
+min(c, a) + b?
+
+
+Result of the move is
+    min()
+
+
+c = 5
+(2, 100)
+(30, 30)
+
+If a >= c, might as well just use it now.
+
+
+c = 5
+(10, 100)
+(30, 30)
+
+I should use (30, 30) first.
+
+Using "higher potential" last is not always correct.
+c = 5
+(100, 10)
+(30, 30)
+
+
+I should focus on making tricky examples where it's barely possible to reach 100.
+
+c = 10
+(90, 10)
+(50, 45)
+(80, 10)
+(10, 80)
+
+
+
+-----
+
+targ = 4
+(3, 1)
+(1, 2)
+(2, 1)
+
+
+targ = 5
+(4, 1)
+(1, 4)
+(2, 2)
+
+
+.
