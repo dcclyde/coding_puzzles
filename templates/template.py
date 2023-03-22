@@ -308,11 +308,6 @@ popcount = bits_set
 # Problem specific code usually goes below this line.
 #########################################################################
 
-# ! Read the sample cases before writing code!
-
-
-
-
 
 
 
@@ -323,7 +318,7 @@ def solve(testID):
     dbgR(N, dat)
     el()
 
-    # ! Read the sample cases AND EXPLANATIONS before writing code for div1 A and later!
+    # ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
 
 
 

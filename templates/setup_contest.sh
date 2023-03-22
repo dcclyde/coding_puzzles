@@ -14,7 +14,7 @@ cp "$template_dir/compare.sh" "$1/"
 # cp "$template_dir/compare.py" "$1/"
 cp "$template_dir/interact.sh" "$1/"
 cp "$template_dir/interact.py" "$1/"
-for PROBLEM in A B C D E F G H I J K L
+for PROBLEM in A B C D E F G H I J K L M N O P Q R S T
 do
     cp "$template_dir/template.py"  "$1/$PROBLEM.py"
     cp "$template_dir/template.cpp" "$1/$PROBLEM.cpp"

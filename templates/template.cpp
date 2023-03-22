@@ -527,6 +527,10 @@ inline namespace FileIO {
 // * debug setup mostly stolen from tourist. https://codeforces.com/contest/1540/submission/120602670
 // * dcclyde added line numbers, colors, probably some other stuff.
 
+// for dbg printouts of C arrays.
+template<typename T>
+V<T> vform(T* arr, ll len) { return V<T> (arr, arr+len); }
+
 template <typename A, typename B>
 string tsdbg(pair<A, B> p);
 
@@ -823,7 +827,7 @@ void debug_out(Head H, Tail... T) {
 #endif
 #pragma endregion
 
-#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgc("boom!", a);exit(1);}});
+#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgcBold("boom!", a);exit(1);}});
 
 #define YES ps("YES");
 #define NO ps("NO");
