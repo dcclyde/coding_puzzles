@@ -1,0 +1,22 @@
+
+I only need to worry about cases with same length.
+If the first digits match: I have no choice here. Track it and move on.
+If they differ by 2+: I can make all digits equal L[0]+1.
+So, I should worry about cases where they differ by 1.
+Also, there shouldn't be any all-repeats numbers between L and R.
+
+
+
+14823 to 20482?
+
+Idea: Ask what's the longest prefix that will match L.
+Anything outside that prefix shouldn't matter
+
+
+
+19999 to 20000: cheapest is just 20000.
+499 to 500: Costs 5 either way.
+
+
+
+.

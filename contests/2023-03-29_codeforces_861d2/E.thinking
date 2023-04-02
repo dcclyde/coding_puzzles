@@ -1,0 +1,143 @@
+
+N = 3, K = 4?
+
+
+0 x x:
+    3 ways to pick which slots.
+    3 ways to pick the value.
+
+
+Other:
+How many ways with 2 things adding to 1?
+2 things adding to 2?
+2 things add to 3
+    0 3, 1 2, 2 1, 3 0
+
+
+Ohhhhhhhhhhhhhhhhh
+
+ok, the target digit doesn't need to be the biggest.
+I just need the sum to match mod K.
+
+For each T:
+    Decide how many copies of T we'll use.
+    Then I need N-C things that sum to T-(k-1)T, but none of the things can be T.
+    If I had a FFT implementation for arbitrary mod then I'd be good...
+
+-------------------
+
+How many ways to choose N things from 0..K-1
+    where at least one of them equals the sum of the rest mod K?
+    In other words, at least one of them equals S/2.
+
+This should be doable?
+I can compute how many ways total to sum to S (without the S/2 constraint).
+Then compute how many ways that don't use any S/2s.
+It's like 1 + x + x^2 + ... + x^(K-1) - x^(S/2)
+    raise to N
+    grab the S/2 term
+
+    repeat this for each S.
+
+
+-----------
+
+N = 3, K = 2.
+
+I need ways to make the full sum equal S while at least one of them equals S/2.
+
+halfS = 0:
+    I need full sum to equal 0 while at least one equals 0.
+
+
+Ways to hit 0 with at least one 0 or 1?
+Total ways                  4
+- ways with no 0s           0
+- ways with no 1s           1
++ ways with no 0s and no 1s 0
+
+
+Ways with at least one 0:   4-0
+Ways with at least one 1:   4-1
+Ways with at least one 0 and at least one 1:    4-0
+
+
+
+
+Ways with no 0s or 1s
+
+
+
+Hit 0 with no 0s or 1s      0   AB
+Hit 0 with no 0s            0   A
+Hit 0 with no 1s            1   B
+Hit 0                       4   X
+
+
+Hit 0 with at least one 1: X-B = 3
+Hit 0 with at least one 0: X-A = 4
+Hit 0 with at least one 1 and at least one 0:
+    X-A-B+AB = 4-1-0+0 = 3
+
+-------------------------------------------
+
+Why is total_ways "always" constant?
+Well OK, I can just decide what to put in the very last slot.
+All slots will just equal K^(N-1).
+
+
+
+Why is my constrained ways "mostly constant"?
+Say K = 8.
+Trying to reach 6 without using 3 or 7.
+Trying to reach 4 without using 2 or 6.
+
+If I pick random stuff until the last entry, then I'll fail if I ended
+    at either banned value.
+
+
+*************************************
+
+! Explaining to Christine
+
+N <= 1e18
+K <= 2000
+
+condition on the sum of all numbers
+mod K.
+For S from 0 to K-1....
+    Make a list of options for the "special" digit.
+    If K = 15 and S = 6, then we basically need at least one digit to be 3.
+    List would be {3}.
+
+    If K = 10 and S = 6, then we need one digit in {3, 8}.
+
+    If K = 10 and S = 9, then there's no way.
+
+    I want to know: How many ways to sum up to S by choosing N numbers
+        from 0..K-1 including at least one from the special set.
+
+    Total ways to sum up to S using N numbers:
+        Just get (N-1) ^ K.
+        Pick whatever we want in first N-1 slots, then the last one is determined.
+
+    So it would be enough if I could count ways to sum to S
+        using N numbers but NO nums from special set.
+
+    Write down the polynomial p(x) = 1 + x + x^2 + ... + x^(K-1) - x^a - x^b
+        where a, b are the things in the special set.
+        Then I want to compute p(x)^N and take the x^S coefficient.
+        Each multiplication takes K*log(K).
+        Full calculation takes K*log(K)*log(N)
+
+        This gives a full solution that costs K^2 log(K) log(N).
+
+***********************
+
+Final:
+I "solved" it by noticing that the "curr" values all seem equal
+    except for at K/d where d is some divisor of K.
+    I don't understand why and I don't have a good way to find what d is,
+    but I can find d clumsily by iterating over prime divisors of K one at a time.
+
+.

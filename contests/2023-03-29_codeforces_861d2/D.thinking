@@ -1,0 +1,37 @@
+
+By default I need (K-1)/2 changes per array.
+How many things already match?
+
+Entry x will be compared against x+2, x+4, ..., x+k-1.
+
+Handle even vs odd positions separately.
+
+Basically, I'm given an array, and I need to know how many cases have
+    dat[a] == dat[b] and b-a <= B.
+
+
+K = 5:
+dat[8] is compared against dat[4], dat[6].
+
+
+dat[4] is NOT compared against dat[2] if K is 25.
+If dist to each end is at least K: Compare against K recent items.
+If we're near the start:
+    Say K = 9.
+    Compare 6 against 4
+    8 against 6, 4, 2
+    10 against 8, 6, 4, 2
+
+K = 9, N = 100:
+10: 8, 6, 4, 2
+12: 10, 8, 6, 4
+
+...
+90: 88, 86, 84, 82
+92: ...
+
+96: 94, 92, 90, 88
+98: 96, 94, 92
+100: 92
+
+.
