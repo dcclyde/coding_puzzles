@@ -1,0 +1,16 @@
+
+A up, B down.
+
+How many days will it take?
+Smallest N such that (N-1) * (A-B) + A >= H.
+
+Someone says f(A, B) = N. What does that tell me about H?
+
+---
+
+I always make at least 1 step of progress per day.
+Height could be up to like 1e18...
+
+H - A <= (N-1) * (A-B)
+
+.

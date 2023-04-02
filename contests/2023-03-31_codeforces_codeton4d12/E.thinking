@@ -1,0 +1,20 @@
+
+Starting from a vertex with score 0,
+we can add vertices with score <= current size of our set.
+Can we add all the vertices?
+
+What if I try to just check everything?
+priority queue of TODO stuff
+track what stuff we've seen and use DSU to add the score
+    if we merge onto a previous component.
+
+------------
+
+If I can't reach the next point, stop.
+
+Otherwise, grab that guy's stuff.
+    By default that would just be 1 item, but it could be more if they previously got combined
+    with other start points.
+If I reach a 2 that got combined with some stuff before, I'm allowed to grab all his stuff.
+
+.
