@@ -140,4 +140,28 @@ I "solved" it by noticing that the "curr" values all seem equal
     I don't understand why and I don't have a good way to find what d is,
     but I can find d clumsily by iterating over prime divisors of K one at a time.
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+My solution works, so I'm reading their explanation to try to understand better.
+They said:
+If K = 8 and I want to reach 6 without using 3 or 7,
+I should think about subtracting 3 from all of my digits.
+So really I need to make 8 - 3*N without using 0 or 4.
+
+N = 90, K = 120
+Make 2 without using 1 or 61:
+    Same as making 2 - 1*90 without using 0 or 60.
+    = 32
+
+Make 4: 4 - 2*90 = 64
+
+Make 30: 30 - 15*90 = 0
+
+The important step size is D such that (D - (D/2)*N) = 0 mod K
+K divides D * (N-2) / 2.
+
+
+Separately, I'm still not sure why it matters whether we're making 0 vs something else...
+
+
 .
