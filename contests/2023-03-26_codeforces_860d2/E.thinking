@@ -1,0 +1,25 @@
+
+2 numbers: only [1, 0] works.
+
+f(stuff) is always <= 2?
+I could always just make [1, L-2, etc].
+So we only need to answer:
+    * Is this already a multitest? (answer 0)
+    * Can we fix it with just 1 change?
+
+For A:
+    I can track dp[n] = num tests if [n, ..., N-1] is a valid set of tests
+    dp[n] = -1 otherwise
+
+For B:
+    If x[n] = 1 or x[n+1] = L-2 then yes, we can always win in 1 step.
+    Otherwise we need to hope for a different winning configuration.
+    I can use dp[n+1] to decide whether I can win by changing slot n.
+    Otherwise I need to keep slot n the same and change something else...
+
+    Say I change position k.
+    Then I need [n+1, k-1] to be some valid sets
+        and [k]
+
+
+.
