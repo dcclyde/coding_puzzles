@@ -1,0 +1,22 @@
+
+G_1: Everything is connected.
+G_2: a, b are connected iff a, b are NOT neighbors in the original tree.
+
+How can I get from v to w?
+
+Is it possible that I have at least one edge but I'm not in the party component?
+
+What's the biggest length from v to any other vertex?
+map
+
+Go up some amount and then use height.
+I need height to point down a different subtree though.
+
+From root, just use height.
+From v:
+    I could use height.
+    If parent didn't use me, then I could use out[parent] + 1.
+    If parent did use me, I could use out_backup[parent] + 1.
+
+
+.

@@ -1,0 +1,135 @@
+
+a_1, a_2, a_3
+
+How many sums <= S?
+Sort it.
+I can spend N*log(N) time no problem. N time if I bother with 2ptrs.
+
+0, 3, 8, 20, 50
+
+3, 8, 20, 11, 23, 28, (stuff involving 50)
+    3, 8, 11, 20
+
+11, 14, 23, 19, 28, 31
+    11, 14, 19
+
+25, 30, 33
+    25, 30
+
+55
+
+
+At layer L, items are sum of 2^L original items.
+
+I need to sum up 2^(N-1) original items.
+
+
+01
+02
+03 12
+04 13
+05 14 23
+
+0102
+0103 0112
+0104 0113 0203 0212 (indices sum to 5)
+0105 0114 0123 0204 0213
+
+
+01020103 01020112 (indices sum to 7)
+    00001123
+    00011122
+
+    11110003?
+
+01020105 01020114 01020123 01020204 01020213 01030104 01120212 etc...
+    00001125
+    00011124
+    00011223
+
+    00111222
+
+
+
+Finally, the indices I choose should sum to 2^(N-1) - 1.
+
+Maybe: Choose 2^(N-1) indices summing to 2^(N-1) - 1
+    such that the L most common values show up at most 2^(N-2-L) times total.
+
+
+
+
+Any chance I could do some "normalization" stuff?
+Subtract a constant each time, so my sequences may as well start with 0.
+They'll still get huge though, right?
+
+
+The last element never matters.
+
+
+What is this going to look like roughly?
+I could run like some dp[n][num_taken]?
+num_taken gets way too big though.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I'm supposed to be able to compute F(a_0, ..., a_{n-1}) in O(n log(n)) time.
+01
+02
+03 12
+04 13
+05 14 23
+
+
+F(a_0, ..., a_{n-1}) = F(0, a_1-a_0, ..., a_{n-1}-a_0) + a_0 * 2^(n-1)
+
+
+
+H(a) = H(0) + a
+H(a, b) = H(0, b-a) + 2a
+
+If I currently have T terms, then the final result will be a sum of 2^(T-1)
+    items from the current list.
+
+T = 2: sum of 2 terms
+T = 3:
+(a, b, c)
+(a+b, b+c)
+(a+b+b+c)
+
+F()
+
+Subtract a0 from every element.
+
+
+
+
+1 2 4 5 6
+3 5 6 6
+8 9 9
+17 17
+34
+
+
+0 1 3 4 5
+1 3 4 4
+4 5 5
+9 9
+18
+
+1 2 4 5 6
+    0 1 3 4 5
+
+1 3 4 4
+    0 2 3 3
+
+2 3 3
+    0 1 1
+
+1 1
+    0 0
+
+0
+
+
+.

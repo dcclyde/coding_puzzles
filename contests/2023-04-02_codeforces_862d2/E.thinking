@@ -1,0 +1,62 @@
+
+I see some people using HLD and segtrees.
+I'm not sure how to make the segtree part work though.
+
+********
+
+Separately - could I just do it with DFS?
+For each node, I want to know the largest value with >= 2 items in this subtree.
+    Track the answer so far
+    Track values that occur once and are big enough to matter
+    When merging two children, do the "small into large" trick to get N*log(N) time total.
+
+Also, track counts over whole tree for each node that occurs at least twice total.
+For each node, how many copies do I need in this subtree so that the "upward half"
+    holds the value at least twice?
+    7 times total: need <= 5 in this subtree.
+    ...
+    Need to think more about this part.
+
+*****************************
+
+Root the tree at 0 I guess.
+For each vertex, I'd like to compute A) MAD(v's subtree)
+    and also B) MAD(everything outside v's subtree).
+
+! A
+Run a DFS.
+For each vertex, I should compute the answer here
+    and also a set::set of all values that show up once and are bigger than current answer.
+
+To compute this stuff:
+First compute it for my children.
+Now for myself:
+    Whichever child has the largest singles-set, grab that and start adding onto it.
+    This should cost N log(N) total thanks to small-to-large stuff.
+
+
+! B
+Track an ordered map from value to number of occurrences in my subtree.
+Merge these the same way as above.
+
+Say I have
+3: 5
+7: 3
+12: 1
+
+and say these numbers all occur 8 times in the whole tree.
+When I merge on a new child subtree, maybe I now have
+3: 4
+7: 8
+12: 7
+
+While merging,
+if some value goes above total_available-2, then I should remove it from the data structure.
+    This also means I need to track a hash table of stuff I deleted.
+
+***********
+
+HLD thinking:
+Really I would like to have values on edges here.
+
+.
