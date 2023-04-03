@@ -32,6 +32,28 @@ struct IntervalUnion {
         }
         x.insert( pr );
     }
+    void remove(pair<T, T> pr) {
+        auto& [a, b] = pr;
+        bool done = false;
+        while ( !done ) {
+            done = true;
+            auto it = x.lower_bound(MP(a, a));
+            if (it != x.end() && it->first <= b) {
+                auto itR = it->second;
+                x.erase(it);
+                if (itR >= b + MERGE_ADJACENT) { x.insert(MP(b+MERGE_ADJACENT, itR)); }
+                done = false;
+                continue;
+            }
+            if (it != x.begin() && (--it)->second >= a) {
+                auto itL = it->first;
+                x.erase(it);
+                if (itL <= a - MERGE_ADJACENT) { x.insert(MP(itL, a-MERGE_ADJACENT)); }
+                done = false;
+                continue;
+            }
+        }
+    }
     set<pair<T,T>>::const_iterator query(T p) {
         auto it = x.lower_bound(MP(p,p));
         if ( it != x.end() && it->first == p ) {return it;}
