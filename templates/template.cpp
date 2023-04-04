@@ -635,6 +635,18 @@ string tsdbg(queue<T> S) {
     return tsdbg(queue_to_iterable(S));
 }
 
+template<typename T>
+V<T> stack_to_iterable(stack<T> S) { // PASS BY VALUE!
+    V<T> working;
+    while (!S.empty()) {working.push_back(S.top()); S.pop();}
+    // reverse(all(working));
+    return working;
+}
+template <typename T>
+string tsdbg(stack<T> S) {
+    return tsdbg(stack_to_iterable(S));
+}
+
 template <typename A, typename B>
 string tsdbg(pair<A, B> p) {
     return "(" + tsdbg(p.first) + ", " + tsdbg(p.second) + ")";
