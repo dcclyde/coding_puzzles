@@ -1,0 +1,14 @@
+
+N <= 2e5
+vals <= 1e9
+
+max(0, 1) = a
+max(1, 2) = b
+
+If a < b, I know out[2] = b.
+If a > b, I know out[0] = a. One of the others must be b.
+
+
+Just make each individual element as big as it's allowed to be?
+
+.

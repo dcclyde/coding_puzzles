@@ -1,0 +1,17 @@
+
+How many vertices does a K-flower have?
+K^2 I guess.
+
+How many edges?
+K+1 loops, each with K edges.
+
+* Graph should be connected.
+* Everyone should have degree 2 or 4.
+* If I start somewhere with degree 4 and traverse only deg 4,
+    I should end up where I started after K steps with no other options.
+* If I start somewhere deg 2 and traverse only deg 2, I should find 2 endpoints K-1 apart.
+
+
+
+
+.

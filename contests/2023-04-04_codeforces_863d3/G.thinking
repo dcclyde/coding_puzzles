@@ -1,0 +1,69 @@
+
+Given N, B.
+I care about paths that are in blocks of size B.
+First B positions have color c1, then next B have color c2, and so on.
+
+I care about max length AND count of such paths.
+N^2 solution is good. N^3 gets half credit.
+
+********************
+
+What subproblems should I solve using DP?
+
+What's max num blocks with last ending at n, and how many ways to do that?
+
+
+! Just work on small for now.
+dp[n][b] = ways to get b total items ending with item n?
+    If I'm in the middle of a chunk, I can see what color I need by looking at dat[n].
+
+Then push?
+dp[fut][b+1] += 1 if fut is an acceptable next step.
+
+
+
+
+! OK, that worked for small. Now think about large?
+Seems like they don't really want N^2 sqrt(N).
+Probably N^2 log(N) is fine.
+
+There can be 5000 different colors.
+For each color and position, I could write down where that block would end?
+    I mean I guess just write down list of positions per color.
+
+Then try dp[n] = (max blocks, ways)?
+
+dp[n] = max of dp[n-q] + 1 where block ending at n starts
+
+Maybe just max(dp[n-1], dp[n-q]+1)?
+
+q is determined by: Find the block ending at n. Can't use that stuff.
+
+***
+
+I also need to use a sum though.
+This shouldn't be a problem.
+I'm maxing the dp.f and then if it was equal I'll add dp.s, otherwise assign dp.s.
+
+*********
+
+Well....
+I don't actually need to take the smallest possible block ending at n.
+That block will govern the target number of blocks dp[n].f,
+    but there may be worse blocks that still work OK.
+
+Really I maybe need an aggregate over all 0 <= k <= start.
+
+! That doesn't fully solve my problem.
+Really I need something like:
+Consider all possible starts for my current block.
+Remember to scale things by binom(n - start + 1, B).
+
+**************
+
+For any legal previous end, what's the max possible number of blocks?
+Also, how many total ways are there to achieve that number of blocks?
+
+
+
+.

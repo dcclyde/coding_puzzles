@@ -1,0 +1,7 @@
+
+Rectangle is F_n x F_n+1.
+
+I want to write it as union of fibonaci squares.
+Painted cell needs to receive a size 1 square.
+
+.
