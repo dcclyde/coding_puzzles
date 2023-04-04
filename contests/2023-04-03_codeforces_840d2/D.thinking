@@ -1,0 +1,44 @@
+
+N <= 100.
+Say I've placed the first n entries.
+The state I care about is:
+    Most recent value placed
+    How many values below this have been placed
+    How many values above this have been placed
+
+From there I could push by asking what value will show up next.
+dp[n+1][future][below]
+
+
+Maybe I only care about n and most recent?
+Once I reach N, there are no more choices to be made.
+
+Well... I also care about how many items in [0, x-1], [x+1, y-1], etc have been used up.
+
+Should be fine to assume x < y.
+
+
+When I reach N, I need to know whether this permutation is gonna work out in the back half.
+I definitely need to have hit X already.
+If I also already hit Y then I always win.
+If I haven't hit Y then the number of remaining values above Y needs to match up.
+
+*****************
+
+N = 9
+hit 5 at time 2
+hit 7 at time 6
+
+xpos = 2        x = 5
+ypos = 6        y = 7
+
+0 1 5
+it's just 5 choose 2 = 10.
+
+If I go 0 1 5 8:
+    n = 4
+    above_y = 1
+    total_above_y = 8-7 = 1
+    todo_above_y = 0
+    arrive_at_y = n + todo_above_y
+.

@@ -1,0 +1,10 @@
+
+For any v, all vertices in a cycle through v are also on the *longest* cycle through v.
+
+
+I need:
+Given vertices a, b.
+How many edges are on some path from a to b
+    but aren't required for connecting a to b?
+
+.

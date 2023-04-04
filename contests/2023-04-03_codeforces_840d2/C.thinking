@@ -1,0 +1,14 @@
+
+values all > 0.
+First thought: Just grab min and max, and replace the chunk in between with the difference.
+
+Think about replacing on a certain range.
+Say min = a, max = b.
+New score is len * (b-a)
+old score was at least len * a.
+
+I want to say:
+
+
+
+.

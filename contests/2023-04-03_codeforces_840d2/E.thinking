@@ -1,0 +1,34 @@
+
+Given P.
+I want to find a directed graph with exactly P pairs
+    that can reach each other.
+
+
+Tiebreaker:
+The other pairs can reach in 1 direction or 0 directions.
+I want lots of pairs that can reach in 1 direction.
+    (aka minimize number of weakly connected components.)
+
+*************
+
+I could just start with a complete graph.
+
+Maybe it's just sum of triangle numbers?
+
+dp[n] = (fewest triangle numbers to get here, lowest cost to get here)
+
+If we had a before and we add b more, then cost increases by a*b.
+
+*******************
+
+P = 4?
+
+They say: N = 5, unidirectional = 6.
+10 pairs total, so 1 connected component.
+
+My code claims N = 4.
+
+0 1 2 all reach each other
+then 3 4 reach each other
+
+.
