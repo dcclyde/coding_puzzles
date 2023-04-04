@@ -7,9 +7,9 @@ TODO:
 
 --------------
 
-I think I can index out of bounds in strings without getting errors!
 
-I think compare.sh compilations aren't hitting the precompiled headers.
+
+I think I can index out of bounds in strings without getting errors!
 
 
 

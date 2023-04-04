@@ -618,10 +618,21 @@ V<T> pqueue_to_iterable(priority_queue<T> PQ) { // PASS BY VALUE!
     // reverse(all(working));
     return working;
 }
-
 template <typename T>
 string tsdbg(priority_queue<T> PQ) {
     return tsdbg(pqueue_to_iterable(PQ));
+}
+
+template<typename T>
+V<T> queue_to_iterable(queue<T> S) { // PASS BY VALUE!
+    V<T> working;
+    while (!S.empty()) {working.push_back(S.front()); S.pop();}
+    // reverse(all(working));
+    return working;
+}
+template <typename T>
+string tsdbg(queue<T> S) {
+    return tsdbg(queue_to_iterable(S));
 }
 
 template <typename A, typename B>
