@@ -1,0 +1,59 @@
+
+Queries.
+1: Add x to the pile.
+2: Subtract x from everything in the pile, discard <= 0.
+3: Repeat every operation we've seen so far.
+
+Baby version has x <= 2e5, adult version has x <= 1e9.
+Makes me think baby version uses segtrees on values? or something like that?
+
+**********
+
+When I see qtype = 3:
+Let's say I currently have 3 5 8 8.
+
+I'll end up with 3 5 8 8 again, plus the original guys lose
+    whatever was the total health subtracted before this step.
+
+
+There can be 2^N pigs in existence.
+
+
+Try some kinda data structure indexed by health values?
+Operations I need:
+    1: Add 1 to a slot.
+    2: Shift the whole thing left by a certain amount.
+    3: Same as 2, but add the new array instead of replacing it.
+
+Idea: Use a "circular array".
+Shifting is now easy: we track where the start point is, and we just move that.
+    (We do need a range assignment operator to 0 some entries.)
+
+*********
+
+I'm suspicious that we need some reduction based on realizing
+that if you use operations 2 and 3 a lot then everything dies.
+
+Some kinda "potential energy" argument.
+
+OK, so:
+do operation 3 in a slow way.
+If we've done it at least ~20 times then we're guaranteed to kill everything
+    on future op3's, so we can just treat them as shifts.
+
+
+
+One caveat: What if we call operation 3 a bunch and we haven't ever subtracted?
+In this case, we need to be able to multiply the whole thing by 2.
+
+"Final" list of needed operations:
+* Query a point
+* Assign a range to a constant
+* Multiply a range by 2
+
+**************
+
+Try to speed up just a bit:
+For type 3, I could just query positions from total_subtracted + 1 to the end.
+
+.

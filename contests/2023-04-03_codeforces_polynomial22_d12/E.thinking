@@ -1,0 +1,28 @@
+
+All variables <= 2e5.
+
+Given a tree.
+Two pieces both start at ROOT.
+They can never be further than distance D from each other.
+
+Each has a list of destinations he needs to hit. Order doesn't matter.
+Finally, need to return to the root.
+
+**********************
+
+We think:
+A can just take the shortest path
+    that touches all A vertices
+    plus Dth ancestors of all B vertices.
+
+B can do the opposite.
+
+
+To get Dth ancestors: Use the jumping-by-powers-of-2 trick.
+    I think it's part of an LCA implementation somewhere.
+
+To get the shortest path, I could do a first traversal where I build
+    x[v] = number of special positions in v's subtree.
+
+
+.

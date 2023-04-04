@@ -1,0 +1,10 @@
+
+Chain all the cells together.
+
+S = N / K
+L = ceil(N / K)
+
+We shouldn't have any with more than L.
+If S < L, then the number equalling L should be <= N % K?
+
+.

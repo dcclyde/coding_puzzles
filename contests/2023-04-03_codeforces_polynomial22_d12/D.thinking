@@ -1,0 +1,17 @@
+
+It should always be possible as long as the total number of 1s is divisible.
+
+Split rows into light vs heavy.
+
+For each column, check which light rows are 0 here and which heavy rows are 1 here.
+Match em up and record these operations.
+Remember to update the weight of each row, since light/heavy rows can become neutral.
+
+***************
+
+I need to record:
+light stuff: row id --> weight
+heavy stuff: row_id --> weight
+
+
+.
