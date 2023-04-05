@@ -1,0 +1,42 @@
+
+N <= 1e6.
+
+I choose any 2 substrings.
+I should make the bitwise-or big.
+
+First substring should just be the whole number. Get all the digits I can get.
+Then...
+
+For each 0, I want to know whether I can fill it in.
+
+1 1 1 0 0 1 1 0
+
+First 0: Fill with first 1.
+Second 0: second 1
+
+Seems like just 2 pointers.
+The substring pointer always advances once as I step forward,
+    but when I hit a 0 it also continues until it finds a 1.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+OK, now I've read more carefully.
+I need to use *contiguous* subsegments.
+
+The first string should still just be everything.
+Second string?
+I should try to use the randomness maybe?
+There are only 20 big cases...
+
+
+Say first 0 is at 2^e position.
+I only care about substrings of size L = e+1.
+I need to start left of there.
+
+I could imagine loading up all possible start positions.
+Then step forward. If I find another 0, then I now only like starts that have a 1 here too.
+    I guess it's safe to assume this will eliminate half the starts.
+
+
+
+.

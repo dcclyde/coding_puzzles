@@ -1,0 +1,15 @@
+
+I need to do H damage total.
+
+I could do A damage every tA steps and B every tB steps.
+Or, I could do C damage if both cannons are ready.
+
+What strategies should I be considering?
+Use A and B, but if they're "near synced" then wait instead?
+
+
+I guess:
+Suppose A is ready to shoot.
+Given H and current cooldown on B, should I wait or just shoot now?
+
+.

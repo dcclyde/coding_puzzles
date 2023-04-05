@@ -1,0 +1,10 @@
+
+dp[n][c] = num magazines saveable among first n boxes
+    with the final box being covered iff c is 1.
+
+I can either:
+    Move a cover down. Then I score dp[n-1][0] + dat[n-1]. I need to have a cover though.
+    Don't move a cover. Then I score dp[n-1][0 or 1]. I add dat[n] if I have a cover.
+
+
+.
