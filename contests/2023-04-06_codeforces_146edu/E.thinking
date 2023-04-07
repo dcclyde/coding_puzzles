@@ -1,0 +1,38 @@
+
+N <= 2e5
+Q <= 2e5
+
+It costs w[k] dollars to move between k and k+1.
+
+What's the total cost to create some permutation with no fixed points?
+
+************
+
+f(l, r) = cost for the range [l, r].
+f(l, r) = min of f()
+
+
+I feel like we'll mostly want to transpose adjacent stuff?
+Any reason why we'd want to break down NOT into just 2s and 3s?
+
+Transpose a 2:      2 * a[k]
+Mess with a 3:      2*a[k] + 2*a[k+1]
+
+
+Maybe my total cost is 2*(sum - sum of a subset)
+and the subset just can't contain consecutive stuff?
+
+If that's true, I'd want to know about max sum of a subset if I can't include consecutives.
+1010101
+
+f[n] = ?
+    If I include n: pay f[n-2] + A[n].
+    If I don't include n: pay f[n-1].
+
+************
+
+I'd really like to be thinking in terms of segments' answers.
+I guess I could track 4 scores per segment based on whether the first/last elements are included.
+
+
+.

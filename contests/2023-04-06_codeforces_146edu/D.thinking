@@ -1,0 +1,105 @@
+
+2000 guns
+
+K <= 1500
+
+f[k] = fire rate. Up to 2000
+d[k] = damage. Up to 1e9
+
+I can change some d's so that f[k] * d[k] is near some target.
+
+Sort the f[k] * d[k] stuff.
+Try changing just the first one, or just the first two...
+
+I guess just repeatedly edit by enough to put this gun near the top of the new range?
+
+
+! Wait, I need ALL guns to be happy in the end.
+
+
+*******
+
+Range will start at some gun's dps.
+It might not be a dps that's in my initial set though.
+
+I'd like to do some kind of "consider plausible target ranges in increasing order" thing.
+
+When I adjust a D value, I'm adding a jump between 1 and 2000.
+
+***********
+
+I'm going to end up picking some interval from the starting guns
+and then putting everything else in that interval.
+
+I don't necessarily know how far to extend from the start/end of that interval though.
+
+N = 2000 possible intervals?
+    Not sure about that - maybe I could have 10 and 15 but modify the 15 voluntarily...
+
+
+I could easily solve it in N * K * N time.
+Just pick a starting value, then 2K+1 possible intervals that include it,
+    then move everything else into that interval.
+
+I'd like to have N^2 or N*K time.
+
+The small size of F should matter I guess...
+
+
+*******************************
+
+Given some interval.
+Can everything get into this interval?
+It only depends on the interval mod K, right?
+
+Seems like I can check for each B whether it works if I start at B % K.
+Then I could check any interval really fast.
+
+
+Well...
+I want to write out details for checking whether (f, d) can move into [L, L+LEN-1].
+What's the first multiple of f that's >= L?
+ceil(L/f) * f
+
+This is stable under jumps by f.
+
+Basically my query is like: Will this interval contain a multiple of f for every f in my set?
+
+There are 2000 * 3000 semi plausible intervals I could query.
+
+
+For a given f, there are certain "good" starts mod f.
+-LEN+1 through 0.
+
+If I need -LEN+1 through 0 mod f
+and also mod g, h, i, ....
+then can I track this nicely somehow?
+
+
+I may query some pretty big start values.
+
+
+!!!!!!!!!!!!!!!! POST CONTEST
+Actually I can just do 2 pointers ish stuff?
+For any start point S, I can ask about the latest possible endpoint that'll still be allowed.
+
+I'm looking at https://codeforces.com/contest/1814/submission/201011987.
+Their idea is to efficiently answer: Is it possible to leave the interval [l, r] unchanged?
+To do 2ptrs stuff, I'll need to call that function 2N times. So it's okay to spend N-ish time in there.
+
+For each f:
+    If it can land in [L, R] then we're good.
+    If not, it has 2 options, 1 below and 1 above. I could use a sub-2ptrs to check those.
+
+Make a big list of intervals.
+Track by l and r.
+
+If this setup doesn't work, grab the leftmost r and move it to the right.
+
+
+???????????????????????????????????????
+
+I think that implementation is correct, but codeforces wants me to optimize out the log factor.
+
+
+.

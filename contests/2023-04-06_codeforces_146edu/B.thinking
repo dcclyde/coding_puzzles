@@ -1,0 +1,31 @@
+
+Target dims up to 1e9.
+
+Path cost is num steps + biggest step size.
+
+Go to 10:
+5 + 5 costs 7
+
+Go to 100:
+50 + 50 costs 52
+10s costs 11
+
+If I use max step B then cost will be B + ceil(X / B) + ceil(Y / B).
+
+Can I assume final cost will be a divisor of X or Y?
+Probably not... what if X was some big prime?
+
+B + ceil(X/B) + ceil(Y/B)
+
+What if B increases by 1?
+
+
+I guess just try all B, since it'll be more or less bounded by sqrt(X+Y).
+
+****************************
+
+Target square 3?
+
+
+
+.

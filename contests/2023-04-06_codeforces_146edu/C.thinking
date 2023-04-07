@@ -1,0 +1,15 @@
+
+How many boxes should A use?
+Assume it's <= N/2.
+
+Will ternary search work here?
+
+If we give A more boxes then A's time cost is increasing and B's is decreasing.
+
+
+Most important box goes first.
+Maybe just - always inspect the next most important box as early as possible?
+
+
+
+.
