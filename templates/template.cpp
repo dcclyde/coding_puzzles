@@ -211,6 +211,19 @@ struct custom_hash {
 #define unordered_map DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_MAP
 #define unordered_set DCCLYDE_REMINDER_DONT_USE_UNPROTECTED_HASH_SET
 
+// Example: tinyurl.com/2c222yvx
+// myset.order_of_key(5) = number of elements < 5
+// myset.find_by_order(5) = iterator to 5th largest element (0-indexed)
+template <class c, class cmp = less<c>>
+using indexed_set = tree<c, null_type, cmp, rb_tree_tag, tree_order_statistics_node_update>;
+template<class c, class d, class cmp = less<c>>
+using indexed_map = tree<c, d, cmp, rb_tree_tag, tree_order_statistics_node_update>;
+
+// Maybe I need this if I want the indexed_ stuff to compile with _GLIBCXX_DEBUG?
+namespace std {
+    ostream& operator<<(ostream &o, vector<int>) {return o;}
+}
+
 
 // loops
 #define CONCAT_INNER(a, b) a ## b
