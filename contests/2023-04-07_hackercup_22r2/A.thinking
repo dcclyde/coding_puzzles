@@ -1,0 +1,20 @@
+
+! For A-small:
+
+Given the arrays of character counts, how do I decide whether this is a good string?
+
+EVEN LENGTH:
+    One of the two middle chars will become the irrelevant center.
+    I need one half to equal "all but one" from the other half.
+
+    Delete something in first half:
+        Remaining stuff from first half = second half without center piece
+
+    Basically, I need either "first half minus its center = second half minus something"
+        or vice versa.
+
+
+ODD LENGTH:
+    One half will receive the middle char and lose any char I hate.
+
+.

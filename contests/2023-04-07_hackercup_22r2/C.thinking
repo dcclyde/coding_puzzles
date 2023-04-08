@@ -1,0 +1,29 @@
+
+We'll pick K+1 cookies.
+We need the probability that the heaviest cookie is from batch 1.
+
+N <= 3000
+num cookies per batch <= 3000
+
+We need to choose least one from batch 1.
+
+Besides that, we just can't choose any from the fatter batches.
+
+I could do this with binomial coefficients...
+total ways: binom(num_total, K+1)
+good ways: binom(num_le_goodweight, K+1) - binom(num_lessthan_goodweight, K+1)
+
+
+* There's a bit more nuance to it though.
+There could be other batches with same weight as batch 1.
+
+I have 4 kinds of cookies.
+A = num in batch 1
+B = num not in batch 1 but having same weight
+C = num lighter than batch 1
+D = num fatter than batch 1
+
+
+
+
+.
