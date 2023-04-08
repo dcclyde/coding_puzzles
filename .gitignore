@@ -1,6 +1,6 @@
 
-scratch/*
-testlib/*
+scratch/
+testlib/
 *.log
 *.prog
 *.out
