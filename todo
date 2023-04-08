@@ -8,6 +8,9 @@ TODO:
 --------------
 
 
+Make a new function for loading a vector like readvec<ll>(N, A).
+
+
 
 I think I can index out of bounds in strings without getting errors!
 
