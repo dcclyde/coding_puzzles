@@ -1,0 +1,64 @@
+
+T(a1, b) + T(a2) <= T(a1) + T(a2, b).
+    * If b has two choices, they should marry the poor person.
+
+T(a, b1) + T(b2) >= T(a, b2) + T(b1).
+    * If a has two choices, they should marry the rich person.
+
+I guess it means the people who get married will always be a prefix of the women
+    and a suffix of the men.
+
+
+T(a1, b1) + T(a2, b2) >= T(a1, b2) + T(a2, b1).
+I guess it means we'd like to marry first women to last man, 2nd to 2nd-last, etc.
+We might get in trouble with some banned marriages though (due to salary condition)
+
+[1, 5] and [3, 6]?
+
+Any chance it's optimal to just only arrange marriages in that "nice" form until the salaries cross and then quit?
+
+I could think about T(a1, b1) + T(a2, b2) vs. T(a1, b2) + T(a2) + T(b1).
+
+
+*****
+
+Would it become more interesting if I require s_m >= C * s_w for some C >= 1?
+
+Some of my claims still hold.
+I'll use a prefix of the women and a suffix of the men.
+If a1, a2 could pair with either of b1, b2 then we should use (a1, b2) and (a2, b1).
+
+
+Not so obvious how to handle deciding how many people should marry near the crossover though.
+
+Say C = 2
+[10, 20]
+[25, 45]
+
+Nah, I think the original plan still works fine.
+
+*****
+
+What if we require w <= m <= 2w?
+
+We still basically prefer to pair far-apart salaries.
+I could consider some kinda 2ptr stuff.
+
+The benefit of pairing (a, b) is
+    T(a) + T(b) - T(a, b)
+    = 4a^2 + 4b^2 - 2(a+b)^2
+    = 2a^2 + 2b^2 - 4ab
+    = 2 (a-b)^2.
+
+Biggest guy: pair with smallest girl he can reach?
+Next guy: same?
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Alternate way to try to make it more interesting:
+What salaries could person a earn if they want to marry person b?
+
+How many positions have m_j and w_j paired after the kth update?
+
+.
