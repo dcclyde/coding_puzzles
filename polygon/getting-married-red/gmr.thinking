@@ -53,6 +53,60 @@ The benefit of pairing (a, b) is
 Biggest guy: pair with smallest girl he can reach?
 Next guy: same?
 
+~~~~~~~~~~~~~~~~~~~
+
+OK, next try requiring w <= 2m and m <= 2w.
+5 pairs with 3
+
+
+Biggest person of all:
+They could imagine trying to pair with the smallest person they can reach.
+    If not, their fallback plan would be next smallest, etc.
+
+Say I have
+
+a1, a2, b1, b2
+If b2 can reach a1, then b1 doesn't want a1.
+
+Let's say b2 can reach a1.
+b1 can reach a1 but not a2.
+
+b1 a1 a2 b2
+
+a1 b1 a2 b2?
+    If b2 can reach a1 then b1 can reach both anyway.
+
+I think the only thing to worry about is when the highest remaining items
+go like B A... A B.
+In that case, I may want to back up and pair b_0 with an earlier a.
+
+What situations would make me confident that I don't need to look back anymore?
+
+Think about DP stuff.
+Let's say I know the answer for A[s:] and B[t:].
+
+
+**********
+
+What if I remove the gender split?
+You can marry anyone within a 2x wealth factor.
+
+If 100 sees 50, is that a good pair?
+
+If we also have 80, then we still want (50, 100).
+If we also have 60, same
+If we also have 40...?
+
+
+
+Will gme-sol.cpp give the right answer if we need to use a
+    smaller-than-max-cardinality matching?
+
+How would I set that up?
+10, 20, 40, and like x ~ 25?
+
+10^2 + (40-x)^2 < 20^2
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!
 

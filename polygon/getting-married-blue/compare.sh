@@ -22,12 +22,21 @@ g++ --std=c++20 "$PROBLEM"-gen.cpp -g -O2 -o gen.out \
 
 for((k = 1; k < 100000 ; ++k)); do
     echo $k
+    # ./gen.out \
+    #     --nmax=2 \
+    #     --naweight=1 \
+    #     --nbweight=1 \
+    #     --vmax=5 \
+    #     --vweight=0 \
+    #     --seed=$k \
+    #     > gen.in
     ./gen.out \
         --nmax=8 \
         --naweight=1 \
         --nbweight=1 \
         --vmax=100 \
-        --vweight=0 \
+        --vweight=1 \
+        --seed=$k \
         > gen.in
     a.out < gen.in > fast.out \
         # 2> /dev/null
