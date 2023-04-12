@@ -1,0 +1,72 @@
+
+1 l r: Change each item in the range into its totient.
+2 l r: count totients required to make the range all equal.
+
+===========================
+
+How would I solve (2) even with no array updates?
+Then this will presumably need some segment tree stuff??
+
+
+Subproblem answer is (num operations needed, final tied result).
+* Need a sentinel for ID.
+
+Given 2 final tied results, what's the new answer?
+What if do it by hand?
+Pretend totient is O(1).
+It takes log(n) steps to get 1. So this should be fast ish?
+
+
+===========================
+
+OK, now how do I apply (1)?
+Say I have a block that needs 4 operations to tie at 6.
+What will be needed after it gets modified?
+
+If I'm now tying at not-1, I probably still need same number of operations?
+
+If I'm tying at 1 though...
+Some items may be arriving at 1 early.
+
+12 -> 4 -> 2 -> 1
+
+(12, 2) gives (2, 2)
+(4, 1) gives (2, 1)
+(2, 1) gives (1, 1)
+
+
+For every position, write down how many totients are needed to get 1?
+Then I need
+    update: subtract 1 on [L, R].
+    query: how many numbers <= 0 in [L, R]?
+
+
+I'm worried that I'm missing some "potential energy" type idea.
+
+I can only apply N*log(N) meaningful totients total in my whole life.
+
+Track which positions are already 1.
+On update, iterate over the useful stuff in that region and subtract 1 from each.
+Then I need min over what's left.
+If I already had 0, I add one "bonus point" for that slot.
+
+
+******
+
+What's my final list of data structures?
+
+LazySeg tracking (num operations needed, final tied result).
+
+map<ll,ll> tracking position -> ops needed to get 1. Remove 0s.
+Regular segtree tracking "bonus points" for points/ranges?
+
+How many items in the map between L and R, *before* the current operation started?
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Post-contest.
+I'm getting TLE.
+Maybe it'd be fast enough if I make the LCA tree suggested in the tutorial.
+    (Faster way to compute how many steps it'll take to merge a and b)
+
+.

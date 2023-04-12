@@ -1,0 +1,61 @@
+
+N <= 1e5
+Q <= 1e5
+
+Heavy child is the one with biggest SIZE, not weight.
+    * Break ties by smaller index!
+
+~ Operation 1 v: Compute sum of weights for subtree v.
+
+~ Operation 2 v: Delete edge from v to parent.
+~    Make an edge from big_child_v to parent instead.
+
+====================================
+
+If I do "euler tour" stuff, is it possible to efficiently update my data structures?
+
+When I do op 2:
+    Compute new p[v].big_child.
+        if p[v].bc == v, then compute new p[v].bc.
+
+    Compute the rotated vertex's big child.
+        Compare his original big child against v without him.
+
+    Lists of children and parents have changed:
+        p[v] loses v as a child.
+        v loses bc[v] as a child.
+
+        p[v] receives bc[v] as a new child.
+        bc[v] receives v as a child.
+
+
+    Update size and weightsum for v and bc[v].
+
+
+Adjacencies should be stored like dat[v] = std::map of (size, index) -> list?
+
+
+
+====================================
+
+Parent:
+    New subtree size: same as before.
+    New subtree weight: same as before.
+    Loses v as child.
+    Gains bc as child.
+
+v:
+    New subtree size: loses bcss.
+    New subtree weight: loses bcsw.
+    Loses bc as child.
+    parent becomes bc.
+
+bc:
+    New subtree size: ss
+    New subtree weight: sw
+    Gains v as child.
+    parent becomes p.
+
+
+
+.
