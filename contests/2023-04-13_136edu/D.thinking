@@ -1,0 +1,25 @@
+
+Can I achieve height <= H?
+
+Operation: Pick a subtree with depth D, and subtract D-1 from all its depths.
+
+Can I do some DP stuff?
+How many ops does it cost to achieve height <= H for subtree v?
+
+To solve for subtree v:
+    For each child, I need to decide whether to
+
+*****
+
+I can view it as coloring up to K vertices.
+For each leaf, at least one of its first H-1 ancestors must be colored.
+
+Here's an algorithm that should be correct:
+Start from the lowest leaf.
+If depth <= H, return victory.
+Otherwise, color his H-1 ancestor (aka just delete that whole subtree).
+Repeat until we've deleted everything or run out of operations.
+
+I think this is possible with HLD. When we "delete a subtree", just mark all of its nodes.
+Or mayyyyybe just add em to an IntervalUnion?
+

@@ -1,0 +1,36 @@
+
+R <= 2e5
+C is always 2.
+
+Start in top left corner.
+I need to find the min number of 1s to turn into 0s
+    so that
+
+
+Seems like DP?
+f[r][c][o] = cheapest cost to reach (r,c) with o in slot (r, c^1).
+
+*****
+
+OK, I need slightly more state.
+o tells me the curr row state.
+I also need next row state though.
+
+What are the possible state combinations?
+
+.0
+00
+
+.1
+1?
+
+What are possible combinations where I messed with next row?
+
+.0
+?0
+
+o = 2: opposite is 1.
+o = 1: opposite is 0 and I previously changed the diagonal guy to 0.
+o = 0: opposite is 0 and I didn't do above.
+
+.
