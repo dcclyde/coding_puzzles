@@ -1,0 +1,16 @@
+
+Going upward, I could compute an increasing list like (starting, delta).
+    In other words, if I start with at least "starting" score
+        then I can grab some prefix and obtain "delta" more score.
+        Both should be increasing.
+
+        starting >= 10: I can get +5
+        Starting >= 8: I can get +10
+            delete the previous item before pushing this one.
+
+Do the same thing downward. Probably flip the array early so I can reuse code.
+
+Then I guess just do 2ptrs through both of those at once.
+
+
+.

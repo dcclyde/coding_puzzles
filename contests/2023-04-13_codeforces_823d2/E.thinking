@@ -1,0 +1,15 @@
+
+I need an N x N matrix with entries in 0..N-1.
+
+They force specific values along the diagonal.
+
+N is prime and N < 350.
+    I could run N^3 if I want.
+
+Requirement: For any rectangle [[a, b], [c, d]] in the grid, a+d-b-c mod N can't be 0.
+
+Well...
+Say I know x[0][0] and x[0][1].
+Then I would know
+
+.

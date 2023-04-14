@@ -1,0 +1,18 @@
+
+Given 1..N.
+Given some subset T.
+
+I want the cheapest cost to delete all elements in U.
+Deleting an element x costs...?
+
+We pick d dividing x.
+
+I think just delete elements in U from low to high.
+For each element x, I need to know the smallest d | x
+    such that no previous multiples of d are in U.
+
+
+
+
+
+.

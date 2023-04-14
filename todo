@@ -8,16 +8,16 @@ TODO:
 --------------
 
 
+
+
 Make a new function for loading a vector like readvec<ll>(N, A).
 
 
 
-I think I can index out of bounds in strings without getting errors!
+I think I can index out of bounds in strings without getting errors :(
+    Update: It seems like I can index oob by exactly one.
+    Maybe this implementation of std::string has a secret \0 or something?
 
-
-
-
-Work on my better_comments tags.
 
 
 Rename tsdbg and tsish to repr and to_string in some order?
@@ -31,13 +31,6 @@ Quick functions for max/min of a container? Similar to sumv?
 
 
 Maybe learn about jupyter server?
-
-Make a version of mi that uses lls?
-
-Mayyybe also some weird intermediate version that uses ints but correctly handles
-    MOD = 1234567891?
-    Or just don't bother and use the ll version?
-    I should time some of this stuff and decide whether ints give any value.
 
 
 
