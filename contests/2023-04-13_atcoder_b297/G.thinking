@@ -1,0 +1,12 @@
+
+N <= 2e5
+
+A_k <= 1e9
+
+Is there a way to do grundy number stuff without iterating up to 1e9?
+
+
+G(k) = 0 for k < L.
+
+
+.

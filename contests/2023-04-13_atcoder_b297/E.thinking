@@ -1,0 +1,27 @@
+
+In AtCoder Kingdom,
+N kinds of takoyakis (ball-shaped Japanese food) are sold. A takoyaki of the
+i-th kind is sold for
+A
+i
+​
+  yen.
+
+Takahashi will buy at least one takoyaki in total. He is allowed to buy multiple takoyakis of the same kind.
+
+Find the
+K-th lowest price that Takahashi may pay. Here, if there are multiple sets of takoyakis that cost the same price, the price is counted only once.
+
+!!!!!!
+
+N <= 10
+K <= 2e5
+
+Seems binsearchy?
+
+Or...
+Actually, maybe I can use a priority_queue and just insert new items each time I pop one off.
+
+
+
+.

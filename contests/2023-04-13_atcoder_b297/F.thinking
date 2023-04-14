@@ -1,0 +1,24 @@
+
+R, C <= 1000.
+
+Choose K cells from RxC without replacement.
+
+I want E[dx * dy].
+
+Maybe:
+For each (dx, dy), count how many ways to achieve it?
+
+Let F(a, b) = ways to put everything in a specific a x b rectangle.
+    F(a, b) = binom(a*b, K).
+
+Let G(a, b) = ways to put everything in a specific a x b rectangle
+    *and* make that the smallest rectangle that works.
+
+G(a, b) =
+    F(a, b)
+    - 2*F(a-1, b) - 2*F(a, b-1)
+    + 4*F(a-1, b-1) + F(a-2, b) + F(a, b-2)
+    - 2*F(a-2, b-1) - 2*F(a-1, b-2)
+    + F(a-2, b-2)
+
+.
