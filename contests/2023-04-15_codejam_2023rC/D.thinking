@@ -1,0 +1,26 @@
+
+N <= 500
+E <= 500
+num_queries <= 500
+num_colors <= 100 (2 in small)
+
+
+For each query:
+Can I walk from start to dest while seeing an odd number of colors?
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I guess 500 is telling me they want N^3.
+
+
+*****
+
+I did the baby version just using 2 DSUs.
+What about the mid version?
+
+If the total number of colors in the graph is odd, I just always win.
+Otherwise...
+Can I avoid just one color?
+If there's a route that doesn't use every color then I win again?
+
+.

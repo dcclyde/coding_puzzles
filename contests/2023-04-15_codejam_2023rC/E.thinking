@@ -1,0 +1,37 @@
+
+
+
+
+
+Already coded the baby case. Just brute force by calling into my answer from A.
+
+What about the full test set?
+
+If P >= 4:
+    We win unless the string is already increasing.
+    Just grab any consecutive letters with dat[k] > dat[k+1]
+        and use [0, k), [k], [k+1], [k+2, N).
+
+    For increasing string, we also win if any letter appears 3 times.
+        Just give em [garbage, AA, A, garbage].
+
+P == 2:
+    Iterate through possible cutoffs.
+    Maintain a map<char,ll> for letters in the first chunk vs second.
+
+    AAAB AABB
+
+P == 3:
+    First time I see an earlier letter, cut it out into its own chunk.
+    This makes me win unless the string is weakly increasing to start?
+        No. Think about AACB.
+        I need a letter that's the earliest I've ever seen.
+
+        Will there be cases where X can be <= Y and Y can be <= Z,
+            but we can't make X <= Y <= Z simultaneously?
+
+
+    Are there cases where I could win on an increasing string?
+    Yeah, I just need first or last letter to appear at least 3 times.
+
+.

@@ -1,0 +1,15 @@
+
+Sounds like segment tree stuff?
+
+First compress everything?
+Probably I also want to make different versions of a coordinate that has 2 different items.
+
+I need these queries:
+* In the std::set of vaccine positions, which are in range [L, R]?
+    (pick these up and remove from the set.)
+    to "pick it up", we insert the corresponding
+
+
+
+
+.

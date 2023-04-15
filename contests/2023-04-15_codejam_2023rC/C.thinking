@@ -1,0 +1,22 @@
+
+Count cool triples (a, b, c)
+a is in b's subtree
+c is *not* in B's subtree.
+
+*****
+
+Traverse the tree.
+I know all the values that exist anywhere in the tree.
+At vertex v, I care about items with score*K < S[v].
+How many of these items are in v's subtree?
+
+Scores can be big.
+I bet I could do some HLD stuff?
+I need a segtree query over the chunk of the array that contains the subtree of v.
+segtree[position] = number of copies of this value
+
+Sort all the values in increasing order.
+If I'm about to check a node with value
+
+
+.
