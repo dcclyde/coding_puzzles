@@ -1,0 +1,20 @@
+
+First, Sequence is given
+
+A chooses integer K_i
+
+B chooses integer S_i from 1..N
+
+
+We play N times.
+In round r, I want to end up with r on the blackboard.
+How many rounds can I win?
+
+OK, so I need to identify cycles and how far each person is from a cycle.
+I'm given N directed edges from x to dat[x].
+
+Actually - the question is just asking how many positions are in cycles?
+
+
+
+.

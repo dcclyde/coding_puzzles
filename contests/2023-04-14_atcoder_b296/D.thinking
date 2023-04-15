@@ -1,0 +1,16 @@
+
+A, B <= 1e12.
+
+Need x >= B
+x can be represented as r*s with r, s <= A
+
+*********
+
+Easy to check whether it's possible. Just need A*A >= B.
+
+
+Maybe it just isn't possible for both numbers to be big enough to cause trouble?
+
+I guess one of the first 1e6 options
+
+.

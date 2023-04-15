@@ -1,0 +1,25 @@
+
+N <= 2e5.
+Given arrays A and B.
+
+I can swap two positions in A, but I need to also make a swap in B.
+    Exactly one of the indices needs to match between these two swaps.
+
+**************
+
+Obviously A and B need to match up to permutation.
+
+Suppose we have two copies of some element.
+Say B[0] == B[1].
+Then I can freely swap A[0] with A[k] as many times as I want.
+Seems like we're always fine in this case.
+
+Otherwise...?
+
+I definitely need the signs of the permutations to match.
+Maybe that's it?
+
+1 2 3
+1 3 2
+
+.
