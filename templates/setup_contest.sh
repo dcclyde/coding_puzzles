@@ -16,6 +16,7 @@ if [ $# -eq 2 ]
 then
     NUM_PROBLEMS=$2
 fi
+echo "Setting up $NUM_PROBLEMS problems."
 
 mkdir -p "$1"
 cp "$template_dir/gen.py" "$1/"

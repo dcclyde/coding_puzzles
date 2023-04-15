@@ -105,6 +105,14 @@ ll powll(ll b, ll e) {
     }
     return out;
 }
+ll rootll(ll a, ll n) {  // nth root of a, rounded down.
+    // assert(a >= 0); assert(n >= 1);
+    ll x = pow(a, 1./n);
+    while (powll(x, n) > a) {--x;}
+    while (powll(x+1, n) <= a) {++x;}
+    return x;
+}
+ll sqrtll(ll a) {return rootll(a, 2);}
 ll powmod(ll b, ll e, ll mod) {
     ll out = 1;
     while (e) {
