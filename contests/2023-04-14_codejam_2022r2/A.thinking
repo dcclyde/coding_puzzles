@@ -1,0 +1,21 @@
+
+Clearly I need N-1 <= K <= N^2-1.
+Parity also needs to match.
+
+*****
+
+Goal:
+Go straight until square S, then run directly to the middle.
+Seems like I could just binary search for when I should break off.
+Remaining steps:
+
+F(n) = row, column where n appears
+G(r, c) = number written in position (r, c).
+
+
+*****
+
+How far should I walk before moving toward the middle?
+Each "outward" step adds 2 to my min achievable distance.
+
+.
