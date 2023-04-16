@@ -68,9 +68,12 @@ def demo_output():
 
 def demo_input():
     dbgBackground("Input helpers")
-    dbg("I added lm1() and nn1() which convert from 1-indexed to 0-indexed.")
-    dbgR("Example: you code `a, b = lm1()` and data file says `2 5`. Now a=1 and b=4.")
+    dbg("lm() grabs the next line of input, splits into list of ints, and returns that.")
+    dbg("Example: you code `a, b = lm()` and data file says `2 5`. Now a=2 and b=5.")
+    dbgP("I added lm1() and nn1() which convert from 1-indexed to 0-indexed.")
+    dbgP("Example: you code `a, b = lm1()` and data file says `2 5`. Now a=1 and b=4.")
     dbg("I'm too lazy to set up an actual demo. I tested it when implementing but it might break one day...")
+    dbg("If the input has some weird format, you can always just use input() to grab 1 line of input and .split() to turn it into list of strings.")
     el(3)
 
 def demo_logic():
@@ -169,15 +172,22 @@ def demo_logic():
             if b == 0: continue
             dbg(a, b)
             dbgcP("cdiv", cdiv(a,b))
-            dbgcG("fdiv vs //", fdiv(a,b), a//b)
+            (dbgcG if fdiv(a,b)==a//b else dbgcY)("fdiv vs //", fdiv(a,b), a//b)
             el()
 
     dbgcR("runtime", TIME())
 
 
+def demo_other():
+    info = '''
+Don't submit any recursive solutions unless you've read the @bootstrap section.
+It's almost always possible to make Python recursive solutions crash if you don't use that trick.
+    '''
+    print(info)
 
 
 demo_debug_printouts()
 demo_output()
 demo_input()
 demo_logic()
+demo_other()
