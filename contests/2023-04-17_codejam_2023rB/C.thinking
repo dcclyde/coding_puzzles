@@ -1,0 +1,20 @@
+
+Distance between elements >= K.
+
+K can be huge.
+hmmmm....
+
+Is this like sqrt decomposition stuff?
+If K is big, it won't take too many steps.
+If K is small, I could try DP like F........
+
+
+***
+
+I guess I should just compute the answer for prefixes/suffixes of the array.
+
+
+
+
+
+.

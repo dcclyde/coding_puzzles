@@ -1,0 +1,8 @@
+
+What's the smallest k such that k*STEP = delta (mod MOD)?
+
+How many solutions will there be total?
+Let g = gcd(STEP, MOD) and assume g | delta.
+
+
+.

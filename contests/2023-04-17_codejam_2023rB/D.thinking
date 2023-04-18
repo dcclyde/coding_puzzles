@@ -1,0 +1,43 @@
+
+N vertices, N <= 1e5
+L chains of stations, L <= 1e5
+total length <= 2e5
+
+******
+
+If any station only touches one train line, that line is obviously essential.
+Otherwise....
+
+We could have 2 chunks that have several links but all links are same color.
+
+
+I'd like to think about super-connected components:
+I can get from a to b even if any one color disappears.
+
+
+Suppose I have some data structure that covers lines 0..L-1.
+Trying to update using line L.
+
+L connects a and b.
+If a, b in same component already, nobody cares.
+If different components that were at least single-connected
+    that whole path of components is now super-connected. Becomes one big component.
+
+If different components that were not connected at all, they're now single-connected.
+
+? What data structure will let me handle this?
+Seems DSU-ish. I also want to know each component's direct neighbors though.
+
+* DSU super: only add edges if we're super-connected.
+* Tree of single-connected stuff?
+    It can be multiple trees....
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I want to know: Which vertices could I remove without disconnecting the graph?
+
+
+
+.

@@ -1,0 +1,14 @@
+
+If no overlap:
+Both choose closest to each other and then run toward the middle.
+
+If yes overlap:
+
+
+
+In general:
+Try each place A can pick.
+B will choose as near as possible to A, trying both sides if possible.
+
+
+.

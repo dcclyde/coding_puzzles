@@ -1,0 +1,27 @@
+
+N stations
+N directed edges
+
+Maybe topological sort?
+OK that would be good if there are no cycles, but there can be cycles.
+
+I guess:
+Set up like topological sort, with a queue of stations with indeg = 0.
+As we go, decrement the amount needed for the destination of each edge.
+    If the amount needed becomes 0, add it to the queue and remove its incoming edges.
+Once the queue is empty, everything remaining is in cycles.
+
+
+How do I solve within a cycle?
+provides = [3, 5, 2]
+needs = [3, 5, 2]
+
+    First I could hand out the number needed assuming we get some from parent.
+    [1, 2, 0]
+
+    Now I guess just fill up whoever is cheapest?
+    Fill the 2 or the 3 in this case, costing 2 either way.
+
+
+
+.
