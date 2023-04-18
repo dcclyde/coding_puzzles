@@ -1,0 +1,10 @@
+
+Option 1: Choose one of the marked squares.
+Option 2: Choose the fattest row and fattest column, NOT counting marked squares.
+
+I guess maybe:
+Store the scores for each relevant row and column.
+Do some 2 ptrs style iteration to check all the highest-value row, column combinations.
+
+
+.

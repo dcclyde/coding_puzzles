@@ -1,0 +1,15 @@
+
+Numbers of strawberries are big (up to 1e16)
+H, W are up to 6
+
+Seems like I could allllmost just try all cuts.
+I make T cuts total. There are up to 10 places where I could make cuts?
+    No - after cutting along rows, a column cut only affects one subpiece.
+
+The final pieces will be rectangles.
+There are only binom(R+1, 2) * binom(C+1, 2) rectangles total in the whole world.
+
+
+
+
+.
