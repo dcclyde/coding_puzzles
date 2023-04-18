@@ -8,7 +8,13 @@ I make T cuts total. There are up to 10 places where I could make cuts?
 
 The final pieces will be rectangles.
 There are only binom(R+1, 2) * binom(C+1, 2) rectangles total in the whole world.
+441 total rectangles.
+So the final scores will all come from that set of 441 things.
 
+There are only 441^2 (min, max) combinations.
+
+Can I do some DP on the rectangles?
+dp[rect][cuts] = smallest possible max?
 
 
 

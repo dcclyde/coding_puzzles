@@ -101,9 +101,9 @@ def rtree_rooted_v2(nr, mute=False):
 #endregion
 
 
-N_RANGE = (1, 4)
-XY_RANGE = (1, 4)
-V_RANGE = (1, 3)
+N_RANGE = (1, 10)
+XY_RANGE = (1, 5)
+V_RANGE = (1, 100)
 
 def gen_test():
     N = ri(N_RANGE)

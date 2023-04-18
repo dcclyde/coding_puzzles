@@ -955,7 +955,7 @@ void solve() {
     ll ctr = 0;
     uset<pll> seen;
     ll out = 0;
-    while (ctr <= N+1 && !todo.empty()) {
+    while (ctr <= N+10 && !todo.empty()) {
         auto [ri, ci] = todo.front(); todo.pop();
         if (seen.find(MP(ri,ci)) != seen.end()) { continue; }
         seen.insert(MP(ri,ci));
