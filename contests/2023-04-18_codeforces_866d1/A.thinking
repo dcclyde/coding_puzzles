@@ -1,0 +1,7 @@
+
+Find current MEX, m.
+Find all positions with value m+1.
+We should choose the smallest chunk that covers all of that stuff.
+We can just do that by spending linear time, then recompute the MEX.
+
+.

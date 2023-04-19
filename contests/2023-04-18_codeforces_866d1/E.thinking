@@ -1,0 +1,57 @@
+
+N nodes, <= 2000
+E edges, <= 2000
+
+Graph is connected by good roads.
+
+I get 100*E operations.
+1. Block an edge
+2. Unblock an edge
+3. Test if (s, a) are connected by good roads, where s is picked by my enemy.
+
+**************************
+
+How do we accomplish a single thing?
+
+We are guaranteed to receive Y if we query a vertex that's connected to everything.
+We are guaranteed to receive N if we query a vertex that's connected to nothing.
+Otherwise we get no information.
+
+Maybe our first query needs to be a vertex that's guaranteed connected
+    to either everything or nothing, AND we aren't sure which.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Say the graph is a triangle.
+We definitely need to block exactly one edge. Then run some random queries.
+
+If the blocked edge was bad, every query will return success.
+If it was good and others were both good, still get all successes.
+If it was good and another was bad, we should get some failures.
+
+Say the nodes are a, b, c and (b, c) is bad.
+Enemy uses probabilities p, r, s.
+We pick a: p+r
+We pick b: p+r
+We pick c: s
+
+Enemy can choose p+r = 1/2 and s = 1/2.
+We get no information beyond seeing that (a,b) and (b,c) aren't both good.
+
+**************************
+
+I can't learn everything by blocking just one edge at a time.
+Think about the graph being a circle of good edges.
+Or just in general, it's possible that deleting any K good edges
+    still leaves a connected graph.
+
+I definitely can never isolate any vertex.
+
+Suppose I block edges until I just have a tree.
+If tree is fully present, all queries return yes.
+
+
+
+
+.

@@ -1,0 +1,139 @@
+
+N stores
+M types of apples
+
+For some stores, we have a list of apple types.
+For others, we have no info.
+
+*****
+
+After any unknown shop, we could have EITHER nothing OR some superset of what I had before.
+
+The space between two consecutive unknown shops could always be represented as EITHER
+1. Some set of apples that we'll try to add.
+2.
+
+
+
+***********
+
+If there are no secret shops, just do it.
+    First pass: Use a hash table to track what we've seen.
+
+
+
+
+***********
+
+Coming into the last unknown shop:
+
+
+Let's say we have two unknown shops.
+Is it necessarily possible to force us to enter the last unknown with no apples?
+Or at least: what conditions would mean we can do that?
+
+X 1 1 3 Y
+What are the meaningfully different states in this case?
+
+Leave X holding 1: Enter Y with 1 3
+Leave X without 1: Enter Y with 3
+
+In general...
+Say A is the first repeating number between X and Y.
+If we start out with that apple, we know what we'll have at Y.
+If we start out without that apple,
+
+
+X 1 2 1 3 Y
+
+If I don't have a 1, it matters whether I have a 2.
+
+State is described by:
+1. What's the first apple in the next range that I'm already holding?
+2. Except: If I'm holding none of them, AND the range has no repeats,
+    then my exact collection matters.
+
+
+We may be able to prune some states:
+When we *arrive* at any ?, it's always better to have wiped out
+    as recently as possible.
+
+
+!!!!!!!!!!!!!!!!!!
+
+If a certain block has no repeats, then we should be able to reset on the final store.
+? Is there some special case with the very first block??
+
+For a block that has repeats:
+We have some stuff that we're forced to hold when we arrive. (or empty.)
+We could compute using dp:
+    last_reset[k] = the last time we reset if we start from k with empty backpack
+    first_reset[k] = the first time .........
+    I think we could compute both of these from back to front in linear time.
+        first_reset[k]:
+            min of...
+            next occurrence of any apple in dat[k]
+            *or*
+            first_reset[k+1]
+
+        last_reset[k]:
+            last_reset[first_reset[k]]. (or never)
+
+We'd like to reset as late as possible.
+Start with empty: last_reset[0]
+Start with some forced stuff: We can pick max of last_reset[k]
+    over the range 0 .. (first position with a forced apple).
+
+
+
+I think we're processing the chunks from front to back.
+The block before first ? can contribute some forced stuff.
+Then we do fancy processing on the 2nd block to figure out where we'll reset.
+
+I think it works?
+
+***
+
+How do we handle the very last mystery shop?
+We still get to choose between some early positions as potential reset points.
+If we choose one of those, we want last_reset[k] to be as EARLY as possible.
+If last_reset[n+1] is INF, then we should never reset in the final chunk.
+    If from_prev also doesn't overlap the last chunk, we just get every apple.
+    If it does overlap, we just get only the last chunk.
+
+
+*****
+~ I missed a bit of nuance above.
+? or maybe not....?
+
+If I'm forced to hold apples 2 and 3, and then the next chunk has 6 8 2 3 5
+
+Could I ever be forced to hold no apples at all?
+Yes.
+If that's the case, I should note it.
+
+*****
+
+Thinking through the last_reset logic again:
+
+
+
+
+If I see an apple that conflicts with from_prev,
+    then I could show up empty for the next shop, but I can't go beyond that.
+
+BUT I also should not go past first_reset[n+1].
+Or - again, I could show up 1 step past there, but no further.
+
+
+Say n = 2
+future = 10
+
+first_reset[3] = 6
+
+I could consider showing up empty at 7, but not 8.
+
+If I find that from_prev conflicts with shop 4, then I could show up empty at 5, but not 6.
+
+
+.

@@ -1,0 +1,33 @@
+
+Given a bunch of rectangles.
+Guaranteed they could be obtained by starting with RxC and chopping em off one at a time.
+
+We need to find all possible (R, C).
+
+**************
+
+We can definitely add all the areas.
+So we only need to consider (R, C) that multiply to the correct total area.
+
+C >= biggest c_j
+R >= biggest r_j
+
+Any rectangle we build needs to have at least one dim in common with another.
+
+
+We need C == biggest c_j or R == biggest r_j.
+
+That gives up to two candidates.
+
+
+What data structure can I use to find what cut I could do next?
+I need maps like
+    r |--> list of rectangle indices
+    c --> list of rectangle indices.
+
+    Look up one that works, remove it from both.
+
+
+
+
+.

@@ -1,0 +1,21 @@
+
+Given a tree. N <= 2e5.
+We need to find a full traversal where each step is length 1 or 2.
+
+
+We think it needs to be a linked list, plus we can add any number of random leaves.
+
+How can I test whether the tree satisfies this property?
+
+I think:
+* Start anywhere. Find the furthest away vertex. That becomes the root now.
+* Compute heights of all vertices. On the way out of each node
+    we should be able to test whether its children will cause trouble.
+
+If the tree is OK, the traversal we want is:
+Make a list of all vertices on the "diameter path".
+Grab path[0], then all leaves attached to path[1], then path[2], then leaves on path[3], etc
+    on the way, back, do the opposite.
+
+
+.
