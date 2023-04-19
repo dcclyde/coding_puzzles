@@ -1,0 +1,52 @@
+
+Single case and 6 second time limit!
+    Single case --> I should precompute some stuff involving divisors?
+
+N <= 1000
+
+A_j <= 1e6
+
+********
+
+Current score S
+next guy A
+He'll say k*A where k*A > S
+k = cdiv(S+1, A)
+
+He contributes a score of k*A.
+
+The final score (not sum) will be <= 1e12 no matter what.
+
+
+Could it be good to try to increase by small amounts?
+
+If I just sort all my people, then as long as the list is increasing there's no problem.
+If there's a tie, use the one with largest A.
+
+Maybe like a priority_queue?
+    Insert (score, A).
+    Pick stuff with small score, then big A.
+    So really I should insert (-score, A).
+
+
+************
+
+The first sample case contradicts this plan.
+It's not always better to use the option with larger A.
+
+
+Any item in A that has no other divisors in A will just be used as-is.
+...
+Really, any item in A will be used as-is once.
+The question is just what to do with the various extra copies.
+
+Multiple that can only be hit one way: Just use it.
+
+~~~~~~~~~~~~~~~
+
+What if the fisherman are just 500 2s and 500 3s?
+I should use scores 2, 3, 4, 6, 8, 9, 10, 12, .......
+
+
+
+.

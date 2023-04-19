@@ -1,0 +1,8 @@
+
+dp[start, end] = answer for that substring?
+
+All the empty strings are draws.
+In general, dp[start][end] = ?
+    Handle 4 cases depending on which ends are picked on the next turn.
+
+.

@@ -1,0 +1,23 @@
+
+N dishes
+A - tastiness with pepper A
+B - tastiness with pepper B
+
+Queries:
+    X, Y: We choose from A some multiple of X times, and from B some multiple of Y times.
+
+**************************
+
+We can just replace B with 0s and talk about how many items we want to choose from B-A.
+Choose items from top to bottom in that sorted list.
+
+
+Given X, Y. What are our options here?
+    c*X + d*Y = N
+
+    I could use eGCD to find a solution.
+    Then find all solutions by finding appropriate step sizes.
+    Then find the last solution before + first solution after the sign change in B-A.
+
+
+.

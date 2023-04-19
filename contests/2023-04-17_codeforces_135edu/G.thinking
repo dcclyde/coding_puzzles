@@ -1,0 +1,25 @@
+
+D = max power = length of the world
+N = num lanterns
+P = num points I care about
+
+Q queries
+
+********
+
+How many ways to assign good power levels?
+
+Ignore queries for now.
+dp[n][p] = answer for first n lanterns and first p points.
+
+dp[n][p] = ?
+    Sum over several options.
+    How much stuff does lantern n cover?
+    Lantern n covers 0 things: ways to assign n's power level * dp[n-1][p]
+    Lantern n covers q things: ways to assign n's power level * dp[n-1][p-q]
+
+    What's the last point covered by lantern n?
+
+
+
+.
