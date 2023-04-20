@@ -1,0 +1,7 @@
+
+longest sorted subarray?
+
+* If the arrays match, we just want longest sorted subarray.
+* If not, start from any different one and expand as far as we can while still sorted.
+
+.

@@ -1,0 +1,48 @@
+
+Num segments <= 2e5
+Desired num black cells <= 1e9
+
+*****
+
+Sounds like DP?
+dp[]
+
+
+
+Cost will be:
+    Right endpoint of the last segment we use (can be a partial segment)
+    + 2 * num segments we use
+
+
+
+
+X.X.X.X.XXXXXXXX.XXXXXXXX
+
+XX.XXXXX.XXXXXXXXXXX
+
+
+Think about the first position where I *could* finish.
+Is it good to discard some early Xs and finish later?
+
+Grab everything.
+Maintain a heap of the chunks we take. Short chunk length is top of the heap.
+
+When we have enough, start checking:
+    Is the smallest chunk we took still a good idea?
+
+    We can't early exit. We need to pop all sizes off the heap.
+    (Exit is when we are at the last chunk and still don't have enough.)
+
+~ Edge case: They're allowed to make the sum of all chunks not big enough. Return -1.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Suppose chunk n is the last chunk that we (at least partly) use.
+Pretend for a minute that we just want O(N^2).
+We're locking in choice of n.
+Grab the OTHER chunks < n from big to small until we have enough stuff.
+
+
+
+
+.
