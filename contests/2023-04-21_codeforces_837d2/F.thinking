@@ -1,0 +1,70 @@
+
+I could do this with Mo's, but they're artificially blocking that method
+    (by encoding queries).
+
+
+I need the smallest x with an odd number of occurrences.
+
+N = 2e5
+Q = 2e5
+
+
+*****
+
+I could think about some sqrt decomposition strats?
+Rare x vs. common x
+
+If x is common:
+    There are only sqrt(N) of these.
+    Check individually for each such x.
+
+If x is rare:
+    Could be lots of different x's, but each appears infrequently.
+
+
+*****
+
+Say v occurs at k0, k1, k2, k3, ...
+I could do like st.upd(k0)
+
+
+
+
+I could try:
+pref[n] = set of good stuff on interval 0 .. n-1
+precompute sqrt[n] different pref[n] versions.
+
+For query(L, R), I compute pref[L] and pref[R+1].
+Now I want smallest element that's in exactly one of these.
+
+Each could have size N.
+
+
+
+*****
+
+I'd like to answer questions like - Is there a good value <= T?
+
+In range (L, R), how many values from 0 to T are there?
+
+I could do that in log^2. segtree where each node has an indexed_set.
+
+What's the smallest T such that A^{-1} of [0, T] is odd size?
+
+Include a 3: Queries with T >= 3 should get 1 higher result.
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+seg[j] = hash(j) if j has shown up odd number of times, 0 otherwise.
+
+
+
+1e7     156568 kb
+2e7     313120 kb
+
+
+
+
+
+.

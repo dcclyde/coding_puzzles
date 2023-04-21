@@ -1,0 +1,11 @@
+
+N = num friends
+E = num BAD edges
+
+I could use a segtree...??
+
+A[k] = first position to the right of k that causes trouble with k.
+
+Starting from k, I need first position R where min of A over k..R is <= R.
+
+.

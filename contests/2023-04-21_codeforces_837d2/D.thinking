@@ -1,0 +1,26 @@
+
+2000 vertices.
+
+letter at each vertex.
+I want biggest length such that there's a SUBSEQ palindrome.
+
+N^2 is ok.
+
+***
+
+How do I get longest palindromic substring on a regular string?
+dp[i][j] = longest palindromic substring from i to j.
+
+
+Can I do this on a tree?
+dp[u][v] = length of best palindrome from u to v.
+
+I guess the key thing I need to know is:
+    What's the first step if I want to walk from u to v?
+    Same from v to u.
+
+I could just make a huge list of like [dist, u, v, unext, vnext] before I start.
+
+
+
+.
