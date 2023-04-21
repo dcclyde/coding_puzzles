@@ -893,205 +893,89 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
+using t3 = tuple<ll,ll,ll>;
+V<ll> dat;
+auto& A = dat;
 
-// const int MOD = 1'000'000'007;
-const int MOD = 998'244'353;
-// const int MOD = 1234567891;  // WATCH OUT, this is bigger than 2^31 / 2!
-#pragma region  // mint
-/**
- * Description: modular arithmetic operations
- * Source:
-	* KACTL
-	* https://codeforces.com/blog/entry/63903
-	* https://codeforces.com/contest/1261/submission/65632855 (tourist)
-	* https://codeforces.com/contest/1264/submission/66344993 (ksun)
-	* also see https://github.com/ecnerwala/cp-book/blob/master/src/modnum.hpp (ecnerwal)
- * Verification:
-	* https://open.kattis.com/problems/modulararithmetic
- */
+namespace MO {
+    /**
+     * Description: Answers queries offline in (N+Q)sqrt(N)
+        * Also see Mo's on trees
+    * Source: Codeforces
+    * Verification: https://codeforces.com/contest/617/problem/E
+    */
 
-#ifndef BENQ_MODINT
-#define BENQ_MODINT
+    const int MAX_N = 100'005;
+    const int MAX_Q = 1'000'005;
 
-template<int MOD, int MODPHI, int RT> struct mint {
-	static const int mod = MOD;
-	static const int modphi = MODPHI;
-	static constexpr mint rt() { return RT; } // primitive root for FFT
-	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
-	mint():v(0) {}
-	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
-		if (v < 0) v += MOD; }
-	bool operator==(const mint& o) const {
-		return v == o.v; }
-	friend bool operator!=(const mint& a, const mint& b) {
-		return !(a == b); }
-	friend bool operator<(const mint& a, const mint& b) {
-		return a.v < b.v; }
-	friend void re(mint& a) { ll x; re(x); a = mint(x); }
-	friend str ts(mint a) { return ts(a.v); }
-	friend str tsdbg(mint a) { return tsdbg(a.v); }
+    int BLOCK;
+    int N;
 
-	mint& operator+=(const mint& o) {
-		if ((v += o.v) >= MOD) v -= MOD;
-		return *this; }
-	mint& operator-=(const mint& o) {
-		if ((v -= o.v) < 0) v += MOD;
-		return *this; }
-	mint& operator*=(const mint& o) {
-		v = int((ll)v*o.v%MOD);
-		return *this; }
-	mint& operator/=(const mint& o) { return (*this) *= inv(o); }
-	friend mint pow(mint a, ll p) {
-		mint ans = 1;
-        if (p < 0) {return pow(inv(a), -p);}
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
-		return ans; }
-	friend mint inv(const mint& a) { assert(a.v != 0);
-		return pow(a,modphi-1);
-		// if MOD isn't prime use second version instead.
-		// Alternatively, find totient of MOD and use pow(a, totient-1).
-		// return (1<a) ? (MOD - ll(inv(MOD%a,a))*MOD/a) : (1);
-	}
-	mint operator-() const { return mint(-v); }
-	mint& operator++() { return *this += 1; }
-	mint& operator--() { return *this -= 1; }
-	friend mint operator+(mint a, const mint& b) { return a += b; }
-	friend mint operator-(mint a, const mint& b) { return a -= b; }
-	friend mint operator*(mint a, const mint& b) { return a *= b; }
-	friend mint operator/(mint a, const mint& b) { return a /= b; }
-};
+    int out[MAX_Q];  // store output
+    V<t3> queries; // store left, right, index of ans
+    int cnt[MAX_N];  // state to help compute answers
 
-using mi = mint<MOD,MOD-1,5>; // 5 is primitive root for both common mods
-using vmi = V<mi>;
-using pmi = pair<mi,mi>;
-using vpmi = V<pmi>;
+    bool cmp(t3 a, t3 b) { // sort queries
+        auto [a0, a1, a2] = a;
+        auto [b0, b1, b2] = b;
+        if (a0/BLOCK != b0/BLOCK) return a0 < b0;
+        return a0/BLOCK%2 ? a1 > b1 : a1 < b1;
+    }
 
-V<vmi> scmb; // small combinations
-void genComb(int SZ) {
-	scmb.assign(SZ,vmi(SZ)); scmb[0][0] = 1;
-	FOR(i,1,SZ) F0R(j,i+1)
-		scmb[i][j] = scmb[i-1][j]+(j?scmb[i-1][j-1]:0);
+    int l = 0, r = -1, cans = 0;
+
+    void modify(int x, int y = 1) {
+        x = A[x];
+        // if condition: --cans;
+        cnt[x] += y;
+        // if condition: ++cans;
+
+        if (y == 1 && cnt[x] % 2 == 0) {++cans;}
+        else if (y == -1 && cnt[x] % 2 == 1) {--cans;}
+        dbgcB("modify", x, y, cans);
+    }
+
+    int solve_one(int L, int R) { // modifyjust interval
+        while (l > L) modify(--l);
+        while (r < R) modify(++r);
+        while (l < L) modify(l++,-1);
+        while (r > R) modify(r--,-1);
+        dbgcP("answer", L, R, cans); el;
+        return cans;
+    }
+
+    void solve() {
+        BLOCK = sqrt(N); sort(all(queries),cmp);
+        each(x,queries) {
+            auto& [l, r, qid] = x;
+            solve_one(l, r);
+            out[qid] = cans;
+        }
+    }
 }
 
-template <int MOD, int MODPHI, int RT>
-string to_string(mint<MOD, MODPHI, RT> modint) {
-    return to_string((int)modint);
-}
-
-#endif
-#pragma endregion  // mint
-
-
-
-const ll GENFAC_MAX = 2501;
-#pragma region  // genFac, comb, fac, binom
-/**
- * Description: pre-compute factorial mod inverses,
- 	* assumes $MOD$ is prime and $SZ < MOD$.
- * Time: O(SZ)
- * Source: KACTL
- * Verification: https://dmoj.ca/problem/tle17c4p5
- */
-
-
-vmi invs, fac, ifac;
-bool genFac(int SZ) {
-	invs.rsz(SZ), fac.rsz(SZ), ifac.rsz(SZ);
-	invs[1] = fac[0] = ifac[0] = 1;
-	FOR(i,2,SZ) invs[i] = mi(-(ll)MOD/i*(int)invs[MOD%i]);
-	FOR(i,1,SZ) fac[i] = fac[i-1]*i, ifac[i] = ifac[i-1]*invs[i];
-    return true;  // dummy value so we can call from global scope
-}
-mi comb(int a, int b) {
-	if (a < b || b < 0) return 0;
-	return fac[a]*ifac[b]*ifac[a-b]; }
-auto& binom = comb;
-
-bool precompute_genfac_dummy = genFac(GENFAC_MAX + 1);
-#pragma endregion
-
-void brute() {
-    lls(R, C, B, W);
-    dbgR(MP(R,C), B, W);
-    el;
-
-	if (B + W > R*C) {return ps(0);}
-
-	auto f2rc = [&](ll f) -> pll {
-		return {f/C, f%C};
-	};
-
-	V<ll> ph(R*C, 0);
-	FOR(k, 0, B) {ph[k] = 1;}
-	FOR(k, B, B+W) {ph[k] = 2;}
-	sort(all(ph));
-	ll out = 0;
-	do {
-		uset<ll> wrows, brows, wcols, bcols;
-		FOR(k, 0, ph.size()) {
-			if (ph[k] == 0) {continue;}
-			auto [r, c] = f2rc(k);
-			if (ph[k] == 1) {
-				brows.insert(r);
-				bcols.insert(c);
-			} else {
-				wrows.insert(r);
-				wcols.insert(c);
-			}
-		}
-		bool ok = true;
-		for(auto& x : brows) {if (wrows.find(x) != wrows.end()) {ok = false; break;}}
-		for(auto& x : bcols) {if (wcols.find(x) != wcols.end()) {ok = false; break;}}
-		out += ok;
-	} while (next_permutation(all(ph)));
-	return ps(out);
-}
 
 void solve() {
-    lls(R, C, B, W);
-    dbgR(MP(R,C), B, W);
+    lls(N);
+    rv(N, dat);
+    lls(Q);
+    dbgR(N, Q, dat);
     el;
 
-	auto dpw = ndvec<mi>(R+1, C+1, mi(0));
-	auto dpb = ndvec<mi>(R+1, C+1, mi(0));
+    MO::N = N;
+    MO::queries.resize(Q);
+    FOR(qid, 0, Q) {
+        ll1(L, R);
+        MO::queries[qid][0] = L;
+        MO::queries[qid][1] = R;
+        MO::queries[qid][2] = qid;
+    }
 
-	auto build_dp = [&](auto& dp, ll K) -> void {
-		FOR(r, 0, R+1) {
-			FOR(c, 0, C+1) {
-				dp[r][c] = binom(r*c, K);
-				FOR(r2, 0, r+1) {
-					FOR(c2, 0, c+1) {
-						if (r2 == r && c2 == c) {continue;}
-						dp[r][c] -= dp[r2][c2] * binom(r, r2) * binom(c, c2);
-					}
-				}
-			}
-		}
-	};
-
-	build_dp(dpb, B);
-	dbgB(pdh(dpb));
-	build_dp(dpw, W);
-	dbgY(pdh(dpw));
-	el;
-
-	mi out = 0;
-	FOR(rw, 0, R+1) {
-		FOR(rb, 0, R+1) {
-			if (rb + rw > R) {continue;}
-			FOR(cw, 0, C+1) {
-				FOR(cb, 0, C+1) {
-					if (cb + cw > C) {continue;}
-					out += dpw[rw][cw] * dpb[rb][cb]
-						* binom(R,rb)*binom(R-rb,rw)
-						* binom(C,cb)*binom(C-cb,cw);
-					dbg(MP(rb,cb), dpb[rb][cb], MP(rw,cw), dpw[rw][cw]);
-				}
-			}
-		}
-	}
-
-	return ps(out);
+    MO::solve();
+    FOR(qid, 0, Q) {
+        ps(MO::ans[qid]);
+    }
+    return;
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce

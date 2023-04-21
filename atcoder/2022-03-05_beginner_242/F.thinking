@@ -14,4 +14,24 @@ F(R, c, b) * G(R-c', c+c', b') gets added onto F(R,
 F(r, c, b) * G(
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+How many ways to use K rooks on a RxC grid?
+Well...
+
+How many ways to use K rooks and RxC grid while needing every row and col?
+
+H(R, C, K) = bin(R*C, K)
+
+
+
+F(R, C, K) = H(R,C,K) - sum of F(r,c,K) * binom(R,r) * binom(C,c)
+    With K fixed, this should be computable in O(R*C).
+
+
+Then final answer is sum of F(rb, cb, B) * F(rw, cw, W) * binom(R,rb) * binom(R-rb,rc) * binom(C,cb) * binom(C-cb,cw).
+    (rb+rw <= R, cb+cw <= C)
+
+    This part is O(N^4).
+
 .

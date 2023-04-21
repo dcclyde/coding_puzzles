@@ -1,0 +1,13 @@
+
+I could try segtree with position = person and value = final answer + (state)
+I'd need a lot of state though. Each segment needs a list of unpaired people?
+
+
+
+I could try adding people to the list one at a time.
+Segtree value = answer from here to the end.
+Add kth person of a certain color -->  I need k/2 range updates.
+
+
+
+.
