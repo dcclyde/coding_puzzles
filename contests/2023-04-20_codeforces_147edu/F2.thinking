@@ -1,0 +1,37 @@
+
+Use L = K+1. L is the length of a fallen tree.
+
+
+f[n][d] = ways to place n trees using first d places.
+    NOT requiring anything about the last place being used.
+
+
+f[n][d] = ?
+    Don't use the last space: f[n][d-1]
+    Do use the last space:
+        2 * f[n-1][d-L] (2 directions)
+        - f[n-1][d-2L+1]
+
+
+Base cases:
+f[0][d] = 1
+f[n][0] = 0 for n >= 1
+
+f[n][d] = f[n][d-1] + 2*f[n-1][d-L] - f[n-1][d-2L+1]
+
+0 = f[n][d] - f[n][d-1] - 2*f[n-1][d-L] + f[n-1][d-2L+1]
+
+I wish I knew f[N][D].
+
+*****
+
+Think about the generating function
+F(x, y) = sum of terms like f[n][d] * x^n * y^d
+
+0 "=" F - y*F
+
+The x^n y^d term of y*F will be f[n][d-1].
+
+
+
+.
