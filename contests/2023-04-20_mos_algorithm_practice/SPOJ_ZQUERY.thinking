@@ -1,0 +1,36 @@
+
+pref always steps up or down by 1.
+I want the 2 farthest-apart matching values in [L, R].
+
+To use Mo's:
+If I add a new element, I can just check whether his furthest friend is far enough.
+If I erase an element?
+
+
+
+How can I convert this fully to "two farthest apart matching values"?
+
+dat =    [1, 1, -1, 1, -1, -1, -1, -1]
+pfx = [0, 1, 2,  1, 2,  1,  0, -1, -2]
+
+
+dat[0..7] or pref[0..8] corresponds to whole array.
+
+In general, for dat[l..r] I should just think about pref[l..r+1].
+
+*****
+
+Maybe it'd be nice to have "segtree-like" struct that uses sqrt decomposition instead?
+    O(1) per update
+    O(sqrt(N)) per query
+
+    I could also allow lazy range updates in O(sqrt(N)).
+
+
+For the current problem:
+I'd like to store the longest available span for each value.
+Add a new value: Look up longest span from his neighbor and add.
+Erase a value: Update longest span for his neighbor.
+
+
+.

@@ -1,0 +1,43 @@
+https://codeforces.com/contest/617/problem/E
+
+Offline queries.
+Benq's documentation suggests I should try Mo's algorithm.
+
+xor of [l, r] = pref[r+1] ^ pref[l].
+
+Suppose I already know the answer for [l, r].
+I want the answer for [l, r+1].
+I should ask: How many k in [l, r+1] satisfy xor(k, r) = TARGET?
+    in other words, pref[r] ^ TARGET = pref[k-1]
+
+    ! Be careful.
+    The adjusted entry is x.
+    How many k satisfy xor(k, x) = TARGET?
+        TARGET = pref[x+1] ^ pref[k]
+        pref[k] = TARGET ^ pref[x+1]
+        I care about l <= k <= x.
+
+If I move the left endpoint:
+Say I moved it left, so I went from [L, R] to [L-1, R].
+Now I want to know how many k satisfy xor(L-1, k) = TARGET
+    pref[k+1] ^ pref[L-1] = TARGET
+    pref[k+1] = TARGET ^ pref[L-1]
+
+    ! Be careful.
+    The adjusted entry is x.
+    How many k satisfy xor(x, k) = TARGET?
+        TARGET = pref[k+1] ^ pref[x]
+        pref[k+1] = TARGET ^ pref[x]
+        I care about x <= k <= r.
+            pref[j] for x+1 <= j <= r+1.
+
+
+1, 2, 1, 1, 0, 3
+
+Start: I can get v = 0.
+Add 1: I can get 0 or 1
+Add 2: 0, 1, 3
+Remove 1 from left: 1, 3
+
+
+.

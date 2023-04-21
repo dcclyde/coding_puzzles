@@ -1,0 +1,14 @@
+
+The query is:
+How many evenly-spaced constant subseqs will we need to remove to get empty seq?
+
+Wait no, I get to permute after each operation.
+If some number has all occurrences in an arithmetic subseq, answer = num distinct.
+Otherwise, answer = num distinct + 1.
+
+I guess for each value I should track:
+    How many copies are there?
+    If there are >= 2 copies, are they evenly spaced? If so, what's the layout?
+
+
+.
