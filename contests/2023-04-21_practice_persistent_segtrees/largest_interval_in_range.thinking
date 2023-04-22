@@ -1,0 +1,13 @@
+
+See USACO site: https://usaco.guide/adv/persistent?lang=cpp
+
+Given N intervals.
+largest interval fully contained within [L, R]?
+
+Add intervals in order by increasing R.
+Position in segtree = L value
+Score in segtree = length
+Time in segtree = R value
+
+
+.

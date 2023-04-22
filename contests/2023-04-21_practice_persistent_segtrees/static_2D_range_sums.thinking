@@ -1,0 +1,13 @@
+
+See USACO site: https://usaco.guide/adv/persistent?lang=cpp
+
+I guess we want to sum scores for 0 <= x < A and 0 <= y <= B.
+
+Given updates like (x, y, val).
+Insert into PST in increasing order of x.
+
+Then to compute solve(A, B),
+run query(0, B-1) in segtree version A-1.
+
+
+.

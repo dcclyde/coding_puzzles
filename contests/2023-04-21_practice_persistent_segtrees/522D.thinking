@@ -1,0 +1,21 @@
+
+Need shortest distance (a, b)
+such that a, b in [L, R] and dat[a] == dat[b].
+
+shortest distance could be a min query?
+How do I handle the "dat[a] == dat[b]" part?
+
+
+!!!!!
+
+Sort queries by increasing L.
+Maintain a segtree:
+seg[k] = distance to nearest equal neighbor on the left,
+    or INF if there is no matching neighbor to the left.
+    Neighbors < current L don't count.
+
+
+
+
+
+.

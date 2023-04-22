@@ -1,0 +1,16 @@
+
+Every node has a height.
+Graph edges change every day.
+
+Queries like x, y, d
+means: What's the smallest height delta
+    between any neighbor of x and any neighbor of y on day d?
+
+***
+
+What if there were no updates?
+
+
+
+
+.
