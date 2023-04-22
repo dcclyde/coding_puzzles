@@ -21,11 +21,18 @@ target_file="$1.cpp"
 # echo "target_file = $target_file"
 if [ -e "$target_file" ]
 then
-    echo "File already exists so we won't overwrite. Filename: $target_file"
+    echo "File $target_file exists. Skipping."
 else
     cp "$source_file" "$target_file"
-    touch "$1.in"
-    touch "$1.thinking"
 fi
+
+if [ -f "$1.thinking" ]
+then
+    echo "File $1.thinking exists. Skipping."
+else
+    cp "$template_dir/template.thinking" "$1.thinking"
+fi
+
+touch "$1.in"
 
 code "$1.thinking" "$target_file" "$1.in"

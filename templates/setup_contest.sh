@@ -14,6 +14,11 @@ fi
 
 if [ $# -eq 2 ]
 then
+    if ! [[ $2 =~ ^[1-9]$|^1[0-9]$|^2[0-6]$ ]]
+    then
+        echo "Second argument must be a number between 1 and 26."
+        exit
+    fi
     NUM_PROBLEMS=$2
 fi
 echo "Setting up $NUM_PROBLEMS problems."
@@ -48,7 +53,7 @@ do
     then
         echo "File $1/$PROBLEM.thinking already exists. Skipping."
     else
-        touch "$1/$PROBLEM.thinking"
+        cp "$template_dir/template.thinking" "$1/$PROBLEM.thinking"
     fi
     files_created="$files_created $1/$PROBLEM.thinking"
 
