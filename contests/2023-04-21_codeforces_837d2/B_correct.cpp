@@ -924,126 +924,32 @@ tcT> struct SegTree { // cmb(ID,b) = b
 		}
 		return cmb(ra,rb);
 	}
-
-    #pragma region  // lstTrue_from_base, fstTrue_from_base
-    // ~ lstTrue_from_base(L, check(v,r)) == lstTrue(L, orig_n-1, check(query(L,r), r)).
-    int lstTrue_from_base(int L, auto&& check) {
-        int ind = 1; int l = 0; int r = n-1;
-        // dbgcBold("lsR", L, MT(ind,l,r), *this);
-        // push(ind,l,r);  // ~ leave these commented for analogy to LazySeg.
-        if (L == 0 && check(seg[ind], r)) {return orig_n-1;}
-
-        while (l != L) {
-            // dbgc("stage 1", ind,l,r, L);
-            int m = (l+r)/2;
-            if (L <= m) {ind = 2*ind; r = m;}
-            else {ind = 2*ind+1; l = m+1;}
-            // push(ind,l,r);
-        }
-
-        T wip = ID;
-        while (true) {
-            T fut = cmb(wip, seg[ind]);
-            // dbgcP("stage 2", ind,l,r, "", fut);
-            if (check(fut,r)) {  // If we can safely add this chunk...
-                wip = fut;
-                if (r == n-1) {
-                    // We've reached the end.
-                    return orig_n-1;
-                } else if (ind & 1) {
-                    // This was a right child.
-                    ind = ind/2 + 1;
-                    int len = r-l+1;
-                    l += len; r += 2*len;
-                } else {
-                    // This was a left child.
-                    ++ind;
-                    int len = r-l+1;
-                    l += len; r += len;
-                }
-                // push(ind,l,r);
-            } else { break; }
-        }
-
-        // (ind,l,r) would reach too far.
-        while (l != r) {
-            // does DL reach too far?
-            int m = (l+r)/2;
-            // push(2*ind, l, m);
-            T fut = cmb(wip, seg[2*ind]);
-            // dbgcW("stage 3", ind,l,r, "", m, fut);
-            if (check(fut,m)) {
-                wip = fut;
-                ind = 2*ind+1;
-                l = m+1;
-                // push(ind,l,r);
-            } else {
-                ind = 2*ind; r = m;
-            }
-        }
-        int out = l-1;
-        ckmin(out, orig_n-1);
-        // dbgR(out); el;
-        return out;
-    }
-
-    // fstTrue_from_base(R, check(v,l)) == fstTrue(0, R, check(query(l,R), l)).
-    int fstTrue_from_base(int R, auto&& check) {
-        int ind = 1; int l = 0; int r = n-1;
-        // dbgcBold("fsb", R, MT(ind,l,r), *this);
-        // push(ind,l,r);  // ~ leave these commented for analogy to LazySeg.
-        if (R == orig_n-1 && check(seg[ind], 0)) {return 0;}
-
-        while (r != R) {
-            // dbgc("stage 1", ind,l,r, R);
-            int m = (l+r)/2;
-            if (R <= m) {ind = 2*ind; r = m;}
-            else {ind = 2*ind+1; l = m+1;}
-            // push(ind,l,r);
-        }
-
-        T wip = ID;
-        while (true) {
-            T fut = cmb(wip, seg[ind]);
-            // dbgcP("stage 2", ind,l,r, "", fut);
-            if (check(fut,l)) {  // If we can safely add this chunk...
-                wip = fut;
-                if (l == 0) {
-                    // We've reached the end.
-                    return 0;
-                } else if (ind & 1) {
-                    // This was a right child.
-                    --ind;
-                    int len = r-l+1;
-                    l -= len; r -= len;
-                } else {
-                    // This was a left child.
-                    ind = ind/2 - 1;
-                    int len = r-l+1;
-                    l -= 2*len; r -= len;
-                }
-                // push(ind,l,r);
-            } else { break; }
-        }
-
-        // (ind,l,r) would reach too far.
-        while (l != r) {
-            // does DR reach too far?
-            int m = (l+r)/2;
-            // push(2*ind+1, m+1, r);
-            T fut = cmb(wip, seg[2*ind+1]);
-            // dbgcW("stage 3", ind,l,r, "", m, fut);
-            if (check(fut,m+1)) {
-                wip = fut; ind *= 2; r = m;
-                // push(ind,l,r);
-            } else {
-                ind = 2*ind+1; l = m+1;
-            }
-        }
-        int out = r+1;
-        return out;
-    }
-    #pragma endregion  // lstTrue_from_base, fstTrue_from_base
+    #pragma region  // first_satisfying
+    // // return smallest x s.t. query(base, x) satisfies some criterion
+	// int first_satisfying_R(int base, int val, int ind=1, int l=0, int r=-1) {
+	// 	if (r == -1) {r = n-1;}
+    //     // ! is there a good idx in [l, r]?
+    //     bool ok = (seg[ind] >= val);
+	// 	if (r < base || !ok) return -1;
+	// 	if (l == r) return l;
+	// 	int m = (l+r)/2;
+	// 	int res = first_satisfying_R(base,val,2*ind,l,m); if (res != -1) return res;
+    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
+	// 	return first_satisfying_R(base,val,2*ind+1,m+1,r);
+	// }
+    // // return largest x s.t. query(x, base) satisfies some criterion
+	// int first_satisfying_L(int base, int val, int ind=1, int l=0, int r=-1) {
+	// 	if (r == -1) {r = n-1;}
+    //     // ! is there a good idx in [l, r]?
+    //     bool ok = (seg[ind] >= val);
+	// 	if (l > base || !ok) return -1;
+	// 	if (l == r) return l;
+	// 	int m = (l+r)/2;
+	// 	int res = first_satisfying_L(base,val,2*ind+1,m+1,r); if (res != -1) return res;
+    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
+	// 	return first_satisfying_L(base,val,2*ind,l,m);
+	// }
+    #pragma endregion
     void detailed_printouts() {
         #pragma region
         dbg_only(
@@ -1087,226 +993,11 @@ template<class T>
 string tsdbg(SegTree<T> st) {
     vector<T> out;
     FOR(k, st.n, st.n + st.orig_n) { out.push_back( st.seg[k] ); }
-    return tsdbg(out);
+    return tsdbg( out );
 }
 
-#pragma region  // LazySeg
-/**
- * Description: 1D range increment and sum query.
- * Source: USACO Counting Haybales
- * Verification: SPOJ Horrible
- */
 
-tcT, class S> struct LazySeg {
-	const T idT{INF_ll}; const S idS{-INF_ll};  // ! identity
-	int n; V<T> seg; V<S> lazy; int orig_n; int SZ;
-	T cmb(T a, T b) {  // ! seg * seg
-		return min(a,b);
-	}
-	void init(int _n) {
-		orig_n = _n; for (n = 1; n < _n; ) n *= 2;
-		SZ = n; seg.assign(2*n,idT); lazy.assign(2*n, idS);  // ! initialize
-	}
-	void push(int ind, int L, int R) { /// modify values for current node
-        if (lazy[ind] == idS) return;
-        seg[ind] = lazy[ind];  // ! lazy * seg
-		if (L != R) F0R(i,2) lazy[2*ind+i] = lazy[ind]; // ! lazy * lazy
-		lazy[ind] = idS;
-	} // recalc values for current node
-	void pull(int ind){seg[ind]=cmb(seg[2*ind],seg[2*ind+1]);}
-	void build() { ROF(i,1,SZ) pull(i); }
-    void push_all(int ind=1, int L=0, int R=-1) {
-        if ( R == -1 ) {R = SZ-1;} push(ind, L, R);
-        if (L < R) {int M = (L+R)/2; push_all(2*ind, L, M); push_all(2*ind+1, M+1, R);}
-    }
-	void upd(int lo,int hi,S inc,int ind=1,int L=0, int R=-1) {
-        dbgcBold("upd", MP(lo,hi), inc);
-        if ( R == -1 ) {R = SZ-1;}
-		push(ind,L,R); if (hi < L || R < lo) return;
-		if (lo <= L && R <= hi) {
-            dbgW(lo,hi,inc,"",MT(ind,L,R));
-			lazy[ind] = inc;
-            detailed_printouts();
-            push(ind,L,R);
-            detailed_printouts();
-            // assert(false);
-            return; }
-		int M = (L+R)/2; upd(lo,hi,inc,2*ind,L,M);
-		upd(lo,hi,inc,2*ind+1,M+1,R); pull(ind);
-	}
-	T query(int lo, int hi, int ind=1, int L=0, int R=-1) {
-        if ( R == -1 ) {R = SZ-1;}
-		push(ind,L,R); if (lo > R || L > hi) return idT;
-		if (lo <= L && R <= hi) return seg[ind];
-		int M = (L+R)/2; return cmb(query(lo,hi,2*ind,L,M),
-			query(lo,hi,2*ind+1,M+1,R));
-	}
-    #pragma region  // lstTrue_from_base, fstTrue_from_base
-    // ~ lstTrue_from_base(L, check(v,r)) == lstTrue(L, orig_n-1, check(query(L,r), r)).
-    int lstTrue_from_base(int L, auto&& check) {
-        int ind = 1; int l = 0; int r = n-1;
-        // dbgcBold("lsR", L, MT(ind,l,r), *this);
-        push(ind,l,r);
-        if (L == 0 && check(seg[ind], r)) {return orig_n-1;}
 
-        while (l != L) {
-            // dbgc("stage 1", ind,l,r, L);
-            int m = (l+r)/2;
-            if (L <= m) {ind = 2*ind; r = m;}
-            else {ind = 2*ind+1; l = m+1;}
-            push(ind,l,r);
-        }
-
-        T wip = idT;
-        while (true) {
-            T fut = cmb(wip, seg[ind]);
-            // dbgcP("stage 2", ind,l,r, "", fut);
-            if (check(fut,r)) {  // If we can safely add this chunk...
-                wip = fut;
-                if (r == n-1) {
-                    // We've reached the end.
-                    return orig_n-1;
-                } else if (ind & 1) {
-                    // This was a right child.
-                    ind = ind/2 + 1;
-                    int len = r-l+1;
-                    l += len; r += 2*len;
-                } else {
-                    // This was a left child.
-                    ++ind;
-                    int len = r-l+1;
-                    l += len; r += len;
-                }
-                push(ind,l,r);
-            } else { break; }
-        }
-
-        // (ind,l,r) would reach too far.
-        while (l != r) {
-            // does DL reach too far?
-            int m = (l+r)/2;
-            push(2*ind, l, m);
-            T fut = cmb(wip, seg[2*ind]);
-            // dbgcW("stage 3", ind,l,r, "", m, fut);
-            if (check(fut,m)) {
-                wip = fut;
-                ind = 2*ind+1;
-                l = m+1;
-                push(ind,l,r);
-            } else {
-                ind = 2*ind; r = m;
-            }
-        }
-        int out = l-1;
-        ckmin(out, orig_n-1);
-        // dbgR(out); el;
-        return out;
-    }
-
-    // fstTrue_from_base(R, check(v,l)) == fstTrue(0, R, check(query(l,R), l)).
-    int fstTrue_from_base(int R, auto&& check) {
-        int ind = 1; int l = 0; int r = n-1;
-        // dbgcBold("fsb", R, MT(ind,l,r), *this);
-        push(ind,l,r);  // ~ leave these commented for analogy to LazySeg.
-        if (R == orig_n-1 && check(seg[ind], 0)) {return 0;}
-
-        while (r != R) {
-            // dbgc("stage 1", ind,l,r, R);
-            int m = (l+r)/2;
-            if (R <= m) {ind = 2*ind; r = m;}
-            else {ind = 2*ind+1; l = m+1;}
-            push(ind,l,r);
-        }
-
-        T wip = idT;
-        while (true) {
-            T fut = cmb(wip, seg[ind]);
-            // dbgcP("stage 2", ind,l,r, "", fut);
-            if (check(fut,l)) {  // If we can safely add this chunk...
-                wip = fut;
-                if (l == 0) {
-                    // We've reached the end.
-                    return 0;
-                } else if (ind & 1) {
-                    // This was a right child.
-                    --ind;
-                    int len = r-l+1;
-                    l -= len; r -= len;
-                } else {
-                    // This was a left child.
-                    ind = ind/2 - 1;
-                    int len = r-l+1;
-                    l -= 2*len; r -= len;
-                }
-                push(ind,l,r);
-            } else { break; }
-        }
-
-        // (ind,l,r) would reach too far.
-        while (l != r) {
-            // does DR reach too far?
-            int m = (l+r)/2;
-            push(2*ind+1, m+1, r);
-            T fut = cmb(wip, seg[2*ind+1]);
-            // dbgcW("stage 3", ind,l,r, "", m, fut);
-            if (check(fut,m+1)) {
-                wip = fut; ind *= 2; r = m;
-                push(ind,l,r);
-            } else {
-                ind = 2*ind+1; l = m+1;
-            }
-        }
-        int out = r+1;
-        return out;
-    }
-    #pragma endregion  // lstTrue_from_base, fstTrue_from_base
-    void detailed_printouts() {
-        #pragma region
-        dbg_only(
-        int ST_SIZE = n;
-        int ST_PRINT_SIZE = orig_n;
-        // ST_PRINT_SIZE = ST_SIZE;  // toggle whether to print irrelevant suffix
-        el;
-        dbgc("LazySeg DETAILS");
-        FOR(k, 1, ST_SIZE + ST_PRINT_SIZE) {
-            if ( k >= ST_SIZE) {
-                int p = k - ST_SIZE;
-                dbgP(k, p, seg[k], lazy[k]);
-            } else {
-                vector<int> binary_digits;
-                int temp = k;
-                while ( temp > 0 ) {
-                    binary_digits.push_back( temp % 2 );
-                    temp /= 2;
-                }
-                reverse(all(binary_digits));
-                int L = 0; int R = ST_SIZE-1;
-                FOR(didx, 1, binary_digits.size()) {
-                    int M = (L+R) / 2;
-                    if ( binary_digits[didx] == 1 ) {
-                        L = M+1;
-                    } else {
-                        R = M;
-                    }
-                }
-                if ( L < ST_PRINT_SIZE ) {
-                    dbgY(k, MP(L,R), seg[k], lazy[k]);
-                }
-            }
-        }
-        el;
-        );  // end dbg_only
-        #pragma endregion
-    }
-};
-
-template<class T, class S>
-string tsdbg(LazySeg<T, S> st) {
-    st.push_all(); vector<T> out;
-    FOR(k, st.n, st.n + st.orig_n) { out.push_back(st.seg[k]); }
-    return tsdbg(out);
-}
-#pragma endregion  // LazySeg
 
 
 void solve() {
@@ -1316,8 +1007,7 @@ void solve() {
     dbgR(N, E, edges);
     el;
 
-    // SegTree<ll> st;
-    LazySeg<ll,ll> st;
+    SegTree<ll> st;
     st.init(N);
     st.seg.assign(2*st.n, N);
     for(auto& [a, b] : edges) {
@@ -1325,58 +1015,14 @@ void solve() {
         ckmin(st.seg[st.n+a], b);
     }
     st.build();
-    dbgY(st); el;
-
-    LazySeg<ll,ll> stBackward;
-    stBackward.init(N);
-    FOR(k, 0, N) { stBackward.upd(k, k, st.query(N-1-k, N-1-k)); dbg(stBackward);}
-    dbgB(stBackward); el;
 
     ll out = 0;
     FOR(L, 0, N) {
-        // ll Rold = lstTrue(L, N-1, [&](ll r) {
-        //     return st.query(L, r) > r;
-        // });
-
-        // Find first r such that query(L, r) <= r.
-        // I think this can be coded similar to a crappy query() that handles all left stuff first?
-        // auto fsR = [&]() -> ll {
-        //     ll l = 0; ll r = st.n - 1; ll ind = 1;
-        //     while (l < r) {
-        //         ll m = (l+r)/2;
-
-        //     }
-        // };
-
-
-        // ll R = st.first_satisfying_R(L);
-
-        ll R = st.lstTrue_from_base(L, [&](ll v, ll r) -> bool {
-            return v > r;
+        ll R = lstTrue(L, N-1, [&](ll r) {
+            return st.query(L, r) > r;
         });
         ll len = R-L+1;
-        ll R_backward = stBackward.fstTrue_from_base(N-1-L, [&](ll v, ll l) -> bool {
-            ll reflect = N-1-l;
-            dbgcR("check bkwd", v, l, reflect, (v>reflect));
-            return v > reflect;
-        });
-        ll len_backward = N-1-L - R_backward + 1;
-        dbg(N-1-L, R_backward, len_backward);
-        dbg_only(
-            ll Rold = lstTrue(L, N-1, [&](ll r) {
-                return st.query(L, r) > r;
-            });
-            dbgY(Rold, R, R_backward, MP(len, len_backward));
-            assert(Rold == R);
-            assert(len_backward == len);
-        );
-        assert(len_backward == len);
-
-        // if (R == -1) {continue;}
-        // --R;
-        // out += len;
-        out += len_backward;
-        dbgB(L, R, len, out);
+        out += len;
     }
 
     return ps(out);
