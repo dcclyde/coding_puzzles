@@ -924,19 +924,85 @@ tcT> struct SegTree { // cmb(ID,b) = b
 		}
 		return cmb(ra,rb);
 	}
+    // last_satisfying_moving_right(L, check(v,r)) == lstTrue(L, orig_n-1, check(query(L,r), r)).
+    int last_satisfying_moving_right(int L, auto&& check) {
+        int ind = 1; int l = 0; int r = n-1;
+        dbgcBold("lsR", L, MT(ind,l,r), *this);
+        // push(ind,l,r);
+        if (L == 0 && check(seg[ind], r)) {return orig_n-1;}
+
+        while (l != L) {
+            dbgc("stage 1", ind,l,r, L);
+            int m = (l+r)/2;
+            if (L <= m) {ind = 2*ind; r = m;}
+            else {ind = 2*ind+1; l = m+1;}
+            // push(ind,l,r);
+        }
+
+        T wip = ID;
+        while (true) {
+            T fut = cmb(wip, seg[ind]);
+            dbgcP("stage 2", ind,l,r, "", fut);
+            if (check(fut,r)) {  // If we can safely add this chunk...
+                wip = fut;
+                if (r == n-1) {
+                    // We've reached the end.
+                    return orig_n-1;
+                } else if (ind & 1) {
+                    // This was a right child.
+                    dbgcY("right child");
+                    ind = ind/2 + 1;
+                    int len = r-l+1;
+                    l += len; r += 2*len;
+                } else {
+                    // This was a left child.
+                    dbgcB("left child");
+                    ++ind;
+                    int len = r-l+1;
+                    l += len; r += len;
+                }
+                // push(ind,l,r);
+            } else { break; }
+        }
+
+        // (ind,l,r) would reach too far.
+        while (l != r) {
+            // does DL reach too far?
+            int m = (l+r)/2;
+            // push(2*ind, l, m);
+            T fut = cmb(wip, seg[2*ind]);
+            dbgcW("stage 3", ind,l,r, "", m, fut);
+            if (check(fut,m)) {
+                wip = fut;
+                ind = 2*ind+1;
+                int len = r-l+1;
+                l = m+1; r = m+len/2;
+                // push(ind,l,r);
+            } else {
+                ind = 2*ind; r = m;
+            }
+        }
+        int out = l-1;
+        ckmin(out, orig_n-1);
+        // if (l == L) {out = -1;}
+        dbgR(out); el;
+        return out;
+    }
     #pragma region  // first_satisfying
-    // // return smallest x s.t. query(base, x) satisfies some criterion
-	// int first_satisfying_R(int base, int val, int ind=1, int l=0, int r=-1) {
-	// 	if (r == -1) {r = n-1;}
-    //     // ! is there a good idx in [l, r]?
-    //     bool ok = (seg[ind] >= val);
-	// 	if (r < base || !ok) return -1;
-	// 	if (l == r) return l;
-	// 	int m = (l+r)/2;
-	// 	int res = first_satisfying_R(base,val,2*ind,l,m); if (res != -1) return res;
-    //     // ! Look for something different in other child if needed (e.g. if we want sum >= X)
-	// 	return first_satisfying_R(base,val,2*ind+1,m+1,r);
-	// }
+    // return smallest x s.t. query(base, x) satisfies some criterion
+    // ~ I want first r such that query(base, r) <= r.
+	int first_satisfying_R(int base, int ind=1, int l=0, int r=-1) {
+		if (r == -1) {r = n-1;}
+        dbgcP("fsR", base, ind, MP(l,r), seg[ind]);
+        // ! is there a good idx in [l, r]?
+        bool ok = (seg[ind] <= r);
+		if (r < base || !ok) return -1;
+		if (l == r) return l;
+		int m = (l+r)/2;
+		int res = first_satisfying_R(base,2*ind,l,m); if (res != -1) return res;
+        // ! Look for something different in other child if needed (e.g. if we want sum >= X)
+		return first_satisfying_R(base,2*ind+1,m+1,r);
+	}
     // // return largest x s.t. query(x, base) satisfies some criterion
 	// int first_satisfying_L(int base, int val, int ind=1, int l=0, int r=-1) {
 	// 	if (r == -1) {r = n-1;}
@@ -993,11 +1059,8 @@ template<class T>
 string tsdbg(SegTree<T> st) {
     vector<T> out;
     FOR(k, st.n, st.n + st.orig_n) { out.push_back( st.seg[k] ); }
-    return tsdbg( out );
+    return tsdbg( pdh(out) );
 }
-
-
-
 
 
 void solve() {
@@ -1015,14 +1078,43 @@ void solve() {
         ckmin(st.seg[st.n+a], b);
     }
     st.build();
+    dbgY(st); el;
 
     ll out = 0;
     FOR(L, 0, N) {
-        ll R = lstTrue(L, N-1, [&](ll r) {
-            return st.query(L, r) > r;
+        // ll Rold = lstTrue(L, N-1, [&](ll r) {
+        //     return st.query(L, r) > r;
+        // });
+
+        // Find first r such that query(L, r) <= r.
+        // I think this can be coded similar to a crappy query() that handles all left stuff first?
+        // auto fsR = [&]() -> ll {
+        //     ll l = 0; ll r = st.n - 1; ll ind = 1;
+        //     while (l < r) {
+        //         ll m = (l+r)/2;
+
+        //     }
+        // };
+
+
+        // ll R = st.first_satisfying_R(L);
+
+        ll R = st.lsR(L, [&](ll v, ll r) -> bool {
+            return v > r;
         });
+        dbg_only(
+            ll Rold = lstTrue(L, N-1, [&](ll r) {
+                return st.query(L, r) > r;
+            });
+            dbgY(Rold, R);
+            assert(Rold == R);
+        );
+
+        // if (R == -1) {continue;}
+        // --R;
         ll len = R-L+1;
         out += len;
+        dbgB(L, R, len, out);
     }
 
     return ps(out);

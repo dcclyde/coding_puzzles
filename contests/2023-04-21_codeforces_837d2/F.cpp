@@ -951,6 +951,7 @@ tcT, int SZ> struct pseg {
 	T query(int ti, int lo, int hi) {
 		return query(loc[ti],lo,hi,0,SZ-1); }
 	void build(const V<T>&arr) {loc.pb(build(arr,0,SZ-1));}
+    void clear() { nex = 0; loc.clear(); }
 };
 
 pseg<int, 200'001> pst;
@@ -980,6 +981,10 @@ void solve() {
         segtrees[0] = all 0s.
         segtrees[1]: same as before, except position dat[0] received hash[dat[0]].
     */
+
+    FOR(k, 0, decltype(pst)::LIM) {
+        pst.d[k] = {rng(), rng(), rng(), rng()};
+    }
 
     pst.build(V<int>(NN, 0));  // at time 0, it's all 0s.
     FOR(k, 0, N) { pst.upd(dat[k], dat[k], myhash(dat[k])); }

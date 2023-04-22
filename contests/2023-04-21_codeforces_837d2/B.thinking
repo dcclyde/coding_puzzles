@@ -8,4 +8,54 @@ A[k] = first position to the right of k that causes trouble with k.
 
 Starting from k, I need first position R where min of A over k..R is <= R.
 
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Working on "binary search in segtree" code.
+
+Think about the version where I want first/last x such that query(L, x) satisfies something.
+Flowchart looks like:
+    I know q so far. (initialize as ID)
+    I know current node id l.  (initialize as the leaf that owns L)
+
+    If I can add my current node and condition isn't satisfied yet:
+        Add my node to q.
+        Point 1 step to the right of my parent. (i.e. try doubling size)
+
+    If adding my current node would satisfy the condition:
+        Point at my left child?
+
+
+Say I start at 2 and the secret answer is 13.
+n = 16.
+
+    18: [2, 2]      don't use this, go to parent
+    9: [2, 3]       use this
+    5: [4, 7]       use this
+    3: [8, 15]      this goes too far, so split it up.
+    6: [8, 11]      use this
+    7: [12, 15]     goes too far, split it up
+    14: [12, 13]    use this
+    15: [14, 15]    goes too far
+    30: [14, 14]    goes too far, done.
+
+
+Looks kiiiind of similar to query(L, N-1).
+What do I do when I step too far?
+
+If current node
+
+
+firstTrue(L, l, r) ?
+
+
+Find the first chunk that starts at L and doesn't violate check().
+    If current chunk starts < L:
+        If L >= m+1: curr.r
+        Else: curr.l
+
+    If current chunk starts
+
+
+
 .
