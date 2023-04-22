@@ -632,15 +632,15 @@ typename enable_if<is_iterable_v<A>, string>::type tsdbg(A v) {
     return res;
 }
 
-template<typename T>
-V<T> pqueue_to_iterable(priority_queue<T> PQ) { // PASS BY VALUE!
+template<typename T, typename A, typename B>
+V<T> pqueue_to_iterable(priority_queue<T,A,B> PQ) { // PASS BY VALUE!
     V<T> working;
     while (!PQ.empty()) {working.push_back(PQ.top()); PQ.pop();}
     // reverse(all(working));
     return working;
 }
-template <typename T>
-string tsdbg(priority_queue<T> PQ) {
+template<typename T, typename A, typename B>
+string tsdbg(priority_queue<T,A,B> PQ) {
     return tsdbg(pqueue_to_iterable(PQ));
 }
 
