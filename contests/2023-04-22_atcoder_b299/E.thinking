@@ -1,0 +1,10 @@
+
+I think just
+1. Mark vertices that are within distance d_j-1 from point p_j.
+2. See whether it works when we make all other vertices black.
+
+*****
+
+I didn't previously notice the condition that at least one vertex must be black.
+
+.

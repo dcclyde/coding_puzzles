@@ -1,0 +1,38 @@
+
+Given A with length L.
+Contains each int 1..N at least once.
+
+I want the smallest permutation that can be obtained as a subseq of A.
+
+L <= 2e5.
+
+**************
+
+I could imagine asking questions like
+Is it OK to wait and grab a 1 first?
+    What's the position of the first 1?
+    Would I be able to finish if I only have 1 when I get that far?
+
+    What's the shortest suffix that has all but 1 value?
+
+
+!!!!!
+
+I should build and update:
+What is the last occurrence of v for each value?
+
+First item I pick should be min over 0 .. first "last occurrence".
+Choose the first occurrence of that value.
+
+Then wipe out:
+    all copies of the number I picked.
+    Everything before the occurrence I picked.
+
+
+I think I could just use a regular segtree for the queries.
+Store (value, position) and take mins.
+Find (position, value) for last occurrences and sort it.
+
+
+
+.

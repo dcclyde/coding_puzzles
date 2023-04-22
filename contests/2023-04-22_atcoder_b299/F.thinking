@@ -1,0 +1,24 @@
+
+len <= 100.
+
+How many strings T satisfy: TT is a subseq of S.
+
+!!!
+
+dp[n] = num substrings of 0..n-1 that are square-subseq of S ???
+
+dp[a][b] = num substrings ending with S[a] and S[b]?
+
+
+dp[a][b] = ?
+    Find c, d with c < a < d < b and S[c] == S[d].
+    Then we could score dp[c][d] points.
+
+    Be careful: We don't want to generate the same T twice.
+
+    I guess: Starting from (c, d), we only add to the first possible a and b per character.
+
+
+
+
+.
