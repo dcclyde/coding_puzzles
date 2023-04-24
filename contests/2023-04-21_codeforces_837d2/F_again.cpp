@@ -893,6 +893,7 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
+#pragma region  // PersistentSegTree
 /**
  * Description: Persistent min segtree with lazy updates, no propagation.
  	* If making \texttt{d} a vector then save the results of
@@ -905,29 +906,32 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
  	* https://codeforces.com/gym/102423/submission/70170291
  */
 
-tcT, int SZ> struct pseg {
-	// static const int LIM = 1.25e7;  // TODO Get rough numbers to help set this.
-    static const int LIM = 5e6;  // ok
-    static const int sz = SZ;
+template<class T, class S, int NODES_ALLOCATED> struct PersistentSegTree {
+    static const int LIM = NODES_ALLOCATED;
+    int SZ=-1; int n=-1; int orig_n = -1;
+    static const T idT = 0;  // ! IDseg
+    static const S idS = 0;  // ! IDlazy
+	static T cmb(T a, T b) { return a^b; }  // ! seg * seg
+    static T lazy_seg(S lazy, T seg) { return lazy ^ seg; }  // ! lazy * seg
 	struct node {
-		int l, r; T val = 0, lazy = 0;
-		void inc(T x) { lazy ^= x; }  // ! lazy * lazy
-		T get() { return val^lazy; }  // ! lazy * seg
+		int l=-1, r=-1; T val = idT, lazy = idS;
+		void inc(S x) { lazy ^= x; }  // ! lazy * lazy
+		T get() { return lazy_seg(lazy, val); }
 	};
-	node d[LIM]; int nex = 0;
+	node d[NODES_ALLOCATED]; int nex = 0;
 	int copy(int c) { d[nex] = d[c]; return nex++; }
-	T cmb(T a, T b) { return a^b; }  // ! seg * seg
-	void pull(int c) { d[c].val =
+	void pull(int c) {
+        d[c].val =
 		cmb(d[d[c].l].get(), d[d[c].r].get()); }
 	//// MAIN FUNCTIONS
 	T query(int c, int lo, int hi, int L, int R) {
 		if (lo <= L && R <= hi) return d[c].get();
-		if (R < lo || hi < L) return 0;  // ! IDseg
+		if (R < lo || hi < L) return idT;
 		int M = (L+R)/2;
-		return d[c].lazy ^ cmb(query(d[c].l,lo,hi,L,M),
-							query(d[c].r,lo,hi,M+1,R));  // ! lazy * seg (again)
+		return lazy_seg(d[c].lazy, cmb(query(d[c].l,lo,hi,L,M),
+							query(d[c].r,lo,hi,M+1,R)));
 	}
-	int upd(int c, int lo, int hi, T v, int L, int R) {
+	int upd(int c, int lo, int hi, S v, int L, int R) {
 		if (R < lo || hi < L) return c;
 		int x = copy(c);
 		if (lo <= L && R <= hi) { d[x].inc(v); return x; }
@@ -936,7 +940,7 @@ tcT, int SZ> struct pseg {
 		d[x].r = upd(d[x].r,lo,hi,v,M+1,R);
 		pull(x); return x;
 	}
-	int build(const V<T>& arr, int L, int R) {
+	int build(const auto& arr, int L, int R) {
 		int c = nex++;
 		if (L == R) {
 			if (L < sz(arr)) d[c].val = arr[L];
@@ -946,16 +950,102 @@ tcT, int SZ> struct pseg {
 		d[c].l = build(arr,L,M), d[c].r = build(arr,M+1,R);
 		pull(c); return c;
 	}
+
+    #pragma region  // lstTrue_from_base. TODO add fstTrue_from_base.
+    // ~ lstTrue_from_base(L, check(v,r)) == lstTrue(L, orig_n-1, check(query(L,r), r)).
+    int lstTrue_from_base(int L, int time, auto&& check) {
+        int c = time;
+        int l = 0; int r = n-1;
+        auto m = [&]() -> int {return (l+r)>>1;};
+
+        // dbgcBold("lsR", L, MT(l,r), this, loc);
+        // Special case: Check if the whole array is valid.
+        if (l == r) {return l-1+check(d[c].get(), r);}
+        if (L == 0 && check(d[c].get(), r)) {return orig_n-1;}
+        V<int> path;  // path holds all ancestors of c.
+        auto move_DL = [&]() -> void { path.push_back(c); c = d[c].l; r=m(); };
+        auto move_DR = [&]() -> void { path.push_back(c); c = d[c].r; l=m()+1; };
+        auto move_U = [&]() -> void {
+            int len = r-l+1;
+            if (d[path.back()].l == c) { r += len; }
+            else { l -= len; }
+            c = path.back(); path.pop_back();
+        };
+        auto move_R = [&]() -> void {
+            int steps = 0;
+            while (d[path.back()].r == c) { move_U(); ++steps; }
+            c = d[path.back()].r; int len=(r-l+1); l+=len; r+=len;
+            rep(steps) { move_DL(); }
+        };
+
+        while (l != L) {
+            // dbgc("stage 1", l,r, L, path);
+            if (L <= m()) {move_DL();}
+            else {move_DR();}
+        }
+
+        T wip = idT;
+        while (true) {
+            T fut = cmb(wip, d[c].get());
+            // dbgcP("stage 2", l,r, "", fut, path);
+            if (check(fut,r)) {  // If we can safely add this chunk...
+                wip = fut;
+                if (r == n-1) {
+                    // We've reached the end.
+                    return orig_n-1;
+                } else if (d[path.back()].r == c) {
+                    // This was a right child.
+                    move_U(); move_R();
+                } else {
+                    // This was a left child.
+                    move_R();
+                }
+            } else { break; }
+        }
+
+        // (l,r) would reach too far.
+        while (l != r) {
+            // does DL reach too far?
+            T fut = cmb(wip, d[d[c].l].get());
+            // dbgcB("stage 3", l,r, "", fut, path);
+            if (check(fut,m())) {wip = fut; move_DR();}
+            else {move_DL();}
+        }
+        int out = l-1;
+        ckmin(out, orig_n-1);
+        // dbgR(out); el;
+        return out;
+    }
+    #pragma endregion  // lstTrue_from_base
+
+
 	vi loc; //// PUBLIC
-	void upd(int lo, int hi, T v) {
+	void upd(int lo, int hi, S v) {
 		loc.pb(upd(loc.bk,lo,hi,v,0,SZ-1)); }
 	T query(int ti, int lo, int hi) {
 		return query(loc[ti],lo,hi,0,SZ-1); }
-	void build(const V<T>&arr) {loc.pb(build(arr,0,SZ-1));}
-    void clear() { nex = 0; loc.clear(); }
+
+    void clear() { FOR(c, 0, nex) {d[c] = {};} nex = 0; orig_n = n = SZ = -1; loc.clear(); }
+	template<typename A> void build(const V<A>& arr) {
+        assert(arr.size()==orig_n && SZ>0); loc.pb(build(arr,0,SZ-1));}
+    template<typename A> void init(const V<A>& arr) {
+        clear(); orig_n = arr.size(); for (n = 1; n < orig_n; ) n *= 2; SZ=n; build(arr); }
+	void init(int n_) { init(V<T>(n_)); }
 };
 
-pseg<int, 200'001> pst;
+template<class T, class S, int NODES>
+string tsdbg(PersistentSegTree<T, S, NODES>* st) {
+    int c = st->loc.bk;
+	assert(st->orig_n != -1);
+	V<T> out;
+	FOR(k, 0, st->orig_n) {out.pb(st->query(c, k, k));}
+    return tsdbg(out);
+}
+#pragma endregion  // PersistentSegTree
+
+// ! Remember to update LIM. Watch out for overflow!
+const int PSEG_NODES_ALLOCATED = 1.25e7;  // ~ TODO tune using custom invocation
+PersistentSegTree<int, int, PSEG_NODES_ALLOCATED> pst;
 custom_hash myhash;
 
 
@@ -987,7 +1077,8 @@ void solve() {
         pst.d[k] = {rng(), rng(), rng(), rng()};
     }
 
-    pst.build(V<int>(NN, 0));  // at time 0, it's all 0s.
+    // pst.build(V<int>(NN, 0));  // at time 0, it's all 0s.
+    pst.init(NN);
     FOR(k, 0, N) { pst.upd(dat[k], dat[k], myhash(dat[k])); }
 
     lls(Q);
@@ -1006,7 +1097,7 @@ void solve() {
         // Find the first leaf where pst.query(l, 0, j) != pst.query(r+1, 0, j).
         auto first_different = [&]() -> ll {
             ll L = 0;
-            ll R = pst.sz - 1;
+            ll R = pst.n - 1;
             int c1 = pst.loc[l];
             int c2 = pst.loc[r+1];
             if (pst.d[c1].get() == pst.d[c2].get()) {return NN;}

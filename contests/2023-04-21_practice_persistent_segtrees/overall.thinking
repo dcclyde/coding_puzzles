@@ -1,0 +1,43 @@
+Problems list: https://codeforces.com/blog/entry/56880
+
+
+? Aggregate values in [L, R] coming from positions <= P.
+    I can do this with a regular segtree, offline at least.
+    Segtree positions are array *values*.
+    Insert value at position P and then run all queries that use this end position.
+
+    PSEG would let me do this online though.
+
+? Find Kth smallest value from positions [L, R].
+    https://www.spoj.com/problems/MKTHNUM/
+    ! TODO code this.
+    It will need simultaneous binsearch in 2 pst timestamps.
+        (or just Mo's...)
+
+
+
+
+? Find Kth smallest *distinct* value from positions [L, R].
+    ~ Example: DISTNUM2.thinking.
+    ~ Super hard example: 226E.thinking. (Also needs HLD with ordered aggregation)
+
+    Pseg lets me solve this offline.
+    segtree positions = array values.
+    I can do simultaneous binsearch in query(0, v, time=R) vs query(0, v, time=L).
+        No, this is messier than I thought.
+        Ends up using persistent 2D range queries.
+
+    Alternate solutions?
+    Mo's algorithm should work if N sqrt(N) log(N) is fast enough.
+
+
+    ? Similar: Find smallest value that occurs odd number of times in [L, R].
+        ~ Example: 2023-04-21_codeforces_837d2/F.cpp
+            Also has code for running the simulaneous binsearch,
+            but assumes we start from 0.
+
+        Hash all the values.
+        Segtree positions = array values, operation = xor.
+
+
+.

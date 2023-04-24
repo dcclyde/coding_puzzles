@@ -1,0 +1,36 @@
+https://www.codechef.com/MAY16/problems/DISTNUM2
+
+Solution: https://discuss.codechef.com/t/distnum2-editorial/12566
+
+Everything is <= 1e5.
+
+I'd like to have segtree positions ~~ values.
+Then I could run binsearch on the segtree to answer queries.
+
+Maybe I can use P-seg to help handle one of the bounds?
+
+Process R: Set segtree dat[R] to 1. (Note it might already be at 1.)
+
+Query(L, R):
+    Find first v such that query(0, v, time=R) >= query(0, v, time=L-1) + K.
+
+
+
+
+*****
+
+How do I normally count distinct elements in [L, R]?
+Update for R: Put 1 in position R. Erase the 1 in previous instance of same value.
+Query: Compute sum(L, R) using segtree.
+
+!!!!!
+
+For each array position k:
+Define (x, y, z) = (A[k], prev_occ, k).
+
+Count points with x <= T, y < L, z in [L,R].
+How do I do this with PSTs?
+    Solutions says: Do multi-dimensional range queries.
+    PST version just saves one factor of log since we can query the past on that dimension.
+
+.

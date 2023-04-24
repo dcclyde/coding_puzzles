@@ -1,0 +1,11 @@
+
+The total number of squads formed ever should be at most N*log(N).
+
+I'd like to know: Starting at s, what's the longest interval I could pick
+    that has <= K distinct values?
+
+* That sounds like fast binary search on a p-segtree.
+Do the normal setup for "count distinct in an interval" queries.
+Then use the pseg properties to run the queries I need.
+
+.

@@ -1,0 +1,19 @@
+
+N <= 35000, K <= 50.
+
+dp[k][n] = best score using k boxes on first n positions.
+dp[k][n] = max of distinct(p, n-1) + dp[k-1][p].
+
+I need dp[K][N].
+
+***
+
+! Version 1
+Segtree[p] = distinct(j+1, p) + dp[k-1][j].
+
+Then dp[k][n] = max of segtree for p <= n.
+
+I want to update it to hold distinct(p,n-1) +
+
+
+.

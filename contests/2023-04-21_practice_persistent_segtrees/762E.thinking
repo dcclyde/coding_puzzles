@@ -1,0 +1,30 @@
+
+K is fixed.
+Items like (x, r, f).
+Special pairs have f within distance K
+    and |x1-x0| <= r0
+    and |x1-x0| <= r1.
+
+**********
+
+Which dimension will be time?
+
+Add a new station at frequency f.
+Ask: How many stations
+
+
+
+Process events (x-r) and (x) and (x+r)?
+
+Process (x-r):
+    Station at x is now active.
+
+Process (x): Try to actually compute scores.
+    Query: How many stations in my range are currently active?
+    I only care about stuff within the right f range.
+    I could do the f range part using PSeg history? Just run 20 separate queries?
+
+
+! Checked their tutorial. It suggests skipping PSeg and just building the whole segtree 20 times.
+
+.

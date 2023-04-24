@@ -1,0 +1,22 @@
+
+Operations:
+
+0. Query total book count.
+1. Assign shelf[R, C] = 1
+2. Assign shelf[R, C] = 0
+3. Flip all bits on shelf R.
+4. Jump back to a historical position.
+
+~ Using PSeg:
+
+0: Query sum
+1: Assign a position
+2: Assign a position
+3: Flip a range
+4: Revert
+
+Seems like normal PSeg stuff.
+A little extra work due to the 2 operations though.
+At least they give 512 MB.
+
+.

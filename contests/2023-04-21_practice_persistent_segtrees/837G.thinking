@@ -1,0 +1,10 @@
+
+Forced online.
+
+Segtree stores the sum of all function values so far.
+Segtree position = x value.
+Insert all the functions one at a time.
+Then for solve(L, R, x) we should output
+    query(x, x, R) - query(x, x, L-1).
+
+.

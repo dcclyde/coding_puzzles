@@ -1,0 +1,28 @@
+
+I want to adapt lstTrue_from_base and fstTrue_from_base for pseg.
+
+I guess it's common to want to run this simultaneously across two different timestamps.
+
+
+Think about lstTrue_from_base(L, check, timestamp).
+Start at the top.
+
+Stage 1: Traverse to the bottom, moving to the child that includes L.
+
+Stage 2:
+    If current node goes too far, go to stage 3.
+    Add current node.
+    If this is a left child, move R in this layer.
+    If this is a right child, go U, then R in that layer.
+
+Stage 3:
+    If left subchild goes too far, go L.
+    Else, add left subchild. Then go R.
+
+Final answer is r-1.
+
+
+
+
+
+.

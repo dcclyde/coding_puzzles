@@ -1,0 +1,20 @@
+
+Working on a tree.
+
+update(c): "attack city c at time Y"
+
+query(a, b): kth item on the path from a to b,
+not counting stuff that was attacked after year Y.
+
+    Tree aspect: Seems like binary search in a HLD that holds a segtree.
+
+    At Y=0, all nodes hold value 1.
+    Attack a city: Set it to 0.
+    Query:
+        Binary search through year Y version vs current version.
+        Find first node where current query [a, x] is >= K + year y query [a, x].
+
+
+This looks hard to implement!
+
+.

@@ -1,0 +1,30 @@
+
+Given K in advance.
+Queries [L, R]. Needs to be online.
+
+*****
+
+For each R, I need to find smallest L that doesn't contain any bad stuff.
+I think I can just do it with a segment tree.
+Oh, but online....
+ok, I guess it should be a persistent segment tree.
+
+Increment R one at a time.
+Then if the value I just added is the Kth (or later) item with that number,
+    add a marker K-1 items ago.
+
+Query: How far back can I look while avoiding any markers?
+    Use max of that or L.
+    I need to query the version of the segtree that existed after marker update at "time R".
+
+
+
+I think I can avoid needing a binsearch formulation.
+Instead of putting the marker back there, I just put the marker in
+
+Every position stores position K-1 copies ago.
+I need a range [x, R] such that query(x, R) > x.
+OK, this still needs binsearch.
+
+
+.
