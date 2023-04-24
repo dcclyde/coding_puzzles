@@ -1,0 +1,19 @@
+
+N <= 2e5.
+
+I choose a permutation of length N.
+I need all prefix sums to be different mod N.
+
+I guess N has to come first.
+
+Example answers use prefix sum ordering like 0,  -1, 1,  -2, 2, ...
+                                             N, N-1, 2, N-3, 4, ...
+
+
+Alternate formulation: There shouldn't be any range in [1, N-1] that sums to 0 mod N.
+
+
+Try putting N, -1.
+"sub-prefixes" can't be 1.
+
+.

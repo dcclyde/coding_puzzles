@@ -1,0 +1,9 @@
+
+cost = max weightsum from root to leaf?
+
+All edges have the same weight, W.
+It costs C dollars to move my root 1 step.
+
+I think moving by 1 step should always increase score by W-C until we reach the diameter.
+
+.

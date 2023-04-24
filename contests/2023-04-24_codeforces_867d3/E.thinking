@@ -1,0 +1,14 @@
+
+If odd length, we lose.
+If most common character occurs > N/2 times, we lose.
+Else this should at least be possible?
+Just keep pairing current most common with 2nd most common.
+
+
+aaaa bbbb cc
+
+A A A A A B B
+C C C B B B B
+
+
+.

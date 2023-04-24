@@ -1,0 +1,81 @@
+
+Values <= B.
+
+"magic triple" means 3 distinct indices that form a geo series.
+Maybe this is sqrt decomposition stuff?
+well... there could be a ton of distinct items.
+
+I clearly only care about counts of each value.
+
+
+For Small, I guess the intended solution is to loop over all starting values
+    and also over all r <= sqrt(max_value / curr_value).
+
+
+For Large, I have sqrt(B) ~ 3e4.
+I assume the above is too slow?
+For value v, I pay sqrt(B/v).
+
+
+The ratio needs to be an integer...
+
+x*r = y and y*r = z
+x*z = y*y
+
+I could make a list of all y*y.
+Then I need to count pairs (x,z) with x*z in that list.
+
+
+Maybe there's a "simpler" trick?
+* I think it would be fine if I iterated over all pairs (x, y) with x | y.
+Is there a good way to do that?
+
+Start from x.
+Add x to my value or move to the next item in the list, whichever is bigger.
+
+
+***********
+
+Maybe some kind of DP?
+After I've found the nice multiples of x, I'd like to avoid repeating that work
+    to re-find different pairs among those later.
+
+
+***********
+
+geo sequence looks like cx^2, cxy, cy^2.
+Products are all integers but c, x, y might not be...
+
+m * a^2 / c^2
+m * a*b / (c*d)
+m * b^2 / d^2
+
+Given x, there are limited options for a.
+Then I could choose m = x/a^2.
+But I could also choose lots of different levels of c.
+
+
+
+!!!!!
+
+? Key idea:
+If ratio is small, just try em all. Costs N*R?
+If ratio is big, we need x <= B/R^2. Costs N * (B/R^2)?
+
+TODO Read editorial. I'm barely passing but this solution is faster...
+    Mine: https://codeforces.com/contest/1822/submission/203357131
+    Other: https://codeforces.com/contest/1822/submission/203296683
+
+!!!!!
+
+? Seems like it's also possible to take advantage of fast factorization somehow.
+Iterate over (y, yc).
+Factor y.
+Iterate over all factors of y?
+
+
+Yeah, this makes sense.
+I can iterate over (z, zc).
+Then iterate over all perfect square factors of z.
+
+.
