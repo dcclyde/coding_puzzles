@@ -1,0 +1,16 @@
+
+Need a permutation
+P[N] = 1
+P[1] = x
+P[2] is a multiple of 2
+P[3] is a multiple of 3
+etc...
+
+I guess basically I need a path that starts at x, moves to multiples, ends at N.
+What does "lex smaller" mean?
+Better to take smallest possible first(...) step.
+
+OK, so find prime factorization of N/x and use that.
+
+
+.

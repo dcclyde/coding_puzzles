@@ -1,0 +1,24 @@
+
+Given N.
+Find seq of length N such that max - min = sqrt(sum).
+
+I need to use DISTINCT integers.
+
+
+R-L >= N-1.
+
+0+1+...+N-1 = N(N-1)/2 =
+
+
+Try using "sum of gaps" = G.
+
+(M-m)^2 gives (N-1+G)^2.
+
+sum can be
+
+
+
+
+
+
+.

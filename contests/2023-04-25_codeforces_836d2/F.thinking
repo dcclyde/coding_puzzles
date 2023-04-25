@@ -1,0 +1,31 @@
+
+Infinite binary string.
+
+Update: toggle position x. 1 <= x <= 2e5.
+
+I need a list of ranges such that:
+    Covers all 1s.
+    All ranges have half 0s and half 1s.
+
+******************
+
+I could try to maintain:
+Start at first 1. Find any later position that makes a valid interval.
+Use that interval and then find the next 1 and so on.
+
+What would my update look like?
+
+Add a 1 somewhere.
+Extend or create an interval to cover it.
+    Suppose we extended an interval.
+    Now maybe it touches another interval.
+
+
+
+
+Remove a 1 somewhere.
+Interval gets smaller accordingly.
+Now maybe
+
+
+.

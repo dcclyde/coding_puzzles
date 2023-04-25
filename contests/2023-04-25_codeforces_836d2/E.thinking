@@ -1,0 +1,88 @@
+
+Given R, C, MOD.
+
+Legal moves: add 1 to any row or column.
+
+????????????????????????????????????????????????????????
+
+Let g = gcd(R, C).
+We can only ever add multiples of g to the total sum.
+
+
+Imagine we had a fully completed grid.
+First row exactly tells us what we should add to every column.
+
+If the grid is fully empty, can I just pick first row and col totally arbitrarily?
+Seems right.
+
+This is probably going to end up as a graph problem?
+Maybe something about connected components?
+    edges <--> rows where
+
+If I have known values for A[r][c1] and A[r][c2]
+    then I lose my degree of freedom for w(c2) - w(c1).
+
+    Draw an edge from c1 to c2.
+
+    Compute connected components in that graph.
+
+
+I could think of it as:
+Mark all constrained vertices.
+Iterate: if 3 corners of a rectangle are constrained, add the 4th.
+    If I add a new point: What new rectangles does this offer?
+
+
+
+
+
+
+It's like following a path where every other step is horiz vs vert.
+
+
+
+
+*****
+
+Eventually I should end up with a "sparse" full rectangle.
+~ Answer should be:
+    Check if all the new constraints are satisfied. If not, output 0.
+    Otherwise, suppose there are B blocks and r x c leftover after those blocks.
+    I think I should have MOD ^ (B-1 + r + c).
+        If there are no constraints, I should think of adding 1 constraint and getting B=1.
+
+Rows 1, 2, 3 are connected to each other and to cols 1, 2.
+That's a 3x2 block.
+
+
+
+
+
+*************
+
+This seems like some weird DSU type stuff?
+Given a new point (r, c) I should unite row r's chunk with column c's chunk.
+    If they were already united, I need to check for contradiction.
+
+Maybe just a DSU that has R+C vertices, one per row and per column.
+How can I compute the needed value at some position?
+
+
+I could think about just a graph with R+C vertices.
+I need to find the connected components, but I also need to propagate values.
+If I have edges ()
+
+
+
+Do a BFS?
+Start with value (0, 0).
+I'm at row r.
+Step using (r,c). Now I'm at col c.
+
+
+
+
+
+
+
+.

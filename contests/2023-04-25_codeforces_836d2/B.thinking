@@ -1,0 +1,24 @@
+
+Given N.
+I need xor of my array to equal average value.
+
+If N is odd, I can just choose all 1s, right?
+
+N even...
+a copies of x, b copies of y
+a, b odd
+xor is x^y
+average is (a*x + b*y) / (a+b)
+
+I need xor to be in between x and y.
+I could try x = 1, y = 3?
+No, then I'd need a = b = N/2.
+
+x = 1, y = 2k+1
+
+xor is 2k
+I need N * 2k == a + (N-a) * (2k+1)
+a = N / (2k)
+I need a to be odd. I should just pick k = 2 ^ (max pow2 dividing N, minus 1)
+
+.
