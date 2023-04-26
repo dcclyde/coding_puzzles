@@ -1,0 +1,17 @@
+
+Query N:
+    ae(1, N-1)
+    ae(2, N-2)
+    ...
+
+Query N+1
+    ae(1, N)
+    ae(2, N-1)
+
+
+Start anywhere, find the furthest.
+Then find distances from there.
+
+N-1, 0, N-2, 1, ...
+
+.

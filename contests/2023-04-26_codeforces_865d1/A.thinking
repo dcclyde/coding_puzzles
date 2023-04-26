@@ -1,0 +1,43 @@
+
+yes/no
+
+choose 1 adjacent
+add 1 to both or subtract 1 from both
+
+Wait... I wanted to think about these as practice but I'm realizing I actually read
+a bunch of these problems previously and solved in my head.
+
+Um.. I guess I still need the coding practice?
+
+~~~~~~~~~~~~~~~~
+
+I get to pick coefficients c_0, c_1, etc.
+
+Add c_0 times (1 1 00000000)
+c_1 times (0 1 1 0 0 0 0 0 0 0 0)
+etc
+
+What are my constraints here?
+b0 <= b1:
+    Need a0 <= a1 + c1
+    -c1 <= a1-a0
+
+b1 <= b2:
+    Need a1 + c0 <= a2 + c2
+    c0-c2 <= a2-a1
+
+    c1-c3 <= a3-a2
+
+    ...
+
+b(n-2) <= b(n-1)
+    need a(n-2) + c(n-3) <= a(n-1)
+    c(n-3) <= a(n-1) - a(n-2)
+
+
+Maybe:
+Always possible if N odd
+For N even, actually track the updates?
+
+
+.
