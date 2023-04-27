@@ -1,0 +1,19 @@
+
+2e5 nodes.
+2e5 directed edges.
+
+We want to know expected num visits to each vertex before reaching the absorbing state.
+
+https://en.wikipedia.org/wiki/Absorbing_Markov_chain#Expected_number_of_visits_to_a_transient_state
+
+Let Q be the transition matrix with absorbing state removed.
+We'd like to compute (I-Q)^{-1}.
+Really we only need one row of this matrix though.
+So I have some big sparse linear system and I need to solve it for one specific RHS.
+
+Probably this will be some kinda DP.
+The tree structure should matter? (as opposed to a graph)
+
+
+
+.

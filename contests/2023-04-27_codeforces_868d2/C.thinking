@@ -1,0 +1,38 @@
+
+"strongly composite": num prime divisors <= num composite divisors.
+    1 is neither.
+
+Given array A.
+I need to find array B:
+B has same product as A, and all items in B are strongly composite.
+B as big as possible.
+
+****************
+
+pqr:
+p q r
+pq qr pq pqr
+
+pq^2
+p q
+pq q^2
+
+
+
+p^2 is good
+    p
+    p^2
+
+
+pq
+    p q
+    pq
+
+
+OK, so I guess:
+pair everything up until we have
+
+
+
+
+.

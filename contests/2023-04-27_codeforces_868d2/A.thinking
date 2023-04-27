@@ -1,0 +1,6 @@
+
+Num pairs with a*b == N
+
+x 0s: Get x*(x-1) + (N-x)*(N-x)
+
+.

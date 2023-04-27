@@ -1,0 +1,52 @@
+
+length N
+K <= 20 conditions like:
+    prefix of length x_j has exactly c_j unique palindrome substrings.
+    Multiple copies of same substring don't count!
+
+Need to find a good string or report that none exist.
+
+Sort conditions by x_j of course.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Why is K = 20?
+Should I be just using binary strings for certain cases?
+    maybe doesn't make sense.
+* Maybe I should use a new letter with each query?
+
+
+Say I have a string of length N.
+Now I want to extend by S steps and get P more palindromes.
+
+c_j >= 3.
+
+~ What if P is 0?
+    Can't use any new letters.
+    If I ended with abc then I could continue repeating abcabcabc,
+        assuming I haven't already written a reversed version.
+
+    I could think about writing "ascending chunks" of size at least 3?
+
+~ If P in [1, S] then I think I could just add a new letter,
+    then add reversed version of recent stuff.
+
+
+
+* How would I make as many as possible?
+    OK, I can only add one new palindrome per letter I add.
+
+
+If I want new palindromes, add Z then some reversed stuff. Or just more Zs.
+If I don't want new palindromes...?
+a b c a b c a b c?
+    dp = 5, ds = 2
+        aaa b c   |   a b c dd
+
+    dp = 5, ds = 4
+        aaa b c   |   a dddd
+
+        a b ccccc
+
+
+.

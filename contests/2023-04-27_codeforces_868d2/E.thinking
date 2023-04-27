@@ -1,0 +1,27 @@
+
+Graph size 2e5.
+num vertices per move has to be in [L, R].
+
+********************
+
+Trying to do Grundy stuff:
+
+I'm currently at size N.
+I could kill any segment with size in [L, R].
+What grundy numbers can I achieve?
+
+I'll leave 2 segments.
+
+< L: 0
+L: 1
+
+
+
+Try searching for a specific grundy number?
+For each prefix of the array, I need to know if there's a suffix with acceptable length that has the needed xor.
+
+I guess I want some way to
+
+
+
+.
