@@ -893,87 +893,59 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 // ! ---------------------------------------------------------------------------
 
-ll ask_type1(ll a) {
-    cout << "+ ";
-    ps(a);
-    cout << flush;
-    lls(out);
-    assert(out == 1);
-    return out;
-}
-ll ask_type2(ll a, ll b) {
-    cout << "? ";
-    ps1(a, b);
-    cout << flush;
-    lls(out);
-    return out;
-}
-void finish(V<ll>& a, V<ll>& b) {
-    cout << "! ";
-    auto combined = a;
-    for(auto& x : b) {combined.push_back(x);}
-    pv1(combined);
-    cout << flush;
-    lls(out);
-    return;
-}
+
 
 
 
 
 void solve() {
-    lls(N);
-    dbgR(N);
+    lls(N, E);
+    V<V<ll>> G(N);
+    FOR(k, 0, E) {
+        ll1(a, b);
+        // G[a].emplace_back(b);
+        G[b].emplace_back(a);
+    }
+    dbgY(pdh(G));
     el;
 
-    ask_type1(N);
-    ask_type1(N+1);
-
-    V<ll> dist_from_0(N);
-    FOR(k, 1, N) {dist_from_0[k] = ask_type2(0, k);}
-    ll root = max_element(all(dist_from_0)) - dist_from_0.begin();
-    dbg(root, dist_from_0);
-    el;
-
-    V<ll> dist_from_root(N);
-    if (root == 0) {dist_from_root = dist_from_0;}
-    else {
-        FOR(k, 0, N) {
-            if (k == root) {continue;}
-            if (k == 0) {dist_from_root[k] = dist_from_0[root];}
-            dist_from_root[k] = ask_type2(root, k);
+    V<ll> depth(N, -1);
+    depth[0] = 0;
+    deque<ll> todo;
+    todo.push_back(0);
+    while (!todo.empty()) {
+        ll u = todo.front();
+        todo.pop_front();
+        for (ll v : G[u]) {
+            if (depth[v] == -1) {
+                depth[v] = depth[u] + 1;
+                todo.push_back(v);
+            }
         }
     }
-    dbg(dist_from_root);
 
-    V<ll> path;
+    V<V<ll>> nodes_per_depth(N);
     FOR(k, 0, N) {
-        if (k % 2 == 0) {path.push_back(N-1-k/2);}
-        else {path.push_back(k/2);}
+        if (depth[k] == -1) {return ps("INFINITE");}
+        nodes_per_depth[depth[k]].emplace_back(k);
     }
-    V<ll> pathinv(N);
-    FOR(k, 0, N) {
-        pathinv[path[k]] = k;
+    while (nodes_per_depth.back().empty()) {nodes_per_depth.pop_back();}
+    dbgY(pdh(nodes_per_depth));
+    ll MAX_DEPTH = nodes_per_depth.size() - 1;
+
+    V<ll> out;
+    FOR(step, 0, MAX_DEPTH+1) {
+        // dump everything in layers MAX_DEPTH through MAX_DEPTH - step.
+        FOR(layer, MAX_DEPTH-step, MAX_DEPTH+1) {
+            dbg(layer);
+            for(auto& x : nodes_per_depth[layer]) {
+                out.emplace_back(x);
+            }
+        }
     }
-    dbgY(path);
-    dbgB(pathinv);
-
-    /*
-        pathinv[k] = distance from N-1 to k on the undisguised path.
-        dist_from_root[k] = distance from root to k on the disguised path.
-        root --> N-1.
-            path[0] = N-1
-            pathinv[N-1] = 0
-            dist_from_root[root] = 0
-    */
-    V<ll> out1(N);
-    FOR(k, 0, N) { out1[k] = path[dist_from_root[k]]; }
-
-    reverse(all(path));
-    V<ll> out2(N);
-    FOR(k, 0, N) { out2[k] = path[dist_from_root[k]]; }
-
-    finish(out1, out2);
+    ps("FINITE");
+    ps(out.size());
+    pv1(out);
     return;
 }
 
