@@ -1,0 +1,18 @@
+
+Given A
+Given B
+
+I need to start with A, add something nonneg to each position, then rearrange to B.
+For each position, what's the smallest and biggest number I could add?
+
+***
+
+High end:
+I need the next place where the "diagonal inequality" doesn't work.
+
+
+10 20 30 40 50 60 70 80
+25 35 42 43 90
+
+
+.

@@ -1,0 +1,9 @@
+
+1: Remove min possible num vertices to reduce max matching size by exactly 1.
+2: Print exactly which edges are in that matching.
+
+First I just need to find some max matching.
+Then...
+
+
+.

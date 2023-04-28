@@ -1,0 +1,15 @@
+
+Arrays A, B
+Xor them together, then AND that together.
+
+I get to reorder A, B arbitarily to maximize the result.
+
+******
+
+Iterate over bits from top to bottom.
+Can I make bit b = 1?
+If yes: We've divided B into two chunks. We can't permute
+
+
+
+.

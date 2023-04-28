@@ -1,0 +1,24 @@
+
+S length <= 1e6
+query strings length <= 10
+
+"prefix function":
+    len of longest suffix that equals the corresponding prefix.
+
+*****
+
+OK, it's not quite as simple as just using KMP.
+I'm guessing the issue is:
+KMP takes O(N) time to precompute, but that's some potential energy stuff
+    and it may be lumpy.
+If they set up a test case that makes KMP take a long time on the last few chars,
+    we can get in trouble.
+
+
+aaaaaaaaaa b
+aaaaaaaaaa ab
+etc
+
+I'd like some way to say "we need to at least jump back to the last time we saw b".
+
+.
