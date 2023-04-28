@@ -267,8 +267,8 @@ auto stepped_iota(ll start, ll end, ll step=1) {
 // just as an example of how to iterate in reverse order
 // for(auto& x : dat | views::reverse) {}
 
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define FOR(...) GET_MACRO(__VA_ARGS__, FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
+#define GET_MACRO_5(_1,_2,_3,_4,_5,NAME,...) NAME
+#define FOR(...) GET_MACRO_5(__VA_ARGS__, , FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
 
 #pragma region  // rangeint
 V<int> rangeint(int start, int end, int inc=1) {
@@ -388,47 +388,6 @@ inline namespace Helpers {
     void decrement(auto& ...args) {(increment_one(args, -1), ...);} // subtract one from each, for input. MODIFICATION IS THE GOAL
 }
 
-inline namespace Input {
-    tcT> constexpr bool needs_input_v = !is_readable_v<T> && is_iterable_v<T>;
-
-    // re: read
-    void re(auto &...args);
-    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }  // pairs
-    tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
-    tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
-
-    template <class... Ts> void re(tuple<Ts...> &t) {
-        apply([](Ts &...args) { re(args...); }, t);
-    }
-
-    tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
-        each(x,i) re(x); }
-    void re(auto& ...args) { ((cin >> args), ...); } // read multiple
-
-    // rv: resize and read vectors
-    void rv(size_t) {}
-    tcTUU> void rv(size_t N, V<T>& t, U&... u);
-    template<class...U> void rv(size_t, size_t N2, U&... u);
-    tcTUU> void rv(size_t N, V<T>& t, U&... u) {
-        t.resize(N); re(t);
-        rv(N,u...); }
-    template<class...U> void rv(size_t, size_t N2, U&... u) {
-        rv(N2,u...); }
-    void rv1(size_t) {}
-    tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
-        t.resize(N); re(t); for(auto& x : t) decrement(x);
-        rv1(N,u...); }
-
-
-    // dumb shortcuts to read in ints
-    #define ints(...) int __VA_ARGS__; re(__VA_ARGS__);
-    #define int1(...) ints(__VA_ARGS__); decrement(__VA_ARGS__);
-    #define chars(...) char __VA_ARGS__; re(__VA_ARGS__);
-    #define lls(...) ll __VA_ARGS__; re(__VA_ARGS__);
-    #define ll1(...) lls(__VA_ARGS__); decrement(__VA_ARGS__);
-    #define strings(...) string __VA_ARGS__; re(__VA_ARGS__);
-}
-
 inline namespace ToString {
     tcT> constexpr bool needs_output_v = !is_printable_v<T> && is_iterable_v<T>;
 
@@ -545,8 +504,8 @@ inline namespace FileIO {
 }
 
 #pragma region  // debugging
-// * debug setup mostly stolen from tourist. https://codeforces.com/contest/1540/submission/120602670
-// * dcclyde added line numbers, colors, probably some other stuff.
+// * debug setup adapted from from tourist. https://codeforces.com/contest/1540/submission/120602670
+// * dcclyde added line numbers, colors, and some other stuff.
 
 // for dbg printouts of C arrays.
 template<typename T>
@@ -777,15 +736,19 @@ void debug_out(Head H, Tail... T) {
 #define OUT_RESET       "\033[0m"
 #define OUT_BOLD        "\033[;1m"
 #define OUT_RED         "\033[31" "m"
-#define OUT_CYAN        "\033[36" BOLD_MAYBE "m"
-#define OUT_DEFAULT OUT_CYAN
-// #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
 #define OUT_GREEN       "\033[32" "m"
+// #define OUT_GREEN       "\033[32" << BOLD_MAYBE << "m"
+#define OUT_YELLOW      "\033[33" BOLD_MAYBE "m"
 #define OUT_BLUE        "\033[34" BOLD_MAYBE "m"
+#define OUT_PURPLE      "\033[35" BOLD_MAYBE "m"
+#define OUT_CYAN        "\033[36" BOLD_MAYBE "m"
+#define OUT_BRIGHTBLUE  "\033[38;5;39m"
 #define OUT_WHITE       "\033[97" "m"
 #define OUT_MARK        "\033[0;30;41;1m"
-#define OUT_YELLOW      "\033[33" BOLD_MAYBE "m"
-#define OUT_PURPLE      "\033[35" BOLD_MAYBE "m"
+#define OUT_LTBLUE      "\033[96m"
+
+#define OUT_DEFAULT OUT_CYAN
+#define OUT_INPUTCOLOR OUT_WHITE
 
 
 #define dbgc(...) ;
@@ -803,6 +766,8 @@ void debug_out(Head H, Tail... T) {
 #define dbgcB(...) ;
 #define dbgW(...) ;
 #define dbgcW(...) ;
+#define dbgInput(...) ;
+#define dbgcInput(...) ;
 #define dbgGeneral(...) ;
 #define dbgcGeneral(...) ;
 #define dbg_only(...) ;
@@ -855,6 +820,11 @@ void debug_out(Head H, Tail... T) {
     #undef dbgcW
     #define dbgcW(MSG, ...) dbgcbase(OUT_GREEN, OUT_WHITE, MSG, #__VA_ARGS__, __VA_ARGS__)
 
+    #undef dbgInput
+    #define dbgInput(...) dbgcbase(OUT_GREEN, OUT_INPUTCOLOR, "", #__VA_ARGS__, __VA_ARGS__)
+    #undef dbgcInput
+    #define dbgcInput(MSG, ...) dbgcbase(OUT_GREEN, OUT_INPUTCOLOR, MSG, #__VA_ARGS__, __VA_ARGS__)
+
     #undef dbgGeneral
     #define dbgGeneral(COLOR, ...) dbgcbase(OUT_GREEN, COLOR, "", #__VA_ARGS__, __VA_ARGS__)
     #undef dbgcGeneral
@@ -871,7 +841,68 @@ void debug_out(Head H, Tail... T) {
 #endif
 #pragma endregion
 
-#define timebomb(a) dbg_only({static int _bomb = 0; if(++_bomb>=a) {dbgcBold("boom!", a);exit(1);}});
+inline namespace Input {
+    tcT> constexpr bool needs_input_v = !is_readable_v<T> && is_iterable_v<T>;
+
+    // re: read
+    void re(auto &...args);
+    tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }  // pairs
+    tcT> void re(complex<T>& c) { T a,b; re(a,b); c = {a,b}; } // complex
+    tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i); // ex. vectors, arrays
+
+    template <class... Ts> void re(tuple<Ts...> &t) {
+        apply([](Ts &...args) { re(args...); }, t);
+    }
+
+    tcT> typename enable_if<needs_input_v<T>,void>::type re(T& i) {
+        each(x,i) re(x); }
+    void re(auto& ...args) { ((cin >> args), ...); } // read multiple
+
+    // rv: resize and read vectors
+    void rv(size_t) {}
+    tcTUU> void rv(size_t N, V<T>& t, U&... u);
+    template<class...U> void rv(size_t, size_t N2, U&... u);
+    tcTUU> void rv(size_t N, V<T>& t, U&... u) {
+        t.resize(N); re(t);
+        rv(N,u...); }
+    template<class...U> void rv(size_t, size_t N2, U&... u) {
+        rv(N2,u...); }
+    void rv1(size_t) {}
+    tcTUU> void rv1(size_t N, V<T>& t, U&... u) {
+        t.resize(N); re(t); for(auto& x : t) decrement(x);
+        rv1(N,u...); }
+
+
+    // dumb shortcuts to read in ints
+    #define readBase(TYPE, ...) TYPE __VA_ARGS__; re(__VA_ARGS__); dbgInput(__VA_ARGS__);
+    #define readBase1(TYPE, ...) TYPE __VA_ARGS__; re(__VA_ARGS__); decrement(__VA_ARGS__); dbgInput(__VA_ARGS__);
+    #define ints(...) readBase(int, __VA_ARGS__);
+    #define int1(...) readBase1(int, __VA_ARGS__);
+    #define chars(...) readBase(char, __VA_ARGS__);
+    #define char1(...) readBase1(char, __VA_ARGS__);
+    #define lls(...) readBase(ll, __VA_ARGS__);
+    #define ll1(...) readBase1(ll, __VA_ARGS__);
+    #define strings(...) readBase(string, __VA_ARGS__);
+
+    #define vecs_1(TYPE, SIZE, A) V<TYPE> A; rv(SIZE, A); dbgInput(SIZE, A);
+    #define vecs_2(TYPE, SIZE, A, B) vecs_1(TYPE, SIZE, A); vecs_1(TYPE, SIZE, B);
+    #define vecs_3(TYPE, SIZE, A, B, C) vecs_1(TYPE, SIZE, A); vecs_2(TYPE, SIZE, B, C);
+    #define vecs_4(TYPE, SIZE, A, B, C, D) vecs_1(TYPE, SIZE, A); vecs_3(TYPE, SIZE, B, C, D);
+    #define vecs_5(TYPE, SIZE, A, B, C, D, E) vecs_1(TYPE, SIZE, A); vecs_4(TYPE, SIZE, B, C, D, E);
+    #define vec1_1(TYPE, SIZE, A) V<TYPE> A; rv1(SIZE, A); dbgInput(SIZE, A);
+    #define vec1_2(TYPE, SIZE, A, B) vec1_1(TYPE, SIZE, A); vec1_1(TYPE, SIZE, B);
+    #define vec1_3(TYPE, SIZE, A, B, C) vec1_1(TYPE, SIZE, A); vec1_2(TYPE, SIZE, B, C);
+    #define vec1_4(TYPE, SIZE, A, B, C, D) vec1_1(TYPE, SIZE, A); vec1_3(TYPE, SIZE, B, C, D);
+    #define vec1_5(TYPE, SIZE, A, B, C, D, E) vec1_1(TYPE, SIZE, A); vec1_4(TYPE, SIZE, B, C, D, E);
+
+    #define vecs(TYPE, SIZE, ...) GET_MACRO_5(__VA_ARGS__, vecs_5, vecs_4, vecs_3, vecs_2, vecs_1)(TYPE, SIZE, __VA_ARGS__);
+    #define vec1(TYPE, SIZE, ...) GET_MACRO_5(__VA_ARGS__, vec1_5, vec1_4, vec1_3, vec1_2, vec1_1)(TYPE, SIZE, __VA_ARGS__);
+
+    // #define vecs(TYPE, SIZE, ...) V<TYPE> __VA_ARGS__; rv(SIZE, __VA_ARGS__); dbgInput(__VA_ARGS__);
+    // #define vec1(TYPE, SIZE, ...) V<TYPE> __VA_ARGS__; rv1(SIZE, __VA_ARGS__); dbgInput(__VA_ARGS__);
+}
+
+#define timebomb(a) dbg_only({static int _bomb=a;if(_bomb<=0) {dbgcBold("boom!", a);assert(false);exit(1);} dbgcR("timebomb", _bomb); --_bomb;});
 
 #define YES ps("YES");
 #define NO ps("NO");
@@ -900,9 +931,7 @@ const int INF_i = 2'000'000'001;  // 2e9 + 1
 
 void solve() {
     lls(N);
-    V<ll> dat;
-    rv(N, dat);
-    dbgR(N, dat);
+    vecs(ll, N, A);
     el;
 
     // ! Read the sample cases AND EXPLANATIONS before writing code for nontrivial problems!
