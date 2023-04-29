@@ -1,0 +1,18 @@
+
+Start with 1.
+*multiply* by some fair d6 rolls.
+
+*****
+
+Start by factoring N.
+It needs to be only 2s, 3s, 5s.
+Now do DP over divisors?
+
+
+Target is 6.
+
+2, 3
+3, 2
+6
+
+.

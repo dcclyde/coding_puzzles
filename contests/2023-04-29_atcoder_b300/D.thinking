@@ -1,0 +1,9 @@
+
+p^2 q r^2, p < r < r
+
+Generate primes up to 1e6.
+
+pr is up to 1e6.
+Then need prime multiples of (pr)^2.
+
+.

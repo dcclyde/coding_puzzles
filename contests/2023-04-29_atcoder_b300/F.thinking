@@ -1,0 +1,7 @@
+
+binary string, length <= 3e5
+We'll use M copies of the string. 1 <= M <= 1e9.
+
+Replace K 0s with 1s. Want biggest possible substring of 1s.
+
+.
