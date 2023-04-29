@@ -1,0 +1,12 @@
+
+N <= 100
+Find permutation such that the sum of any interval is not divisible by len(interval).
+
+*****
+
+Parity needs to alternate.
+
+Mod 3?
+1 2 1 0 0 2
+
+.

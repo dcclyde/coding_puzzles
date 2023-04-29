@@ -1,0 +1,36 @@
+
+N <= 2000
+E <= 2000
+
+Need a cycle.
+Need one of those vertices to have deg >= 4.
+    Those extra edges can't point into the cycle.
+
+*****
+
+Look for triangle cycles:
+    For each v
+    For each neighbor w
+
+
+Start somewhere with deg >= 4
+Find a cycle
+
+I think we just need any cycle including a deg >= 4.
+
+If a deg >= 4 node is NOT part of any cycle,
+    it means deleting this node breaks into 4 connected components.
+
+
+It's OK to spend O(N) time at each node we check.
+For each node:
+    Try each child.
+    Do a full BFS tracking parents from this child,
+        ignoring edges from root to children we previously tried.
+    If we get back to root, we have a cycle.
+
+    Runtime should be OK because if a child doesn't work then we won't
+        look at his subtree any more during the rest of the checks
+        with this root.
+
+.

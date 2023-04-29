@@ -1,0 +1,37 @@
+
+Given 2 polys A, B of degree d.
+We know their values at 0, 1, 2, ..., d.
+
+They promise that B(x) = A(x+s) for some s, mod MOD.
+We need to find s.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+This isn't quite the same as saying B(x) = A(x+s) as polynomials.
+    Think about p=2 and x^2 + x.
+
+
+Would it help if we had coefficients for A, B?
+    We could think about how to compute Lagrange interpolation to get those.
+
+
+Maybe we should think about what A(x+1) looks like?
+
+A(x+s) = a_n x^
+
+
+
+***********
+
+OK, actually I think B(x) = A(x+s).
+The difference has p roots and degree <= d, so it must be 0.
+
+
+If I have coefficients a_d, a_{d-1}, b_d, b_{d-1} then I think I can win.
+    Just compute the top two coefficients of A(x+s) and match em up.
+
+
+
+.

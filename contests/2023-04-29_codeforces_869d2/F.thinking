@@ -1,0 +1,75 @@
+
+Let M = (N+1)/2.
+
+If K is M: Press D L.
+
+If K == M-1: RDL
+
+If K == M+1: Don't need a special case.
+
+
+Actually I don't need any special cases for this.
+
+
+If K <= M, move it left.
+    L puts 1 in the corner.
+    DRUL increments what's in that corner. So do this K-1 times.
+
+If K >= M, move it right first.
+    R puts N-2 in the corner.
+    DLUR decrements what's in that corner. So do this N-2-K times.
+
+    DL moves K into the left half.
+        How many items in top left vs bottom left?
+        N-2 items total.
+        (N-3)/2 items are on the right, since right bottom is full.
+
+        Top gets slightly more than half of what's left.
+        But also top gets at most N-K.
+
+
+
+        Top left:
+            min(N-K, )
+
+
+    If topleft > botleft:
+        URDRUL moves K into the left half with nothing in the left bottom.
+        Afterward, botleft things are left of me.
+        Use DRUL that many times.
+
+    Else:
+        UR:
+        botleft becomes topleft.
+
+        DRUR repeatedly to move stuff to right.
+        botleft times.
+        Now there are 2*botleft things to my left.
+
+        L
+        Now I need DRUL per thing to my left.
+
+
+
+
+
+    Now I need DRUL per item ahead of K. How many is that?
+        B = K-N items originally ahead of K on the first part.
+        The number ahead of K when we push back left is like
+        min(
+            B+1
+            something like N/4?
+        )
+
+        If N is 1 mod 4, I think this is just good.
+
+    How many fit in the right bottom area?
+        (N-3) / 2.
+
+
+***********
+
+Update: I didn't finish debugging. C got a solution working in Python so I stopped.
+
+
+.
