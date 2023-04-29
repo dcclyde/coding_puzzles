@@ -1,0 +1,12 @@
+
+Replace A_k with dist(A_k, x).
+
+
+x is closer to (or equal) a0 than a1
+a1 than a2
+etc
+
+a0, a1:
+
+
+.

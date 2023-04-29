@@ -1,0 +1,15 @@
+
+Given starting array.
+All nums are blue.
+Possible turns:
+    1. Color one element blue.
+    2. Permute, but not allowed to move any red stuff.
+    3. Do nothing.
+
+*****
+
+X - num positions that ONLY player 1 needs to mess with
+Y - num positions only player 2 needs to mess with
+Z - num both players need to mess with
+
+.
