@@ -1,0 +1,30 @@
+
+Binary strings A, B, C.
+
+Given to me as A+B+C without spaces.
+
+I know that C is *not* the first string lexicographically.
+
+Find one valid break, or print :(.
+
+*****
+
+Find a 0. Make it B.
+
+If the whole string is 1s, that's fine. First char in its own string.
+
+If the very last character is the only 0?
+
+OK, so the only sad case should be exactly "110".
+
+*****************
+
+Misunderstood the question :/
+
+! B needs to be *either* biggest *or* smallest.
+
+If there's a 0 in interior, make it B.
+If not, maybe OK for B to be the whole interior?
+
+
+.

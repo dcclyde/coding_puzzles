@@ -1,0 +1,11 @@
+
+L, X up to 1e18.
+
+Find the first R such that AND of L..R equals X.
+
+*****
+
+I guess - think about each bit separately.
+For each bit, find the first R such that this bit will be set.
+
+.

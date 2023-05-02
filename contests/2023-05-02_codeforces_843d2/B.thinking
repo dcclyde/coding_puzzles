@@ -1,0 +1,11 @@
+
+Given an array (or lists of bits at least).
+Need to know: Are there 2 distinct subseqs with the same OR?
+    They don't need to use up the whole array.
+    They can overlap.
+
+*****
+
+I should probably consider subseqs like "whole array" vs "whole array minus 1 thing".
+
+.

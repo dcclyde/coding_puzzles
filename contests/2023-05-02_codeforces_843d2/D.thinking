@@ -1,0 +1,30 @@
+
+N <= 2e5
+A_j <= 3e5
+
+Given start, finish.
+Need to find a shortest path from start to finish
+where each edge satisfies gcd(A[u], A[v]) > 1.
+
+*****
+
+I basically want to run BFS but need to watch out for the number of edges.
+If every position is 2*3*5*7 then I'll try everything 4 times...
+Maybe still okay? Primorial grows pretty fast.
+
+What's the total number of prime divisors across all A_j?
+Nobody can have more than 6 prime divisors.
+
+
+If everything is 6:
+Start at START.
+Insert everything. Actually check everything twice.
+Move to some other position. Try to insert everything again.
+
+This is gonna be O(N^2).
+
+I can do better by tracking which primes I've already tried.
+
+
+
+.

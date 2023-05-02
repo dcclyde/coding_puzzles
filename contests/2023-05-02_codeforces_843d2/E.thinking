@@ -1,0 +1,43 @@
+
+N <= 2e5
+| A_j | <= 1e9
+
+Operation:
+Choose a subseq
+apply +1, -1, +1, -1, ...
+    or the reverse.
+
+************************
+
+Suppose A[0] > 0.
+We definitely need A[0] operations that start here with a minus.
+
+This feels like it should be DP.
+
+
+Maybe just greedy?
+Grab the biggest absolute value.
+This can kill a lot of stuff.
+At most half of the array will remain?
+
+Hmmmm...
+10 -1 -8
+
+100 ... 10 10 ... 20
+
+
+100 20 30 -10 -50 20 8
+
+            (score, -, +)
+process 100. (100, 100, 0)
+process 20. (120, 120, 0)
+process 30. (150, 150, 0)
+process -10. (150, 140, 10).
+process -50. (150, 90, 60)
+Process 20. (150, 110, 40).
+Process 8.  (150, 118, 32).
+
+Can I do it with less than 150?
+
+
+.
