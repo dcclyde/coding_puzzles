@@ -1,0 +1,17 @@
+
+Everything needs to appear even number of times, EXCEPT the largest value.
+I need seq of N elements summing to S.
+
+Elements need to be >= 1.
+S <= 1e9.
+
+*****
+
+If the number of elements is even then the sum should be even.
+If N odd then S could be "whatever".
+Always need S >= N though.
+
+Choose all 1s then something huge?
+If N is even then split the huge thing in half?
+
+.

@@ -1,0 +1,61 @@
+
+p(5) = 13
+then p(12) or p(13) or p(14) must be 5.
+
+Probably we'll start getting some cycle structure.
+
+If I have cycle (5, 13) then that's all good.
+
+Otherwise I could have like
+5       13
+14      5
+13      something next to 5. Say 4
+4       12 or 14. Say 12 because that might cause a contradiction?
+12      3
+3       11
+yeah, this is bad.
+
+
+5       13
+14      5
+13      4
+4       14
+
+this seems okay.
+
+So we have N elements and we need to break into A singles, B adj pairs, C leftovers
+    with A, B even.
+    Then our score will be the number of ways to pair up all the As and all the Bs.
+    I think that's A! / (A/2)! / 2^(A/2).
+
+Say I use B adj pairs.
+    Maybe binom(N-B, B) ways to choose the pairs?
+    Then I have N-2B elements left.
+
+How many ways to handle the remaining singles?
+f(0) = 1
+f(1) = 1
+f(2) = 2
+f(n) = (n-1) * f(n-2) + f(n-1).
+
+****************
+
+N = 4:
+    B = 0:
+        (nothing)
+        12
+        13
+        14
+        23
+        24
+        34
+
+        12 34
+        13 24
+        14 23
+
+    B = 2:
+
+
+
+.

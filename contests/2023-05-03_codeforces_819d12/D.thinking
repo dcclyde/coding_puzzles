@@ -1,0 +1,37 @@
+
+Connected graph.
+E <= N+2.
+
+Color some edges.
+I want num connected components in the red graph + num CCs in blue graph to be small.
+
+~ I need to output a full coloring (that ties for optimal result).
+
+*****
+
+If the graph is a tree, I guess it doesn't matter what I do.
+Each missing edge always adds 1 CC.
+
+I bet basically I should detect "unneeded" edges and color those differently?
+
+? No. First sample case shows this doesn't work.
+
+* That attempt also doesn't take advantage of E <= N+2...
+
+I have a tree plus at most 3 extra edges.
+That means the approach above should always work EXCEPT
+for the very specific case where the 3 extra edges can be in a triangle.
+
+Say I got the triangle (a, b, c).
+That means there's some other path from a to b.
+I should uncolor (a, b) and instead color any other edge on the path from a to b?
+
+********
+
+Remove edge from triangle corner v to parent,
+add some edge involving v from the triangle?
+What if the new edge points into v's subtree though?
+
+Maybe take v to be the deepest vertex from the triangle?
+
+.

@@ -1,0 +1,28 @@
+
+All pairs at top level are connected.
+
+All pairs at any given level are connected UNTIL we go outside that level.
+Then we'll get a new group at level L.
+
+
+0 1 2 3 4 3 4 3 2 3 4 5 4 3 2 3 2 1 0?
+ ( ( ( ( ) ( ) ) ( ( ( ) ) ) ( ) ) )
+
+0: 1
+1: 1
+2: 1
+
+Go up one: Always counts?
+
+3 2 1: now 2 would start a new chunk.
+
+0 1 2 3 2 1 0
+((()))
+
+0 1 2 1 0 1 2 1 0
+ ( ( ) ) ( ( ) )
+
+
+((((()))))
+
+.
