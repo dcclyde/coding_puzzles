@@ -1,0 +1,24 @@
+
+X is written.
+Operation: Write X+1.
+How long will it take before I've seen all digits base P?
+
+N <= 100
+P <= 1e9.
+
+***
+
+If p is big, I definitely will need to make most of a loop in 1s place.
+
+I could handle p
+
+
+What's the last digit I'll need to create in 1s place?
+
+
+I guess:
+For each A[k], and each A[k]+1, I can directly compute the first time it'll show up.
+Other values will all just show up in the 1s place.
+
+
+.

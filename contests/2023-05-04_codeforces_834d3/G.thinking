@@ -1,0 +1,68 @@
+
+Given N and B.
+
+???????????????????????????????????????????????????????????
+
+I need to pair up the numbers not present in B.
+
+Probably I could do it mostly greedily?
+How do I know whether I've messed up?
+
+X[k] = num available and <= B_sorted[k].
+It's bad if X[k] <= k.
+
+***
+
+Try pairing leftover[0] with B[0].
+Now B[0] is happy forever.
+X[k] -= 1 in other positions where leftover[0] <= B_sorted[k].
+
+Seems like a segtree on values of B?
+Store infinity if B doesn't contain this value or it's already satisfied.
+We care about tracking (num available < this value) - (index in sorted list)
+
+Query:
+    I want to find the largest value where delta = 1.
+    If there are none, I want the smallest value where delta < INF.
+    * These both work on a min-segtree.
+
+Update:
+    Assign a value.
+    Assign that position as 2*INF.
+    All larger values recieve -1.
+
+~ Seems like a lazy min-segtree.
+
+
+************
+
+Permutation is . 4 . 3 . 6
+
+I'm placing 1.
+segtree says 4 and 6 are in danger, so it needs to pair with one of those.
+Is leftmost good?
+
+
+
+Permutation is . 6 . 4 . 2
+
+I'm placing 1.
+
+
+
+. 3 . 8 . 6 . 4
+1   7   5   2
+
+
+Given 3 8 6 4
+num available looks like
+
+(0) 1 2 1 0 1 0 1 0
+
+
+Place numbers from biggest to smallest?
+Placing 7: What's the rightmost position that's > 7?
+
+
+
+.
