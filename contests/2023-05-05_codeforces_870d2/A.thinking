@@ -1,0 +1,13 @@
+
+Person k says there are at LEAST k false things.
+
+If there are L liars, it must be the people with high numbers, right?
+
+
+If they're lying, then the true answer must be < A[k].
+
+~ Sort A.
+
+
+
+.

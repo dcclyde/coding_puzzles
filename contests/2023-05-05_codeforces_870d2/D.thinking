@@ -1,0 +1,12 @@
+
+Score = (sum of 3 biggest values in interval) - (interval length).
+
+***********
+
+Suppose I have a known start point and I just want 1 big value - length.
+That's just a range query of A[k]-k.
+
+Given a "middle", I can just do those queries in both directions.
+Well, on the left I guess I need A[k]+k.
+
+.

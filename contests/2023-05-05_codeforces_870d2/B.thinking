@@ -1,0 +1,6 @@
+
+Pair up the numbers that need to end up matching.
+X needs to be a divisor of the difference.
+Just track the gcd I guess?
+
+.

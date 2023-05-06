@@ -1,0 +1,34 @@
+
+(x, y) -> m*y + x?
+
+ax + by + c = 0.
+
+Say I use a, b, c. What does that do to (x, y)?
+y = -c/b - a/b x.
+
+Only the slope of my line matters, i.e. m = -a/b.
+I may as well use c = 0.
+
+I basically get the dot product (x,y) . (1, m).
+    x - ay/b
+
+
+I could try using -ay/b huge?
+
+The y values are all separated by at least 1.
+So if m = -a/b > 200 then I can definitely tell where each value came from.
+
+*****
+
+First find all the y coords.
+Use a = 0, right?
+
+Then...
+
+a = -0.1, b = 100?
+
+100y = 0.1x
+y = x / 1000
+
+
+.

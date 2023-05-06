@@ -1,0 +1,47 @@
+
+Aggregate the ratings into directed edges.
+The graph is definitely acyclic.
+
+I want highest-value chain on this graph.
+Seems like DP?
+I should basically run topological sort, but also compute dp[v] as I go.
+
+****************
+
+N <= 5000
+C <= 500
+
+! How can I compute the edges efficiently?
+Choose subset of columns. Reorder rows. Now each column must be strictly increasing.
+
+
+Sort by first city ratings.
+
+I'm trying to imagine some kinda "C pointers" approach?
+
+If I could do C-dimensional range queries I'd be happy.
+
+
+***************
+
+~ I need to avoid doing a bajillion comparisons if the ratings are all nicely sorted.
+Can I use transitivity better?
+I guess I'm kind of doing N^2 comparisons to sort and ideally I could do N*log(N)?
+
+Hm I have transitivity of < but not of =.
+
+
+Sort by first column.
+Now any links would need to point downward in this list order.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Turns out the expected solution was to use bitsets to optimize the C N^2 solution.
+For each n, I can track a bitset that stores the guys who can go after n.
+Get the sorted order for city c.
+Make a bitset called OK.
+Now iteratively:
+    Remove all the guys at next height from OK.
+    Apply bs &= OK for all guys at this height.
+
+.
