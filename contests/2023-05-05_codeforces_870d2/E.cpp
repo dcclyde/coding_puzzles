@@ -940,43 +940,30 @@ struct TopoSort {
 	}
 };
 
-
-void solve() {
+#pragma region  // solve_slow
+void solve_slow() {
     lls(cities, N);
     vecs(ll, N, weight);
     auto ratings = ndvec<ll>(N, cities, -1LL);
     FOR(c, 0, cities) FOR(n, 0, N) { cin >> ratings[n][c]; }
     el;
 
-    // Sort the models.
-    auto lt = [&](auto& a, auto& b) -> bool {
-        FOR(c, 0, cities) {
-            if (ratings[a][c] >= ratings[b][c]) { return false; }
-        }
-        return true;
-    };
-    V<ll> order;
-    FOR(k, 0, N) {order.push_back(k);}
-    sort(all(order), lt);
-
-
-
     TopoSort ts;
     ts.init(N);
-    // FOR(a, 0, N) {
-    //     FOR(b, 0, N) {
-    //         if (a == b) {continue;}
-    //         // Can a go before b?
-    //         bool ok = true;
-    //         FOR(c, 0, cities) {
-    //             if (ratings[c][a] >= ratings[c][b]) {
-    //                 ok = false;
-    //                 break;
-    //             }
-    //         }
-    //         if (ok) {ts.ae(a, b);}
-    //     }
-    // }
+    FOR(a, 0, N) {
+        FOR(b, 0, N) {
+            if (a == b) {continue;}
+            // Can a go before b?
+            bool ok = true;
+            FOR(c, 0, cities) {
+                if (ratings[c][a] >= ratings[c][b]) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {ts.ae(a, b);}
+        }
+    }
     ts.sort();
 
     // Now fill
@@ -991,6 +978,72 @@ void solve() {
     ll out = *max_element(all(dp));
     return ps(out);
 }
+#pragma endregion  // solve_slow
+
+void solve() {
+    lls(cities, N);
+    vecs(ll, N, weight);
+    auto ratings = ndvec<ll>(N, cities, -1LL);
+    FOR(c, 0, cities) FOR(n, 0, N) { cin >> ratings[n][c]; }
+    el;
+
+    const ll MAX = 5001;
+    using bs = bitset<MAX>;
+
+    // cgb[a][b] is true if a can go before b.
+    V<bs> can_go_before(N);
+    for(auto& x : can_go_before) {x.set();}
+    V<ll> ph; FOR(k, 0, N) {ph.pb(k);}
+
+    // OK[x] is true if we haven't seen x yet.
+    bs OK;
+    FOR(c, 0, cities) {
+        sort(all(ph), [&](ll a, ll b) -> bool {
+            return ratings[a][c] < ratings[b][c];
+        });
+        OK.set();
+        ll L = 0;
+        while (L < N) {
+            ll R = L;
+            while (R < N-1 && ratings[ph[L]][c] == ratings[ph[R+1]][c]) {++R;}
+            FOR(k, L, R+1) {OK[ph[k]] = false;}
+            FOR(k, L, R+1) {can_go_before[ph[k]] &= OK;}
+            L = R+1;
+        }
+    }
+
+    TopoSort ts;
+    ts.init(N);
+    FOR(a, 0, N) {
+        FOR(b, 0, N) {
+            if (a == b) {continue;}
+            // Can a go before b?
+            bool ok = true;
+            // FOR(c, 0, cities) {
+            //     if (ratings[c][a] >= ratings[c][b]) {
+            //         ok = false;
+            //         break;
+            //     }
+            // }
+            ok = can_go_before[a][b];
+            if (ok) {ts.ae(a, b);}
+        }
+    }
+    ts.sort();
+
+    // Now fill
+    V<ll> dp(N);
+    for(auto& k : ts.res) {
+        dp[k] += weight[k];
+        for(auto& o : ts.adj[k]) {
+            ckmax(dp[o], dp[k]);
+        }
+    }
+
+    ll out = *max_element(all(dp));
+    return ps(out);
+}
+
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
 // ! Check bounds even if I have a solution - are they letting through simpler versions?
