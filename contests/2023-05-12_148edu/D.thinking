@@ -1,0 +1,26 @@
+
+N length, Q queries.
+
+K_q operations:
+    In operation j, we add/subtract j to some position.
+    In a given position we add, then subtract, etc.
+
+*****
+
+Nobody can increase by more than K.
+Can we solve small using binary search?
+
+If K <= N then we can solve small easily:
+    Apply biggest operation to smallest element
+    second biggest to second smallest, etc.
+
+What if K > N?
+View this as:
+We get N or N-1 increase steps that are bigger than before (K, K-1, ..., K-N+1)
+Before that, we have to subtract 1 from something a bunch of times.
+
+*****
+
+
+
+.

@@ -1,0 +1,14 @@
+
+b(3,k) to b(4,k):
+    add:
+        a0 * binom(3, K-1)
+        a1 * binom(2, K-1)
+        a2 * binom(1, K-1)
+        ...
+
+    The thing I need to add is just b_{3,k-1}?
+
+b(0,k) = 0
+b(1,k) = b(1,k-1) + b(0,k)
+
+.

@@ -1,0 +1,23 @@
+
+N <= 2000
+T, G <= 1e9
+
+N entrances, K generators, T duration, G generator duration
+
+They give me pairs like (L, R).
+I have to choose generator positions so that everyone can hook up to a generator
+    and the total overlap is big.
+
+*****
+
+Sort the guarded intervals.
+
+Maybe DP where I only consider placing generators to match start or end of a given interval.
+
+f(position, num generators still available)
+
+
+
+
+
+.
