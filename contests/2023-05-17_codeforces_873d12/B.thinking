@@ -1,0 +1,26 @@
+
+Each wrong position needs to be able to reach the far edge.
+
+1   2   3   4   5   6
+
+1   5   3   4   2   6
+
+1 2 3 4 5 6
+
+1 5 3 4 2 6
+1 6 3 4 2 5
+
+! oh wait - we can only make swaps at distance EXACTLY k.
+
+Suppose I have
+
+1 . . 1 . 1 . . .
+. 1 . . 1 . . . 1
+
+what k values will work?
+
+
+! Oh wait x2 - it's a permutation, so each value occurs only once.
+
+
+.
