@@ -1,0 +1,11 @@
+
+reverse some segment, then swap prefix/suffix.
+
+We want biggest possible result.
+
+************
+
+The operation is the same as reversing the whole array,
+then reversing a prefix and suffix.
+
+.

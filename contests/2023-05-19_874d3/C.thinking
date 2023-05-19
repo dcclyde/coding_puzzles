@@ -1,0 +1,5 @@
+
+one pass trying to make all even, then one pass for all odd.
+Track the smallest item of each parity that we've seen.
+
+.

@@ -1,0 +1,19 @@
+
+Given a tree. N <= 2e5.
+Choose which edges to remove so that all remaining CCs have 3 nodes.
+(or report it's impossible)
+
+*****
+
+Start at deepest leaf.
+Grab v, parent[v].
+If parent[v] has no other children, grab parent[parent[v]].
+If parent[v] has 1 other child, grab that.
+Otherwise lose.
+
+Initial traversal:
+    parent of each node
+    children of each node - probably a hash table so I can delete/lookup fast.
+    depth of each node
+
+.

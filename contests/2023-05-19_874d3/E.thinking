@@ -1,0 +1,27 @@
+
+N people total, N <= 2e5
+
+*****
+
+Find the cycle structure.
+
+A cycle has to be an actual group.
+Then we can have chains that don't lead
+
+What if we have 2 3 4 5 3?
+
+
+Start somewhere. Move until we double back to a seen position.
+If the last person moved to their already-neighbor, we have flexibility here.
+    call this a "chain"
+
+if not, we don't have flexibility.
+    Call this a "cycle".
+
+They guarantee that the breakdown is possible so there can't be confusing
+    "eventually periodic" stuff.
+
+Max answer should be chains + cycles
+min answer should be cycles + (1 if there are any chains)
+
+.
