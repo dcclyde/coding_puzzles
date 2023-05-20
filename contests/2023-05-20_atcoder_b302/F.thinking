@@ -1,0 +1,11 @@
+
+Need len of shortest path from 1 to M.
+Sum of all set sizes <= 5e5.
+
+*****
+
+I guess just BFS?
+Make a graph with a node per set and also a node per item.
+Set connects to items it contains.
+
+.
