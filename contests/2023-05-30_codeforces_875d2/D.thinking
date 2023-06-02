@@ -1,0 +1,43 @@
+
+The values are <= N, so the sums/products should be <= 2N.
+
+The answer could be really big (Aj = 2, Bj = 2).
+I can't afford O(answer).
+
+Given a certain start position.
+I know Aj and Bj.
+Now I need cases with AjAk = Bj + Bk
+    Bk = Ak * Aj - Bj
+
+    Ak = (Bj + Bk) / Aj
+
+*****
+
+Take logs of A??
+Then.... I need exp(Aj + Ak) = Bj + Bk
+
+
+
+*****
+
+How would I do it if I needed Aj + Ak == Bj + Bk?
+Well... given Aj and Bj, I would then need some particular value of Bk-Ak.
+
+~ Why are all the numbers small?
+Definitely makes it easy to factor all the plausible targets.
+Fix P.
+Fix d.
+    That also fixes P/d.
+    Now I have two lists: Bj with d and Bk with P/d.
+    I need to know how many ways to choose something from Bj and something from Bk to get P.
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+For each (aj, bj), for each ak <= sqrt(BIG), add in the number of occurrences of ak along with the appropriate bk.
+
+If d1 == d2:
+    For each viable d, find how many
+
+
+.

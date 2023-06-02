@@ -1,0 +1,24 @@
+
+If two intervals overlap like (  [ )    ]
+    then we can break into 3 intervals:
+                              ( )( )(   )
+
+If two intervals are nested, we can handle the inner one first, then what remains of the outer.
+
+Process intervals in order of increasing L?
+
+*****
+
+Maintain a stack of interval opens?
+
+
+Open and close events?
+Hit a close: end the most recent open.
+
+Process events.
+Open: add this to the list of currently open intervals.
+Close:
+    Break off all chunks since this interval got opened.
+
+
+.
