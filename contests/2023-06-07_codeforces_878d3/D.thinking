@@ -1,0 +1,10 @@
+
+Choose 3 values.
+I want distance from Aj to closest of my values to be small.
+
+*****
+
+Seems like I could do binary search. Use a set.
+
+
+.

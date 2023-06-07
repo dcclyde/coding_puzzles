@@ -1,0 +1,9 @@
+
+Track the current number of wrong positions?
+Block a position:
+    Decrement the counter if needed.
+    Insert a future event where we'll increment it.
+
+Swap stuff: Adjust counter as needed.
+
+.

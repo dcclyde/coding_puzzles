@@ -1,0 +1,6 @@
+
+If I can win, it should be possible within 2e4 + 100 steps?
+Can I just BFS?
+There should be only R * C * num_shots states.
+
+.
