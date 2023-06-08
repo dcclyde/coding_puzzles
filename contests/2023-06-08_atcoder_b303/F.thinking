@@ -1,0 +1,7 @@
+
+Binary search for the target time T.
+On each turn, choose the spell that will do the most damage *by time T*.
+
+Store spells (Dj, Tj) with Tj increasing and Dj decreasing.
+
+.
