@@ -1,0 +1,9 @@
+
+5, 10 out of 12?
+    Repeat 2x: need 4 5 10 11
+    Repeat 3x: need 1 2 5 6 9 10
+
+There are <= 6 distinct prime divisors.
+Maybe I can just build all inc-exc contributions.
+
+.
