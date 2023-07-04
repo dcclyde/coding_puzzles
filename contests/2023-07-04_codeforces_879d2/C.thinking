@@ -1,0 +1,19 @@
+
+A changes 1 character at every step.
+B reverses a string at every step.
+
+A wants the game to end fast.
+B wants the game to take forever.
+
+N <= 1e5
+
+***************
+
+Reversing doesn't change the situation in any confusing way.
+It's just a parity thing.
+
+A basically wants to make X == Y *or* X == rev(Y).
+Then track parity to see if it takes 1 extra turn to finish.
+
+
+.

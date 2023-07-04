@@ -1,0 +1,16 @@
+
+N <= 1e5
+space <= 1e9
+
+Score for intervals A, B is 2 * (length that's in the bigger but not smaller).
+
+*****
+
+Probably I want to sort the intervals somehow?
+Say [l, r] is the big interval.
+I want smallest possible length of some other interval's overlap with [l, r].
+    Other interval is to the right: Need left endpoint as big as possible.
+    Other interval is to the left: Need right endpoint as small as possible.
+    Other interval is contained: Need len as small as possible.
+
+.

@@ -1,0 +1,21 @@
+
+500 test cases
+L, R <= 1e100
+
+Shorter nums get padded with leading 0s.
+
+*****
+
+Find first position where L, R are different.
+
+
+If R is longer:
+Just put 9s in lo.
+hi is R prefix + 0s.
+
+If lengths are the same:
+Ignore any prefix that matches.
+    51234
+    60123
+
+.

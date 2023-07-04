@@ -1,0 +1,38 @@
+
+I need smallest T such that there isn't any contiguous subarray with lcm = T.
+N <= 3e5.
+
+*****
+
+Primes (and even prime powers) just need to be included directly.
+How big can the answer be?
+Definitely at least N.
+
+
+1
+4
+2
+3
+5
+7
+9
+
+
+I could imagine a strategy like:
+Track a hash table of targets I've hit.
+    ~ Only track up to 1e6.
+For each possible left endpoint, keep extending the interval and computing LCM
+until it gets too big.
+
+I'm not sure whether this will give the right answer,
+but also it has runtime problems in case the array is all 2s.
+
+I could start by removing consecutive duplicates...
+That doesn't really help, it could have 2 4 2 4 2 4 2 4 2 4.
+
+I guess I could also track states I've been in before.
+States like (position, current LCM).
+Then just don't extend any further if I've already tried this state.
+
+
+.
