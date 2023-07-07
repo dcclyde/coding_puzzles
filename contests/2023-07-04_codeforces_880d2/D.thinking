@@ -1,0 +1,18 @@
+
+Imagine I pick x.
+
+
+
+Imagine the true answer is z.
+Use binary search to find the radius I need to stay in.
+Use a segtree to add 1 on that range.
+
+*****
+
+That doesn't quite work because MAX is up to 1e18.
+
+First K-1 friends
+
+
+
+.
