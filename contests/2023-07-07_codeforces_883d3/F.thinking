@@ -1,0 +1,26 @@
+
+200 objects
+9 object types
+I get 5 experiments
+mimic can stay the same for up to 2 consecutive experiments
+
+*****
+
+Well, I lose if I remove the mimic.
+At first I don't know who it is.
+So I guess I shouldn't remove anything at first.
+
+(all)
+    remove nothing
+(all)
+    remove nothing
+(all)
+
+At this point, I know the mimic's type so I can toss everything else.
+Seems like it can be bad if I started with 1 2 2 2 2 2 2 2 2 2 2 2 2
+    and now I have 2 2 2 2 2 2 2 2 2 2.
+
+Well... not really?
+Now I just wait till one of the 2s changes.
+
+.

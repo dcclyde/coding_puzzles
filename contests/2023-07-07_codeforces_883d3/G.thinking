@@ -1,0 +1,13 @@
+
+10 symptoms
+1000 medicines
+
+Each medicine takes a certain number of days, adds certain symptoms, removes others.
+
+*****
+
+There are 2^10 states.
+Seems like some kinda shortest path situation.
+Naive setup would have 100 edges per current state which just seems fine already?
+
+.
