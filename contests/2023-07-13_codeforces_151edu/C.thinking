@@ -1,0 +1,18 @@
+
+Answer true/false.
+
+Need length N <= 10.
+Given a string S. Size up to 3e5.
+Given lo, hi restrictions for each digit of final string.
+
+*****
+
+DP?
+Suppose I've chosen the first c characters.
+What's the first position p in S such that S[:p] has my string as a subseq?
+
+I should prestore:
+Given current position p and search character c, what's the next occurrence of c?
+
+
+.

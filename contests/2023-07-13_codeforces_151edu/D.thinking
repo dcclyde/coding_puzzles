@@ -1,0 +1,17 @@
+
+Given list of rating changes.
+N <= 3e5.
+
+I get to pick a floor F. Rating can never fall below F.
+What F will give the biggest possible final rating?
+
+Rating changes have abs value <= 1e9.
+
+*****
+
+Given some walk shape.
+I can use the biggest possible upward chunk at the end.
+
+Maybe something like: Find the biggest possible downward chunk?
+
+.

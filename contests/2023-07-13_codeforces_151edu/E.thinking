@@ -1,0 +1,22 @@
+
+N boxes, K moves.
+Given some starting setup.
+I make K moves, each moving a single ball to left or right.
+How many different arrangements could I find at the end?
+
+*****
+
+This could be DP?
+
+state:
+    What box number are we looking at?
+    What's the most recent ball we used?
+    How many moves have we made?
+
+
+There will be some parity considerations.
+
+
+
+
+.
