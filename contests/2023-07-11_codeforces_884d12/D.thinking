@@ -1,0 +1,34 @@
+
+N <= 1e6.
+
+Need a string that can't be turned into ANY bad grid.
+
+*****
+
+~ Can't have adjacent repeats.
+
+If the string is bad, that means there's some d | N
+and position k
+where S[k] == S[k+d].
+
+Maybe this is a graph?
+Each divisor makes a bunch of edges.
+Then I need to color the graph so that no two adjacent nodes have the same color.
+
+num divisors <= 240.
+
+
+*****
+
+abababababababa
+
+ababa
+babab
+ababa
+
+N = 30?
+Try abcdabcdabcd...
+
+
+
+.

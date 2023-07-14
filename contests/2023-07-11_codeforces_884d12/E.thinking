@@ -1,0 +1,51 @@
+
+R, C up to 2e3
+K = num_constraints up to 4e3
+    we are NOT guaranteed that the sum of grid sizes is small.
+    Only the sum of R or the sum of C.
+
+Every 2x2 grid has A, B, C.
+Can't have adjacent copies of any letter.
+
+Each constraint marks two cells that touch diagonally.
+They need to have the same letter.
+
+We only output true/false, is this puzzle solvable.
+
+~~~~~~~~~~
+
+If all constraints were "parallel diagonals" then this would be easy:
+Use the grid with diagonal As, then next diagonal Bs, then next diagonal Cs, then repeat.
+
+Every 2x2 will satisfy exactly one diagonal constraint.
+
+*****
+
+I think we exactly need:
+From one column to the next, either all slashes stay the same or all are flipped.
+
+
+Build a template column, initially all ?s.
+
+First constraint in a column tells me nothing.
+    If I have constraints 0, 1 in rows r1, r2 within same column
+    then that tells me those indices in template should be opposite.
+
+    If I have constraints 0, 0 or 1, 1 then they should match.
+
+Algorithm:
+Build up the connected components of stuff that must match.
+
+Then check the "must not match" and make sure it doesn't conflict.
+    For this step, build a graph where nodes are connected components from prev step.
+    This graph needs to be 2-colorable.
+
+
+*****
+
+Kinda makes me think about some kind of graph that has a node per row and per column.
+See 2 givens in same row --> learn the coloring of the edge between those rows.
+
+
+
+.

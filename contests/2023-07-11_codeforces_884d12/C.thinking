@@ -1,0 +1,16 @@
+
+N <= 2e5
+-1e9 <= values <= 1e9
+
+Delete in the middle: Combine the two neighbors.
+Delete on the end: No extra followup step.
+
+*****
+
+"remove+combine" doesn't change parity.
+So we have to choose just one parity.
+
+Maybe we just want max(sum of even positives, sum of odd positives)
+if everything is negative, just take biggest element.
+
+.

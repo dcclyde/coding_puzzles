@@ -1,0 +1,67 @@
+
+
+*****
+
+Assume c negative for now.
+Start at top, end at bottom.
+Keep writing the next element that will go down as much as possible "without being wasteful".
+Once we
+
+
+Christine theorises:
+    Assume c negative for now.
+    Start at top, end at bottom.
+    Make some nice chain at the far left and another at the far right.
+    Leftover elements will be sorted in the middle.
+
+    If c >= 0, maybe just sort the whole array?
+
+
+~ cc = -c.
+How do we make nice chains?
+Step size s gives a score of min(s, cc)?
+
+
+
+
+
+*****
+
+Probably some DP now.
+Quadratic could be good enough?
+What's the state + value?
+
+State: (current position, )
+
+
+
+c = -10
+
+100 90 80
+
+71 81 89 99
+
+
+Sequences can't overlap. Otherwise we'd just reverse sort the whole thing and be done.
+
+On the second (ending) pass, if we leave some stuff out,
+    it's better to leave out a smaller number. (for lex reasons)
+    Maybe this means we'd rather start at bottom and jump up greedily.
+
+Now I want dp[n] = best sum of scores from both passes over first n elements.
+For F-small, it's OK to spend N time computing dp[n].
+
+dp[n] = max of...
+
+
+Gap bigger than C just splits us into independent subproblems.
+
+
+******
+
+
+
+
+
+
+.
