@@ -1,0 +1,14 @@
+
+N <= 2e5
+values are 0, 1, 2
+
+Operation:
+    Source: already painted, not 0
+    Destination: not painted
+
+*****
+
+If you have a nonzero chunk with a 2 on one end, paint both ends.
+Nonzero chunk with a
+
+.

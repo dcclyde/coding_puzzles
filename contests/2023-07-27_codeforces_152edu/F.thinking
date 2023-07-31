@@ -1,0 +1,68 @@
+
+N <= 2e5
+distinct integers up to 2^30.
+
+Score of a partition is:
+    Smallest xor of two items from same partition.
+
+We want a BIG score.
+
+
+
+We need to actually find+output the good partition.
+
+***************************************************
+
+What's the highest bit we can force to appear?
+    Look at the 3 smallest given elements. Highest bit must be <= their bits.
+
+
+1101 01011
+1101 10101
+1010 10011
+0010 10101
+
+Binary search on score?
+We have some high bits that will never contribute to score.
+    These subdivide us into subproblems.
+
+Within a subproblem, how do I decide whether I can achieve score T?
+
+    Think of a graph:
+        a is connected to b if a^b < T.
+        Then I ask: is this graph 2-colorable?
+
+    I think I could do that using a trie...
+    Don't actually need to split into subproblems.
+    They'll just be different connected components.
+
+
+    0....................
+    011111111110000000000
+
+
+*****
+
+Target T.
+While T's binary digit is 0, just descend into subproblems.
+When T has a 1:
+    We need to get a 1 here.
+    Thus each side should have at most 2 items. Otherwise we fail.
+    Now we should just be able to manually check the remaining items.
+
+
+Maybe skip T.
+BFS until I find a layer where all nodes have at most 2 items.
+
+
+*****
+
+1 2 3 4
+001 010 011 100
+
+T = 3 = 011
+Group into 100 and 001, 010, 011
+
+
+
+.

@@ -1,0 +1,11 @@
+Track the first position with a 1.
+Track the last position with a 0.
+
+some special case if one or both doesn't exist.
+    (a chunk of all 0s is the same as a chunk of all 1s)
+
+    Actually wait. Just - if the chunk is already sorted then use one general marker score.
+
+Just store those pairs in a hash table
+
+.

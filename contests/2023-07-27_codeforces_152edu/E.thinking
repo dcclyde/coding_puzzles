@@ -1,0 +1,9 @@
+
+There are ~ N^2 arrays total to consider.
+
+Subproblem: Arrays that contain 1.
+I need biggest element to be on the right.
+
+
+
+.
