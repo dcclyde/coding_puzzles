@@ -1,0 +1,33 @@
+
+You have a set $$$S$$$ of $$$n$$$ distinct integers between $$$1$$$ and $$$m$$$.
+Each second you do the following steps:
+    * Pick an element $$$x$$$ in $$$S$$$ uniformly at random.
+    * Remove $$$x$$$ from $$$S$$$.
+    * If $$$x+1 \leq m$$$ and $$$x+1$$$ is not in $$$S$$$, add $$$x+1$$$ to $$$S$$$.
+What is the expected number of seconds until $$$S$$$ is empty?
+Output the answer modulo $$$1\,000\,000\,007$$$. Formally, let $$$P = 1\,000\,000\,007$$$. It can be shown that the answer can be expressed as an irreducible fraction $$$\frac{a}{b}$$$, where $$$a$$$ and $$$b$$$ are integers and $$$b \not \equiv 0 \pmod{P}$$$. Output the integer equal to $$$a \cdot b^{-1} \bmod P$$$. In other words, output an integer $$$z$$$ such that $$$0 \le z &lt; P$$$ and $$$z \cdot b \equiv a \pmod{P}$$$.
+
+~~~~~
+
+Sort the list, of course.
+Let's think about decreasing instead.
+! We can decrease to 0 but not below 0.
+
+For each consecutive pair (a, b):
+    What's the expected cost of all cases where b gets selected?
+
+    Expected time until either b catches a OR b arrives at -1.
+
+f(a, b) = subanswer.
+    f(-1, b) = b+1
+    f(b, b) = 0
+    f(a, b) = 1 + (f(a, b-1) + f(a-1, b-1)) / 2
+
+
+
+(0, 1)
+    50%: go to (0). Now score will be 1.
+        No, call this 0. We're only counting score from selections of b.
+    50%: go to (-1, 1). Now score will be 2.
+
+.

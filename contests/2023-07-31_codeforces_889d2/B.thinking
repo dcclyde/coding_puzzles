@@ -1,0 +1,20 @@
+
+N <= 1e18.
+
+Need longest interval length such that L, L+1, L+2, ... are all divisors of N.
+
+*****
+
+They don't assume I know how to factor.
+Maybe the intervals should just be pretty small?
+
+*****
+
+OK that did get accepted.
+Can I prove something about why?
+Maybe I can say something about lcm of an interval?
+
+LCM of 1...(R-L) should be smaller than lcm of L..R?
+
+
+.

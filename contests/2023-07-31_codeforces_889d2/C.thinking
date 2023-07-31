@@ -1,0 +1,53 @@
+
+20 items
+initial values from -20 to 20
+I can make up to 31 operations.
+
+*****
+
+Solving easy case:
+I think I can pick the item with biggest abs value,
+then add it to everything so I'm all nonpositive or all nonnegative.
+
+If all nonnegative:
+    Add a[0] to a[1]
+    Add a[1] to a[2]
+    Add a[2] to a[3]
+    ...
+
+    takes 19 steps
+
+If all nonpositive:
+    Add a[-1] to a[-2]
+    ...
+
+    again 19 steps
+
+Making everything same sign took 19 steps too. So 38 total.
+
+*****
+
+For large, it feels like I should take advantage of entries having small abs value?
+
+Not sure I can use the same kinda approach as above.
+I could have -20 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+Well, maybe I can make something work....
+Suppose there are X negatives and the biggest thing is negative.
+If X is small, I can build up a big positive
+    and then it won't take many operations to kill the negatives.
+If X is big, I can just kill the positives instead maybe.
+
+X >= 8: It's fine to spend 12 steps killing positives.
+so, assume X <= 7.
+-20 -20 -20 -20 -20 -20 -20 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+1   1 -> 2
+2   2 -> 4
+3   4 -> 8
+4   8 -> 16
+5   16 -> 32
+
+Then kill the negatives, etc.
+
+.

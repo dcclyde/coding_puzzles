@@ -1,0 +1,49 @@
+
+N <= 1e5.
+
+I could loosely imagine choosing some cards that sum to N-1.
+Then I get to keep the scores from all other cards, for total of sumv(A) - (N-1).
+Issues:
+    I might not be able to sum to N-1 exactly.
+        Especially - keep in mind that I can't choose later cards right away.
+    It might not even be worth unlocking some of the later stuff.
+
+
+
+
+3 5 4 2 1 3 2
+sum = 20
+
+3, 4: score 13.
+
+!!!!!!!!!!!!!!!!
+
+Editorial claims it's optimal to just use cards off the top??
+What about 2 10 9 5 5 5 5 5?
+Seems like I should use the 9, not the 10...
+
+Then they're talking about knapsack stuff.
+I think maybe they just mean: *of the cards I eventually use*, I can go top to bottom.
+
+With 0 cards, I definitely have a sum of 1.
+After considering first n cards, what sums are possible?
+    Anything possible from prev step
+    Anything possible from prev step + a[n-1]
+
+dp[n][s] = true if I can get sum s by using any subset of cards 0..n-1.
+
+
+Base case: dp[0][1] = 1.
+    (After considering 0 cards, I have a "sum" of 1 because card 0 starts unlocked.)
+
+Consider card n:
+    I could leave the sum as is.
+
+    I can add a[n] to my sum if I want, but only if the sum was already >= n.
+
+    sum = (sum | (sum << a[n] & mask))
+
+
+
+
+.
