@@ -44,6 +44,9 @@ Consider card n:
     sum = (sum | (sum << a[n] & mask))
 
 
+What final scores should I be considering?
+If my final chosen sum is S, I could score (sum of first S items) - S.
+
 
 
 .

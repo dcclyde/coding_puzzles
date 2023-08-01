@@ -935,22 +935,29 @@ void solve() {
     el;
 
     FOR(k, 0, N) {A.push_back(0);}
-    ll S = sumv(A);
+    N = 2*N;
 
     const ll MAX_LEN = 2e5 + 1;
-    bitset<MAX_LEN> possible;
+    bitset<MAX_LEN> reachable;
     bitset<MAX_LEN> mask;
     mask.set();
-    possible[0] = true;
-    ll running_sum = 0;
-    ll out = 0;
+    reachable[0] = true;
     FOR(k, 0, N) {
         // on paths where card k is unlocked, we should consider using it.
-        // on paths where card k is locked, we should update `out`.
+        reachable |= ((reachable & mask) << A[k]);
+        mask[k] = false;
     }
 
+    ll ans = 0;
+    ll running = 0;
+    FOR(k, 0, N) {
+        running += A[k];
+        if (reachable[k]) {
+            ckmax(ans, running - k);
+        }
+    }
 
-    return;
+    return ps(ans);
 }
 
 // ! Do something instead of nothing: write out small cases, code bruteforce
@@ -958,7 +965,7 @@ void solve() {
 // ! If stuck on a "should be easy" problem for 10 mins, reread statement, check bounds
 
 #define PROBLEM_STYLE CF
-// #define SINGLE_CASE  // ! Uncomment this for one-case problems.
+#define SINGLE_CASE  // ! Uncomment this for one-case problems.
 #pragma region  // main
 #if PROBLEM_STYLE == CF || PROBLEM_STYLE == GCJ
 int main() {
