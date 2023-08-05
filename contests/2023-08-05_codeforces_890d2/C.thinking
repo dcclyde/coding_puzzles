@@ -1,0 +1,17 @@
+
+N <= 1000
+K <= 1e8
+
+*****
+
+Check best score for each slot one by one? Maybe back to front?
+
+How do I compute the best score in slot k?
+
+For each possible start position, we ask:
+* Where will this hill end?
+    Maybe binary search? Try to achieve height H?
+        What's the first position to the right of k,
+            such that the A[k] + H runs into that bar?
+
+.

@@ -1,0 +1,50 @@
+
+Given a tree.
+I choose a permutation P.
+Score is: how many unordered pairs (a, b) have P[lca] *strictly between* P[a] and P[b]?
+
+Basically, I have a bunch of triples (a, x, b).
+How many can I satisfy?
+
+
+Seems like:
+if vertex v has children with sizes s1, s2, s3...
+maybe I want "approximately half" of the total size to be below
+    and approximately half bigger?
+
+Subproblem:
+Given array of length N, find closest subset sum to half of the total.
+
+I know the array sums to <= 5000.
+
+I guess I can run some DP...
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now think about large version.
+N <= 1e6.
+Single case, and they give 3 seconds.
+
+*****
+
+Can I even solve it at the root?
+I'm given some array that adds up to S <= 1e6.
+I want to find closest possible subset sum to S/2.
+
+
+*****
+
+S = total
+delta = difference between the two "halves"
+what are the sizes?
+
+S = 15, d = 7:
+    4, 11
+
+    a + b = S
+    b - a = d
+    2b = S+d
+
+
+
+.
