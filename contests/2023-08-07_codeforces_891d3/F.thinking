@@ -1,0 +1,20 @@
+
+Given array A.
+N <= 2e5
+|values| <= 1e9
+
+Each query gives S, P.
+How many pairs satisfy A[j] + A[k] == S and A[j] * A[k] == P?
+
+*****
+
+A[j] = S - A[k]
+(S - A[k]) * A[k] == P
+P = S*A[k] - A[k]*A[k]
+A[k] ^ 2 - S*A[k] + P = 0
+
+So I guess:
+    * Check if the quadratic even has (integer) solutions.
+    * If so, look up how many copies we have available.
+
+.

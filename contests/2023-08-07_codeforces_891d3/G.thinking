@@ -1,0 +1,34 @@
+
+They give me: tree with edge weights, upper bound for weights.
+
+I need to answer:
+How many graphs can I make by adding some extra edges
+such that weights are all <= B and the only MST is the one they originally gave me?
+
+*****
+
+Think about Kruskal.
+For each new edge, the original path connecting these vertices
+    should all be strictly smaller weights.
+
+Maybe aside from that I can just add as many edges as I want?
+Well... I'm not allowed to add edges where they already exist.
+
+How would I handle this for just the root?
+
+~ Probably this is a traversal where I track some data structure
+    and then compute the answer for each parent on the way out.
+
+What do I need to track?
+    Direct children don't contribute. (Edge already exists here.)
+    Sufficient but too big:
+        Full list of {weight: num descendants with this as path max}.
+        When I get a new edge, it overwrites info from a bunch of prev stuff.
+
+        Maybe I can actually just track this using small-to-large?
+        Separately I should track the current total score,
+            and modify it as I modify this data structure.
+
+        I bet this works but seems annoying in Python...
+
+.

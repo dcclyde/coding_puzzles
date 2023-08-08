@@ -1,0 +1,11 @@
+
+Given array A.
+For each s, I want...
+maybe I just want the sum of interval lengths?
+
+OK, how do I get that?
+
+Move the base one step to the right:
+I lose 1 point for each item to my right, and gain 1 per item to my left.
+
+.
