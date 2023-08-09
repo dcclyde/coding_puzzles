@@ -1,0 +1,9 @@
+
+Start with 1.
+Given some list of operations like "+ 3" or "* 5".
+
+I guess ideally we always wish to add first and multiply later.
+Describe that in equations?
+    Adding S basically adds S*C where C is cumulative product of LATER multipliers.
+
+.

@@ -1,0 +1,53 @@
+
+BINARY array
+N <= 2e5
+
+*****
+
+1 0 1 0 0
+
+need to reach 0 0 0 1 1.
+
+Any 0s at beginning / 1s at end can be "ignored".
+    Maybe also any 0s and 1s that are in any valid final position?
+    1 0 1 0 0 --> 1 1 0 0?
+
+    Remember that "ignored" things can still get picked. It just doesn't advance our state.
+
+so, maybe the state is like
+(num 1s, num 0s, num useless things)
+(a, a, c)
+
+what would transitions be?
+f(a, c) = 1
+    + a^2 / (2a+c)^2 * f(a-1, c+2)
+    + (1-P) * f(a, c)
+
+P*f(a, c) = 1 + P*f(a-1, c+2)
+f(a, c) = 1/P + previous
+
+f(0, N) = 0
+
+this is enough maybe?
+
+010
+
+*****
+
+To reach the next state, I need to choose a good 1 and a good 0.
+I have X good 1s, X good 0s, and C trash.
+
+First, I need to avoid picking trash.
+Next, I need to avoid picking two 1s or two 0s.
+
+
+
+
+*****
+
+010
+001
+
+we always decrease the binary number.
+
+.

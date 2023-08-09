@@ -1,0 +1,21 @@
+
+N <= 2e5
+A[k] = -1, 0, 1
+
+I need to break into chunks.
+Compute alternating sum of each chunk.
+Those sums should add up to 0.
+
+*****
+
+I might as well make all chunks of size 1 or 2.
+Let's say sumv(A) = S.
+I want to flip S/2 1s to -1s.
+
+*****
+
+For the large case, I can add 1s but also 2s?
+No, I actually just don't see any differences that matter.
+Yeah, same code works.
+
+.

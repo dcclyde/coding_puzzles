@@ -1,0 +1,30 @@
+
+Single case.
+
+N <= 5e5, x <= 5e5.
+
+Is A[0]! + A[1]! + ... + A[N-1]! divisible by x!?
+
+*****
+
+I could try to answer separately for each prime.
+There are 41538 primes <= 5e5.
+
+Let's say X! has p^e.
+We need to find the number of times p^e divides A[0]! + A[1]! + ... + A[N-1]!.
+
+*****
+
+Assume A is sorted.
+If the sum of A[0:k] factorials is not divisible by A[k]!, we lose.
+
+I want to store integers as an infinite list
+    (0, 1, 0, 0, 3)
+    0 * 1! + 1*2! + 0*3! + 0*4! + 3*5!
+
+    I think I'll only need to track one term though.
+
+    scalar * base!
+    m * b!
+
+.
