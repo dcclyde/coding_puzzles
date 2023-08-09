@@ -1,0 +1,17 @@
+
+length <= 1e6.
+
+how many iterations before we just have length 1?
+
+22 -> 22
+32, 33, 333, ...
+
+
+
+313, 3111, 31, 3
+
+
+I guess - if I ever have consecutive non-1s then I lose?
+
+
+.
