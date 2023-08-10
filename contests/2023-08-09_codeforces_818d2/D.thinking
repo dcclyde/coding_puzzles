@@ -1,0 +1,47 @@
+
+2^n participants.
+left side will win except in at most K cases.
+
+N <= 1e5
+K <= 1e9
+
+MOD = 1_000_000_007
+
+*****
+
+I could consider making a "normal seeded bracket".
+Override the finals: we lose 1 4 5 8 etc.
+
+well.... no reason to put more people over there?
+Seems like enemy should always just choose one (1/2^K) chunk
+    and I'll get the best person from that chunk.
+
+100 people and 8 chunks?
+
+*****
+
+ohhhhhhhhhh
+changing a match outcome has more effects than I was imagining.
+
+I want 1 to win by default.
+
+1 person is distance 0 from winning
+N people are distance 1
+distance 2:
+    1st round opponent: 0 extras
+    2nd round opponent contributes 1
+
+
+
+~ N = 5
+Distance 0: 1
+Distance 1: 5
+Distance 2: 10
+    0 + 1 + 2 + 3 + 4 = 10
+
+Distance 3:
+
+It's just the number of 0s in binary representation?
+
+
+.

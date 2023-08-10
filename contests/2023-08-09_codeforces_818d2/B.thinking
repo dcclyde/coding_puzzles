@@ -1,0 +1,12 @@
+
+Given N, K with K | N.
+given a target position tr, tc
+
+Diagonals in blocks of size K would work except for the condition about tr, tc.
+Adding an X there costs us 1 dollar.
+So now it's just a question of whether we could save that dollar.
+
+Maybe just rotate all of the diagonal submatrices to cover that square...
+
+
+.

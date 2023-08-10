@@ -1,0 +1,23 @@
+
+Operation:
+Increase x by 1 if it's <= the NEXT element (wrapping at end)
+
+Test whether I can eventually make A into B.
+
+N <= 2e5
+values up to 1e9
+
+*****
+
+How big can A[k] get?
+
+Start at any instance of argmin B[k].
+(Maybe just rearrange the arrays so that's at the end.)
+Then walk backward checking whether I can create each A[k].
+Options:
+    Keep the starting value (works if A[k] == B[k]).
+    Take any value up to A[k+1] + 1.
+
+
+
+.

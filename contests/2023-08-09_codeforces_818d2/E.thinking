@@ -1,0 +1,74 @@
+
+Given N.
+N <= 1e5.
+
+For all triples with a+b+c == n, add up:
+    lcm(c, gcd(a,b))
+
+*****
+
+Iterate over g?
+    a = g*x
+    b = g*y
+    c = n - g*(x+y)
+
+    lcm(c, g) = c*g / gcd(c, g)
+        = c*g / gcd(n, g)
+
+
+    So, each coprime pair (a,b) gets a score of (n - g*(a+b)) * g / gcd(n,g).
+        Sum of N - g*(a+b).
+        Well...
+        N * (total num coprime pairs with sum < N/g) - g * (sum of all those pair sums)
+
+
+How many coprime pairs summing to S?
+(a, b) = 1 and a+b == S
+    equivalent to pairs with (S, a) = 1.
+    That's just phi(S).
+
+*****
+
+N = 5
+    g = 1
+        1 1: c = 3, score 3
+        1 2: c = 2, score 2
+        1 3: c = 1, score 1
+
+    g = 2
+        2 2: c = 1, score 2
+
+
+*****
+
+I care about
+    How many coprime pairs with sum < N // g?
+    Sum of all those pair sums?
+
+N = 3, g = 1.
+I want pairs with sum
+
+
+N = 5, g = 1.
+I want pairs with sum <= 4.
+    1 1
+    1 2
+
+    pair sum = 5:
+        phi(5) = 4, so there are 4/2 = 2 pairs.
+
+~~~~~
+
+1 1
+1 2
+1 3
+2 3
+
+What's the sum of all stuff coprime to x?
+There are phi(x) items total.
+They come in pairs unless x is 2.
+
+phi(x) * x + phi(x)//2 * x
+
+
+.
