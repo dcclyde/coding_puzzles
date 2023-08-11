@@ -1,0 +1,9 @@
+
+Compute
+dp[n] = max happiness I can get by spending n turns on openers and locked cans.
+f[n] = max happiness I can get by spending n turns on unlocked cans.
+
+How to compute dp[n]?
+Well, I need the first prefix of openers such that sum(prefix) is enough to open the right number of cans.
+
+.

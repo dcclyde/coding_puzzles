@@ -1,0 +1,14 @@
+
+N <= 3000
+How many ways can I replace ?s with parens and get a valid bracket sequence?
+
+*****
+
+Idea:
+dp[n][h] = num ways to process first n positions and be at height h.
+
+dp[0][0] = 1
+dp[n][h] = ?
+    depends on A[n-1].
+
+.
