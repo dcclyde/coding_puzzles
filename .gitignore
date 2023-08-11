@@ -1,6 +1,8 @@
 
 scratch/
 testlib/
+spinningup/
+interview/
 *.log
 *.prog
 *.out
