@@ -1,0 +1,31 @@
+
+N <= 250
+
+max sum of k*p[k], *excluding* the biggest term.
+
+*****
+
+Looks like I could juuuuuust about afford N^3.
+
+? Well... I can also just hardcode the answers, so even slower stuff would be fine.
+
+
+I can definitely score 1^2 + 2^2 + 3^2 + ... + (N-2)^2 + N*(N-1).
+
+Let's say I decide the "dead pair" will be (X, Y).
+What's the best way to pair everything else up?
+Answer: Always just sort and pair em in order.
+
+
+*****
+
+OK after bruteforcing small cases I decided the best permutation is maybe always
+1, 2, 3, ..., K, N, N-1, N-2, ..., K+1
+for some K.
+Fine to just try em all.
+I don't know why these are the best permutations though...
+
+
+
+
+.

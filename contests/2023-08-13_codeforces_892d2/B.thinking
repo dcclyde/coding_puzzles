@@ -1,0 +1,11 @@
+
+Given N arrays, each with len >= 2.
+I simultaneously push at most 1 element per array to some other array.
+I need to maximize sum of array mins.
+
+*****
+
+The global min element will always count.
+I guess ideally we want a ton of crappy elements to be dumped in the same pile.
+
+.

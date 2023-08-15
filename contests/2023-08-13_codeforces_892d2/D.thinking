@@ -1,0 +1,11 @@
+
+Coords are up to 1e9 but there are only 4e5 notable positions,
+so coord compression can help if needed.
+
+
+Maybe like...
+hang onto a std::set of points we haven't reached yet.
+
+
+
+.
