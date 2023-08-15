@@ -1,0 +1,17 @@
+
+N, E <= 2e5
+edges are colored red or blue.
+
+vertices are also colored.
+
+~ Sounds like it's possible to have both color edges between same pair of vertices.
+
+I need to find a spanning tree where a red vertex always touches at least one red edge
+    and same for blue.
+
+*****
+
+It means I need to find N-1 edges that satisfy this condition everywhere.
+
+
+.

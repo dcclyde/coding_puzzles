@@ -1,0 +1,25 @@
+
+N <= 1000
+
+*****
+
+1 2 3
+  2 3 4
+    3 4 5
+      4 5
+      4 5 6
+
+*****
+
+ohhhhhhhh
+! "Here, A_{L+1} means A_1."
+
+so I need a "cycle".
+2 1 2
+
+probably I could do basically what I was doing before, except start with
+N, N-2, N-4, ..., 2, 1, and then go from there.
+
+
+
+.
