@@ -1,0 +1,12 @@
+
+N <= 2e5
+
+I need to find a permutation with (tied for) most unique values
+    among gcd of consecutives, including the loop around the ends.
+
+*****
+
+1 always creates 1s.
+
+
+.

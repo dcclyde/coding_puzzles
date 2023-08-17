@@ -1,0 +1,54 @@
+
+Given a binary string.
+N <= 3000
+
+K = num changes allowed.
+K <= N.
+
+Score is a*(max consecutive 0s) + (max consecutive 1s).
+
+I need the answers for a=1, a=2, ..., a=N.
+
+*****
+
+Making 1 change:
+
+Think about: How to make biggest possible chain of 0s?
+
+There will always be some "breakdown into subproblems":
+    there'll be some point where the 0 chain is on one side and 1 chain is on the other.
+
+
+Make a big chain of 0s:
+    If we have K changes available,
+    we can just do a 2ptrs thing where we always update what right endpoint we can reach
+        from each left endpoint.
+
+    During this process, I'll also find the subanswers for each subarray [0:something].
+
+    Let K0 = num changes to make 0s on the left
+    K1 = num changes to make 1s on the right.
+
+    For each K0:
+        Run the process above. Store subanswers for each array [:cutoff]
+        Compute K1
+        Run same process from right to left for 1s.
+        Store subanswers for each array [cutoff:]
+
+        now iterate over cutoff and see what outcomes we can obtain.
+        We have all the subanswers of the form
+        "Assume I use 0s on left, 1s on right. Fixed cutoff. K0 changes in 0s, K1 in 1s.
+        What's the best len_zeros and len_ones?
+        "
+        That's N^2 subanswers total.
+
+        That gives N^2 combinations of (len_zeros, len_ones)
+        which should include all the optimal pairs.
+
+        For each len_zeros, track what's the best len_ones we've seen.
+
+        Now we have only N potential good points.
+        We can try each of them for all N values of a.
+
+
+.

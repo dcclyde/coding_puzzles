@@ -1,0 +1,54 @@
+
+* Add X to the end
+* Remove the last K items
+* Undo the most recent query
+* Count of distinct items in array
+
+Q <= 1e6
+Elements <= 1e6
+
+~~~~~~~~~~
+
+Maybe use persistent segtrees?
+    !: Just jump back to the appropriate previous version.
+
+
+Array where A[x] = first position where x appears.
+Maintain the length L of the current array X.
+
+?: How many positions in A have values < L?
+
+A common trick for this kind of thing is:
+Insert stuff into the data structure from low value to high.
+After inserting all stuff at value L, run the queries that use this value.
+
+*****
+
+I could read all the queries and write down
+"x will be added at position k at time t"
+
+"-" queries just change L.
+
+
+Count distinct elements in range?
+
+*****
+
+! "Remove the last k items": Keep in mind we can only remove Q/2 items total anyway though.
+
+
+Maintain included numbers, in some way that lets me look up whether x is included
+    unordered_set? Array of bools?
+    * PSeg storing 0s and 1s...
+Maintain included members, sorted by first position
+    Operations needed:
+        Find+delete all elements with position > something
+
+    * PSeg storing (position, value)
+
+Maintain current size
+    * easy...
+
+
+
+.
