@@ -1,0 +1,49 @@
+
+How many winning positions?
+
+*****
+
+Compute from left to right whether position k is winning?
+
+! I win if I *can't* make a move.
+
+Process from left to right.
+Store segtree[k] = 1 if I can win with position (whatever) and value k, 0 otherwise.
+
+I mean really I just need to track the biggest value that's a losing position so far?
+
+
+2 1 4 3
+2: lose
+1: lose, there's no move
+4: win, 2 options but no followup
+
+query: among positions seen so far with value < curr, is there a losing position?
+
+
+***
+
+1 2 3
+
+1:
+    No moves. Winning.
+
+2:
+    I can only move to 1, which is winning. I lose.
+
+3:
+
+I actually need: are ALL possible moves winning?
+
+If there are no moves, that's good.
+If there are some moves and all of those positions win, that's bad.
+
+*****
+
+Say I win starting from positions 0, 2, 7.
+Now I'm at 10.
+Enemy can move to 2 and then they win?
+
+
+
+.

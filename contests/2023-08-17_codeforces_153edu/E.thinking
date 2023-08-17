@@ -1,0 +1,16 @@
+
+Seems like all pairs shortest path.
+I don't need a node for every position though, just for every pair of chars.
+
+It does cost 1 to jump to a different "node instance" though...
+
+N <= 5e4
+26**2 = 676
+product is like 3380 * 1e4 = 3.38e7
+
+Full graph has O(N) vertices and edges.
+
+I don't actually need all pairs.
+I could just compute shortest paths from/to each of the "augmenting" nodes.
+
+.

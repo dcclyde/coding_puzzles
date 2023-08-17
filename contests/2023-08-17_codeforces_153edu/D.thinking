@@ -1,0 +1,62 @@
+
+binary string S
+N <= 100.
+
+Min operations needed to make S balanced.
+They promise that it's possible to balance this string.
+
+*****
+
+There are binom(N, 2) subseqs total.
+But binom(n0, 2) + binom(n1, 2) are boring to us.
+
+I want ss01 to be exactly half of the remaining stuff.
+
+
+00100110011
+   ^     ^
+    what happens when I switch these?
+    That 0 is moving past 3 1s.
+    Then the 1 moves past 3 0s.
+    I guess score increases by 6.
+
+
+0 0 1 1 1
+    -> 6
+
+1 0 1 1 0
+    -> 2
+
+The distance on this swap was 4.
+I think that swap distance = score delta always.
+Is there any reason not to just make big swaps first?
+OK, I might end up overshooting...
+* Remember N <= 100.
+
+There should be no reason to swap the same position twice.
+
+
+
+
+Maybe like dp[n][s] = "can I get score s using the first n positions?"
+
+Hm, I also need to worry about num swaps though...
+
+The full simple dp would be like
+dp[n][s][k] = "can I get score s using the first n positions, with k swaps?"
+Processing position n:
+    Consider all possible swaps a.
+    Then dp[n]
+
+
+00000000001111111111
+
+
+
+
+
+Maybe I can prune out certain swaps.
+
+
+
+.
