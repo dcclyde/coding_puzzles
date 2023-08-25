@@ -1,0 +1,8 @@
+
+N different flavors: binom(N, 2).
+
+If some of the flavors have repeats, I just get binom(N, 2) + num_repeats.
+
+N*(N-1) / 2 + (0 to N)
+
+.

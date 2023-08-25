@@ -1,0 +1,8 @@
+
+Need A[0] == num entries with height >= 1
+A[1] == num entries with height >= 2
+etc
+
+I could do this in O(N) with 2ptrs but maybe easier to just binary search.
+
+.

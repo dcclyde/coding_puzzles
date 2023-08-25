@@ -1,0 +1,32 @@
+
+Sort and remove duplicates.
+Add (len) to first element, (len-1) to second, etc.
+
+
+5, 5 --> 5
+
+5, 8
+    7, 9
+    9 10
+    11
+
+Basically we ask: How many times will we increment the biggest number
+before everybody else catches up?
+
+5 8 20:
+    8 will step by 1s, needs 12 steps.
+    5 moves toward 8 by 1s, needs 3 steps.
+
+    Biggest gap is 12, so add 12?
+
+*****
+
+How do I maintain biggest gap in the array?
+
+std::set of values. lets me compute gaps.
+
+std::set of gaps.
+update gaps when I remove/insert numbers.
+
+
+.
