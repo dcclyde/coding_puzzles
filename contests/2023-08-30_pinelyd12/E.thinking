@@ -1,0 +1,97 @@
+
+N <= 2e5  (quests)
+E <= 2e5  (dependencies)
+K <= 1e9  (num hours)
+
+*****
+
+Subproblem: What's the answer if I start at time k?
+There are no more decisions to make after that.
+
+I could do this with basically a topological sort I guess.
+
+The next vertex to process should be available AND early.
+Well... or just available is enough.
+Build dp[n] = earliest time I can finish vertex n.
+    Use push dp!
+
+*****
+
+Can I set up some data structure and update as I go?
+S = start point.
+If I increment S -> S+1:
+    "most things" cost 1 dollar less.
+    Items that happen at hour S *and* I could do them right away:
+        used to cost 0, now costs K-1.
+
+If I'm thinking of recording what time something happens,
+I should only bother writing down what *day* it happens.
+
+*****
+
+Maybe find longest "bad chain"?
+Pretend we start at time 0.
+A "bad chain" is just a dependency chain that happens progressively earlier in the day.
+
+*****
+
+I can start at the beginning of day 0
+and write down the completion day for all leaves.
+
+For a given vertex, I want to store a "function" for how to compute completion day.
+    Really just store a list of "ultimate parent, offset" pairs.
+    Need to claim these lists can't be long
+        (start hour, offset in days)
+        if o1 > o2 then o1 matters more.
+        If tied, then only the "first" start hour matters.
+
+Say I'm processing vertex n.
+This vertex has offset D days counting from some set of source vertices.
+    (Really it would count from the earliest vertex in that set, which depends on start hour.)
+
+Now think about some child o of n.
+Figure out whether I accrue an additional offset day when stepping n -> o.
+    If o currently has offset < D days, replace dp[o] with dp[n].
+    If o currently has offset > D days, do nothing.
+    If o currently has offset == D days, need to combine the sets.
+
+
+*****
+
+start hour 3, offset 5
+
+start hour 7, offset 5
+
+start hour 6, offset 3
+    This is irrelevant
+
+
+For each hour (task?) assume this is the very last task.
+Then when could we have started?
+This will give only 1 thing to store.
+Iterating over these dp values definitely gives the final answer.
+
+*****
+
+How to get the final answer once I know best hypothetical start time for each leaf?
+
+If I end with the latest-hour leaf:
+    I need min over all the dp[n].
+
+If I end with leaf N-1:
+    Think about min over most of the dp[k], but also dp[N] - 1 extra day.
+
+Maybe sort my leaves by hour,
+then iterate back to front.
+For each hour I pass, add 1 day to all that stuff and update the min if needed.
+Then update my final answer using the timespan from current min to (0, h).
+
+
+
+
+
+
+
+
+
+.

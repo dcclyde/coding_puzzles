@@ -1,0 +1,40 @@
+
+2 1 1 2
+
+2 3 1 1 1 2
+2 2 1 1 1 3
+
+If I've ever picked a 2, I don't need to bother picking any more 2s.
+It does potentially matter which 2 got initially picked though.
+
+One thing to think about is: what's the set of values that I pick?
+
+2 1 4 3
+
+Pick {1}
+    1 2 4 3
+
+2 3 1 1 1 2
+
+{1}
+    1 3 2 1 1 2
+    1 3 1 2 1 2
+    1 3 1 1 2 2
+    (there are 3x 1s, so 3 possible results.)
+
+
+There'll be at most N swaps performed total.
+
+Positions that occur as array values "matter" in some sense.
+For positions that don't occur as array values, I just care how many times each value occurs.
+
+
+1 2 1 4 4 1 2 4 1
+
+wolog the positions that occur as values are 1, 2, ..., D.
+
+~ If A[k] = k (watch out for 1-indexing) then all copies of k are irrelevant.
+
+
+
+.

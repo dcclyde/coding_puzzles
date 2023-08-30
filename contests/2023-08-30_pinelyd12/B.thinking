@@ -1,0 +1,8 @@
+
+N <= 1e5
+
+*****
+
+If 2 is before 1, then we need to choose x=2 at some point.
+
+.

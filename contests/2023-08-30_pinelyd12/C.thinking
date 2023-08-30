@@ -1,0 +1,33 @@
+
+N <= 1e5
+array items are pairwise distinct from 0 to N.
+
+operation:
+    For each position in order, replace the value with whichever value
+    is currently MISSING.
+    (note there are N+1 legal values total)
+
+Find the array after doing this K times.
+K <= 1e9
+
+*****
+
+1 0 3
+    2 0 3
+    2 1 3
+2 1 0
+
+******
+
+0 1 3
+
+0 1 2 3
+3 1 2 0
+3 0 2 1
+3 0 1 2
+
+0 1 3 2
+
+2 0 1 3
+
+.

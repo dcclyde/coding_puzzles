@@ -1,0 +1,46 @@
+
+N <= 1e4
+
+*****
+
+If there are an odd number of items with highest available bit,
+all possible answers must have that bit set.
+    If that is fulfilled, then the ones with even high-bit nums on both sides
+    can definitely win.
+
+
+Otherwise, must have an even number of "highest bit available" items on each side.
+
+So we only need to worry about cases with even number of highest-bit items.
+
+
+
+In general, to end up with position k, I need subproblems [0, k] and [k, N] to be solvable.
+    Actually seems not true.
+
+How do I know whether [0, k] is solvable?
+    There'll be some options for what the final step could be.
+
+0 has to die in the first step.
+How much stuff should die with 0?
+
+We could use DP:
+Can [L, R] be reduced to just R?
+This would be O(N^3) because naively we'd consider all possible (L, M, R).
+
+*****
+
+For every bit bigger than me, I need even number of copies on both sides?
+
+For stuff that includes my own high bit:
+    Even number on both sides: good.
+    Odd number on both sides: bad.
+    odd on left, even on right?
+        Even number in total.
+        I exactly need to kill an odd number of things on the left at some point.
+        They'll be matched against another odd number of things,
+        so it'll come down to other bits.
+
+
+
+.
