@@ -1,0 +1,13 @@
+
++: Append some integer.
+-: pop_back
+0 or 1: tells whether array was sorted at that moment.
+
+*****
+
+Add 5 elements, declare sorted.
+Add another, declare unsorted.
+
+I think I need a stack of info about whether certain prefixes are sorted.
+
+.

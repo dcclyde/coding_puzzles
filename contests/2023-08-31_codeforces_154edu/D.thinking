@@ -1,0 +1,15 @@
+
+If adjacent (a, b) have a == b, I definitely need an operation here.
+If adjacent (a, b) have a > b, I could use an operation here OR just -1 the whole region.
+
+All numbers start out positive.
+If A[k] gets negated, then all previous stuff needs to get negated too.
+
+With no negations, I just need to know how many adjacent pairs are messed up.
+
+What if I negate [0:k]?
+Include messed-up pairs from suffix.
+Include "reverse messed-up" pairs from prefix.
+The border will always be fine because it'll be negative < positive.
+
+.

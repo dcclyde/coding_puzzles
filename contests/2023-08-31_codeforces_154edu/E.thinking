@@ -1,0 +1,59 @@
+
+N <= 4000.
+
+Consider all possible arrays with values from 1 to V.
+
+*****
+
+Easy to compute num cases with a good array starting at position 0.
+
+Score contribution from position k?
+    Need [k:k+V] to be a good array,
+    AND no previous good array touching this chunk.
+
+It would be important to know: for each k,
+how many ways are there to fill in [0:k] so that
+
+~ This actually feels pretty tricky:
+[1, 2, 3, 1, 2, 3, 1, 2, 3]
+The last 1, 2, 3 should be counted.
+There are lots of previous overlapping things, but they get killed by a past good chunk.
+~ This is probably going to mean I do DP stuff?
+
+*****
+
+dp[n][k] = ways to fill first n slots and have
+
+How many ways to have first good array end at position E?
+    End with any permutation.
+    TODO maybe some dp for the prefix?
+
+If I know that...
+
+score[n] = num cases with a good array ending at n-1?
+    Iterate over previous good array end.
+    No previous good array: Use firstgood[n].
+    Previous good array ending at k: Use score[k+1] * firstgood[n-k-1].
+
+OK, so maybe it's sufficient to compute firstgood.
+
+Think about putting permutation at the start.
+
+firstgood[n][k] = ways to fill n slots, no good arrays after the initial permutation,
+    most recent "repeat" has 2nd-most-recent position at k.
+        no, try k = largest prefix of unique stuff.
+
+    firstgood[n+1][k]?
+        Fill in a good item:
+            firstgood[n][k-1] * (V-k).
+        Fill in a bad item:
+            firstgood[n][j] for j >= k.
+
+    Always mark firstgood[n][V] = 0, because we discard full permutations.
+
+    I could do these updates using a segtree to make the suffix sums fast?
+
+
+
+
+.

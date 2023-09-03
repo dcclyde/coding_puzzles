@@ -1,0 +1,20 @@
+
+Binary strings A, B
+both start with 0, end with 1
+
+Operation:
+Choose 2 matching bits in same string. Change the range in between to match too.
+
+Is it possible to make A and B equal?
+
+*****
+
+Maybe there needs to be a place with
+    01
+    01
+    ?
+
+Suppose I end with 000000 111111 000 1111
+
+
+.
