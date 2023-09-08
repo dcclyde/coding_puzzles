@@ -1,0 +1,19 @@
+
+Given an array A and a binary string S.
+
+1 l r: flip everything in S[l, r].
+2 g:
+    g is a bit.
+    return xor of everything in A that corresponds to a value of S[i] = g.
+
+*****
+
+Easy to compute xors of whole intervals.
+Then I just need xor of the 1 items.
+
+"xor of 1 items" could be a segtree operation...
+could I update that segtree fast enough?
+Seems like it should be doable...??
+
+
+.

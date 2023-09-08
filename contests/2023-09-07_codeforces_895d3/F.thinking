@@ -1,0 +1,16 @@
+
+Given N, Ck, Ak.
+Directed edges k --> A[k].
+
+I need to order the vertices.
+If I take k before A[k], I score C[k] points.
+
+Structure will look like some cycles and some chains that end at a cycle.
+I guess - from each cycle, I'll lose the cheapest link.
+
+Maybe I can implement this without finding the cycles?
+Just run toposort until I run out of "free stuff".
+Then use a heap to always choose the next cheapest item, and then follow up afterward
+    with more toposort steps until we need to pay again.
+
+.

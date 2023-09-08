@@ -1,0 +1,15 @@
+
+N <= 2e5
+Create the biggest possible sum.
+Choose a subarray [l, r] and replace it with its product.
+
+*****
+
+Basic idea:
+We'd like to multiply tons of stuff together, but not 1s.
+
+1s on the ends obviously survive.
+
+2 1 1 1 2
+
+.
