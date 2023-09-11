@@ -1,0 +1,56 @@
+
+Answer is just YES/NO.
+
+N, K up to 1e5
+
+A starts as 0s; want to create B.
+
+Operation:
+    Choose an array of distinct positions.
+    Change A[0] to
+
+*****
+
+Change A[S[0]] to S[1]
+A[S[1]] = S[2]
+A[S[2]] = S[3]
+A[S[3]] = S[4]
+
+*****
+1 2 3:
+    Use S = [1, 3, 2].
+
+
+4 1 4 3:
+    Use S = [3, 4].
+
+
+
+Think of my states as graphs.
+I can name any cycle and create it.
+
+? Maybe just comes down to: Is there a cycle in B?
+    S must have length K.
+    ~ Maybe also S can't have any S[k] = k?
+
+
+*****
+
+0 0 0 0 0
+[5, 1, 3]
+    3 0 5 0 1
+
+Could I solve some cases that don't have a nice length K cycle?
+Last thing I pick should look like...?
+
+*****
+
+Start flood filling stuff I can set correctly.
+Anything in a K-cycle is happy.
+From there, anything that has those values becomes happy. And so on.
+
+!!!!! NOTE my current D code doesn't work. Probably not hard to fix but I didn't feel like it.
+
+
+
+.

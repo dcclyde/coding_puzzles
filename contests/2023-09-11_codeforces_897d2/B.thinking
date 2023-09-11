@@ -1,0 +1,12 @@
+
+binary string S
+is X good?
+Flip all X's bits in S. Then S should be a palindrome.
+
+*****
+
+X is good if there EXISTS a binary string of length N with X ones such that etc.
+
+
+
+.

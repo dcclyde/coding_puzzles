@@ -1,0 +1,39 @@
+
+set S, size N, distinct integers.
+
+A inserts an element. Can't be already present.
+B removes a *strictly smaller* element.
+
+End when B can't remove a smaller element, OR after 2N+1 moves.
+
+*****
+
+A always goes last.
+My last move should insert 0.
+
+
+0 1 2 3?
+
+Insert 4, he removes 3.
+Insert whatever he removed... etc.
+
+I get N+1 turns.
+I could always achieve at least N???
+
+If I choose something past the end of the starting array, I'll lose.
+    I could just be forced to lose if the initial array is 0, 1, 2, ..., N-1.
+
+*****
+
+0 1 2 4 5?
+
+
+*****
+
+Maybe:
+If the starting array is 0 1 2 3 ... N-1, I'm gonna be sad.
+Just take a bunch of sad turns.
+
+Otherwise, first output the MEX. Then just output his moves until game ends.
+
+.
