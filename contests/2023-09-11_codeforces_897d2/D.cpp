@@ -942,32 +942,7 @@ void brute() {
         if (B[j] == j+1) {return NO;}
     }
 
-    // Now test: is there a cycle of length exactly K?
-    // V<ll> visited(N, -1);
-    // FOR(base, 0, N) {
-    //     if (visited[base] != -1) {continue;}
-    //     ll pos = base;
-    //     ll time = 0;
-    //     V<ll> wip;
-
-    //     while (true) {
-    //         if (visited[pos] == -1) {
-    //             visited[pos] = time;
-    //             wip.push_back(pos);
-    //         } else {
-    //             ll cycle_len = time - visited[pos];
-    //             dbgcR("found cycle", base, pos, wip, cycle_len);
-    //             if (cycle_len == K) {
-    //                 return YES;
-    //             } else {
-    //                 for (auto& x : wip) { visited[x] = INF_ll; }
-    //                 break;
-    //             }
-    //         }
-    //         pos = B[pos]-1;
-    //         ++time;
-    //     }
-    // }
+    // Now test: is it true that all cycles have length K?
 
     auto step = [&](ll pos) {
         return B[pos]-1;
@@ -975,17 +950,16 @@ void brute() {
 
     FOR(base, 0, N) {
         ll pos = step(base);
-        if (pos == base) {return NO;}  // cycle of size 1
-        FOR(time, 1, K+1) {
+        FOR(time, 1, N+1) {
             if (pos == base) {
-                if (time == K) {return YES;}
+                // cycle length = `time`
+                if (time != K) {return NO;}
                 break;
             }
             pos = step(pos);
         }
     }
-
-    return NO;
+    return YES;
 }
 
 void solve() {
@@ -1021,9 +995,14 @@ void solve() {
                 wip.push_back(pos);
             } else {
                 ll cycle_len = time - visited[pos];
+                el;
                 dbg(time, pos, visited, cycle_len);
                 dbgcR("found cycle", base, pos, wip, cycle_len);
-                if (cycle_len < 0) { break; }  // we've already checked this cycle and it's OK.
+                if (cycle_len < 0) {
+                    // we've already checked this cycle and it's OK.
+                    for (auto& x : wip) { visited[x] = INF_ll; }
+                    break;
+                }
                 if (cycle_len == K) {
                     // for(auto& x : wip) {
                     //     happy[x] = true;
