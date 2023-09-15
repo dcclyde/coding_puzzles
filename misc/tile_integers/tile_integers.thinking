@@ -1,0 +1,202 @@
+
+~ Testing if a tile is arith progression:
+2^0 + 2^3 + 2^6 + 2^9
+
+(2^12 - 1) / (2^3 - 1)
+
+*****
+
+Result of basic bruteforce:
+OK, if I can add k * sequence_length to each element and get an arithmetic progression then that also obviously works.
+Does that cover everything?
+
+O O . . O O
+
+"If the tile has B black squares, then I need tiles on approximately 1/B positions."
+
+If I can add k*L to elements and get an arithmetic progression, then I can just pretend I had that progression from the start?
+
+Think about subproblems for different residues mod L.
+If I have one of every residue, this is a PAP (pseudo arith progression).
+Otherwise...
+
+0 1 2 3 4   10 11 12 13 14
+
+2 2 2 2 2 0 0 0 0 0
+
+I think there's some way to phrase as subproblems involving tiling mod L.
+
+
+~ If I have a good tile: Choose any instance that appears in this tiling. If we union that instance into the tile, the combined thing will still work.
+
+Think about "nesting the tilings".
+Start with some valid tiling.
+Pick any tiling of a finite integer interval. Now ...?
+
+What if I started with a tiling like 0 2 4?
+How can I meaningfully generate "nested tilings" from this?
+One idea: I can tile a closed interval using 0 1 2 3 4 5. Then make each original cell count as 6 new cells. But I can
+
+Something like: "I know 0 2 4 works. Suppose I have some other different tiling. Take the 0th, 2nd, and 4th tile instances there and glue em together."
+
+*****
+
+Look for tilings with length L.
+Well, find some subtiling of Z/LZ.
+Suppose the subtile has size M. Let D = L/M. Then the subtiling has D in M positions and 0 elsewhere.
+Now, how do I lift this to all corresponding big tilings?
+For each position with a D, I need a valid tiling of size D.
+
+Say L = 24, D = 3, M = 8.
+So there are 8 nonzero positions in the subtiling.
+
+In my bruteforce tests, it seems like tiling Z/LZ with size M always just requires one entry with each residue mod M. Like then we could just use start points 0, M, 2M, etc.
+    No, that's too simple. Think about tiling Z/4Z using [0, 2].
+
+! To get a tiling of size L:
+    Choose some D with D | L. Let M = L/D.
+    Choose any tiling of Z/LZ with size M.
+    Now, for each set bit in the subtiling, pick (independently) a tiling of Z with size D.
+
+    Does this description also encompass stuff with gcd > 1 or do I need to add that as an extra rule?
+        0 4
+        mod 2: [2, 0]
+        We get to pick any 2-element tiling of Z. Looks like we picked [0, 2].
+        OK, so the above description does handle this case.
+
+
+
+~ Now I'd like to understand tilings of Z/LZ.
+Any tiling of Z/LZ is a tiling of Z.
+If I have a tiling of Z with size S, and S divides L, is that good enough?
+    No...
+    TODO I think maybe this is the main remaining piece of the puzzle.
+
+
+????????????????????????????????????????????????????????????????????????????????
+
+! To tile Z/NZ with size L: (aka finding an N-tiling)
+    Require L | N, obviously.
+    Require 1 < L < N wolog. The L = 1, N cases are trivial anyway.
+    Choose an L-tiling; let M denote the size.
+    Then choose M different (N/M)-tilings of size L/M.
+
+    To assemble this stuff into the desired N-tiling:
+        The L-tiling decides how many items we'll use from each residue class mod L.
+        The (N/M)-tilings decide which items to include from each residue class.
+
+! To tile Z with size L: (aka finding an inf-tiling)
+    Tile size will be L.
+    Choose an L-tiling; let M be the size.
+    Then choose M different inf-tilings of size L/M.
+
+    Assembly is same as above. This time the (N/M)-tilings are replaced with inf-tilings because each residue class mod L is a copy of Z instead of Z/(N/M)Z.
+
+One step I haven't proven:
+    Look at the inf-tiling case. But this comes up in N-tilings too.
+    In the above, I'm acting like any tiling of size L must induce a tiling of Z/LZ.
+    For example, if you want an inf-tiling of size 3, the number of values in each residue class
+        has to look like (3, 0, 0) or (0, 3, 0) or (0, 0, 3) or (1, 1, 1).
+        (2, 1, 0) is an example of a combination that I think would never work (values should be spread evenly across some residue classes that tile Z/3Z).
+    This seems true in my bruteforce (trying all subsets of 0, 1, ..., 25. But bugs always possible) and I have some vague handwavy proof sketchy in mind but definitely haven't proven it.
+
+????????????????????????????????????????????????????????????????????????????????
+
+* SCRATCH WORK:
+
+Try tiling Z/7Z.
+I guess I need L = 1 or 7.
+L = 1:
+    M = 1
+    then 1 tiling of size 1
+    Just [0] I guess.
+L = 7:
+    M = 1:
+        1 7-tiling of size 7
+
+
+N = 36
+[0, 5] won't work: we end up tiling groups of 10.
+Try it and see if the above explanation covers this.
+    L = 2
+    Tile Z/2Z like [1, 1].
+    M = 2
+    D = 1
+    Now I need 2 different tilings of Z/18Z.
+    Evens: use [0]
+    Odds: use [2]
+    OK maybe the method is good but the counterexample is actually not a counterexample?
+
+
+need a tiling of Z/18Z for evens and another for odds.
+
+
+
+
+
+0 1 3 6
+4 5 7 2
+
+
+
+
+0 1 4 5?
+L = 4
+D = 2, M = 2
+Tile Z/4Z with size 2: 1 1 0 0
+Tiling of size 2: 0 1
+Another tiling of size 2: 0 1
+yes, this works.
+
+
+
+
+0 2
+1 3
+4 6
+5 7
+this gives a tiling of Z/8Z with tile size 2.
+[4, 0, 4, 0, 0, 0, 0, 0]
+
+0 8 16 24 2 10 18 26
+0, 8, 16, 24, 2, 10, 18, 26
+
+that's divisible by 2 though...
+0 1 4 5 8 9 12 13
+0, 1, 4, 5, 8, 9, 12, 13
+
+L = 8
+[2, 2, 0, 0, 2, 2, 0, 0]
+
+D = 2, M = 4.
+This is NOT a boring tiling of Z/8Z.
+
+
+
+[2, 0, 2, 0]
+0 4 2 6
+
+
+
+0 1 6 7 12 13
+L = 6
+mod 6, I have [3, 3, 0, 0, 0, 0]
+M = 2 ("size of the subtiling")
+D = 3 (L / M aka number in each nonzero residue slot)
+
+
+
+0 1 5
+say mod is 6
+1 2 32
+    35
+mod 63.
+
+shift by 3.
+35 * 8 = 280
+280 % 63 = 28
+    4 8 16
+
+
+
+.
